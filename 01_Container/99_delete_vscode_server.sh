@@ -1,0 +1,21 @@
+#!/bin/bash
+if [ ! -f "../.env" ];then
+	echo ".env 파일 세팅을 해주세요."
+	exit 1
+fi
+. ../.env
+
+# ==================================================================
+PROFILE_STRING=""
+if [ -n "$PROFILE_NAME" ]; then
+    PROFILE_STRING="--profile ${PROFILE_NAME}"
+fi
+
+aws cloudformation delete-stack \
+  --stack-name eks-edu-${EMPLOY_ID} \
+  --region ${AWS_REGION} ${PROFILE_STRING}
+
+echo "삭제중....."
+aws cloudformation wait stack-delete-complete \
+    --stack-name eks-edu-${EMPLOY_ID}
+echo "삭제 완료....."    
