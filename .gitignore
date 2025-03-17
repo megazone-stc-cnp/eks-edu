@@ -36,4 +36,5 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-.env
+env.sh
+**/env.sh

@@ -1,15 +1,15 @@
 #!/bin/bash
-if [ ! -f "../.env" ];then
-	echo "Root 디렉토리에 .env 파일 세팅을 해주세요."
+if [ ! -f "../env.sh" ];then
+	echo "Root 디렉토리에 env.sh 파일 세팅을 해주세요."
 	exit 1
 fi
-. ../.env
+. ../env.sh
 
-if [ ! -f "./.env" ];then
-	echo "02_Default_Environment/.env 파일 세팅을 해주세요."
+if [ ! -f "./env.sh" ];then
+	echo "02_Default_Environment/env.sh 파일 세팅을 해주세요."
 	exit 1
 fi
-. ./.env
+. ./env.sh
 # ==================================================================
 if [ ! -d "template" ];then
   mkdir template

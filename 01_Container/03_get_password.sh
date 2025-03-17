@@ -1,9 +1,9 @@
 #!/bin/bash
-if [ ! -f "../.env" ];then
-	echo ".env 파일 세팅을 해주세요."
+if [ ! -f "../env.sh" ];then
+	echo "env.sh 파일 세팅을 해주세요."
 	exit 1
 fi
-. ../.env
+. ../env.sh
 
 # ==================================================================
 PROFILE_STRING=""
