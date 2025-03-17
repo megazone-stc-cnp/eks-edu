@@ -12,4 +12,3 @@
 - Weaveworks가 상업중 운영을 중단한다고 하여, 현재는 AWS에서 인수한 상태
 
 ### 관련 링크
-- https://eksctl.io/

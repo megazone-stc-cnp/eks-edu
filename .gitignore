@@ -38,3 +38,4 @@ terraform.rc
 
 env.sh
 **/env.sh
+**/template/*.yaml
