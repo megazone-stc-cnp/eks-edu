@@ -318,6 +318,10 @@ Resources:
     Properties:
       GroupDescription: Cluster communication with worker nodes
       VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - Description: Allow all inbound traffic from VS Code Server SecurityGroup
+          IpProtocol: -1  # 모든 트래픽 허용
+          SourceSecurityGroupId: !Ref SecurityGroup
   EksWorkshopIdeLambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -494,9 +498,7 @@ Resources:
                   git clone https://github.com/megazone-stc-cnp/eks-edu.git
                   EOT
 
-                  systemctl restart code-server@ec2-user
-
-                  
+                  systemctl restart code-server@ec2-user                
   EksWorkshopIdeRole:
     Type: AWS::IAM::Role
     Properties:
@@ -518,6 +520,7 @@ Resources:
         - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
         - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Policies:
         - PolicyName: ide-password
           PolicyDocument:
@@ -534,8 +537,6 @@ Resources:
               - Effect: Allow
                 Action: secretsmanager:ListSecrets
                 Resource: "*"
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: "/"
   EksWorkshopIdeInstanceProfile:
     Type: AWS::IAM::InstanceProfile
