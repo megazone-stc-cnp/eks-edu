@@ -13,4 +13,4 @@ fi
 
 aws cloudformation describe-stacks \
     --stack-name eks-edu-${EMPLOY_ID} --query "Stacks[0].Outputs" \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --region ${AWS_REGION} ${PROFILE_STRING} --output json
