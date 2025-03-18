@@ -12,5 +12,5 @@ if [ -n "$PROFILE_NAME" ]; then
 fi
 
 aws cloudformation describe-stacks \
-    --stack-name eks-edu-${EMPLOY_ID} --query "Stacks[0].Outputs" \
+    --stack-name eks-workshop-${EMPLOY_ID} --query "Stacks[0].Outputs" \
     --region ${AWS_REGION} ${PROFILE_STRING} --output json

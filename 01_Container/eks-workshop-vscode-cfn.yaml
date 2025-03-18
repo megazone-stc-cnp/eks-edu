@@ -1,34 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Creates a code-server IDE for the EKS workshop
 Parameters:
-  VpcBlock:
-    Type: String
-    Default: 192.168.0.0/16
-    Description: The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range.
-
-  PublicSubnet01Block:
-    Type: String
-    Default: 192.168.0.0/18
-    Description: CidrBlock for public subnet 01 within the VPC
-
-  PublicSubnet02Block:
-    Type: String
-    Default: 192.168.64.0/18
-    Description: CidrBlock for public subnet 02 within the VPC
-
-  PrivateSubnet01Block:
-    Type: String
-    Default: 192.168.128.0/18
-    Description: CidrBlock for private subnet 01 within the VPC
-
-  PrivateSubnet02Block:
-    Type: String
-    Default: 192.168.192.0/18
-    Description: CidrBlock for private subnet 02 within the VPC
   InstanceVolumeSize:
     Type: Number
     Description: The Size in GB of the Cloud9 Instance Volume.
-    Default: 60
+    Default: 30
   RepositoryOwner:
     Type: String
     Description: The owner of the GitHub repository to be used to bootstrap Cloud9
@@ -101,19 +77,39 @@ Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock:  !Ref VpcBlock
+      CidrBlock: 10.0.0.0/24
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      Tags:
-      - Key: Name
-        Value: !Sub '${AWS::StackName}-VPC'
   InternetGateway:
-    Type: "AWS::EC2::InternetGateway"        
-  VPCGatewayAttachment:
-    Type: "AWS::EC2::VPCGatewayAttachment"
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/24
+      VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select [0, !GetAZs ""]
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+  PublicSubnetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicSubnetRouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnet
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -129,199 +125,6 @@ Resources:
           IpProtocol: -1
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
-  PublicRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-      Tags:
-      - Key: Name
-        Value: Public Subnets
-      - Key: Network
-        Value: Public
-
-  PrivateRouteTable01:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-      Tags:
-      - Key: Name
-        Value: Private Subnet AZ1
-      - Key: Network
-        Value: Private01
-
-  PrivateRouteTable02:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-      Tags:
-      - Key: Name
-        Value: Private Subnet AZ2
-      - Key: Network
-        Value: Private02
-
-  PublicRoute:
-    DependsOn: VPCGatewayAttachment
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
-
-  PrivateRoute01:
-    DependsOn:
-    - VPCGatewayAttachment
-    - NatGateway
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable01
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGateway
-
-  PrivateRoute02:
-    DependsOn:
-    - VPCGatewayAttachment
-    - NatGateway
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable02
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGateway
-
-  NatGateway:
-    DependsOn:
-    - NatGatewayEIP
-    - PublicSubnet01
-    - VPCGatewayAttachment
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt 'NatGatewayEIP.AllocationId'
-      SubnetId: !Ref PublicSubnet01
-      Tags:
-      - Key: Name
-        Value: !Sub '${AWS::StackName}-NatGatewayAZ1'
-
-  NatGatewayEIP:
-    DependsOn:
-    - VPCGatewayAttachment
-    Type: 'AWS::EC2::EIP'
-    Properties:
-      Domain: vpc
-
-  PublicSubnet01:
-    Type: AWS::EC2::Subnet
-    Metadata:
-      Comment: Subnet 01
-    Properties:
-      MapPublicIpOnLaunch: true
-      AvailabilityZone:
-        Fn::Select:
-        - '0'
-        - Fn::GetAZs:
-            Ref: AWS::Region
-      CidrBlock:
-        Ref: PublicSubnet01Block
-      VpcId:
-        Ref: VPC
-      Tags:
-      - Key: Name
-        Value: !Sub "${AWS::StackName}-PublicSubnet01"
-      - Key: kubernetes.io/role/elb
-        Value: 1
-
-  PublicSubnet02:
-    Type: AWS::EC2::Subnet
-    Metadata:
-      Comment: Subnet 02
-    Properties:
-      MapPublicIpOnLaunch: true
-      AvailabilityZone:
-        Fn::Select:
-        - '1'
-        - Fn::GetAZs:
-            Ref: AWS::Region
-      CidrBlock:
-        Ref: PublicSubnet02Block
-      VpcId:
-        Ref: VPC
-      Tags:
-      - Key: Name
-        Value: !Sub "${AWS::StackName}-PublicSubnet02"
-      - Key: kubernetes.io/role/elb
-        Value: 1
-
-  PrivateSubnet01:
-    Type: AWS::EC2::Subnet
-    Metadata:
-      Comment: Subnet 03
-    Properties:
-      AvailabilityZone:
-        Fn::Select:
-        - '0'
-        - Fn::GetAZs:
-            Ref: AWS::Region
-      CidrBlock:
-        Ref: PrivateSubnet01Block
-      VpcId:
-        Ref: VPC
-      Tags:
-      - Key: Name
-        Value: !Sub "${AWS::StackName}-PrivateSubnet01"
-      - Key: kubernetes.io/role/internal-elb
-        Value: 1
-
-  PrivateSubnet02:
-    Type: AWS::EC2::Subnet
-    Metadata:
-      Comment: Private Subnet 02
-    Properties:
-      AvailabilityZone:
-        Fn::Select:
-        - '1'
-        - Fn::GetAZs:
-            Ref: AWS::Region
-      CidrBlock:
-        Ref: PrivateSubnet02Block
-      VpcId:
-        Ref: VPC
-      Tags:
-      - Key: Name
-        Value: !Sub "${AWS::StackName}-PrivateSubnet02"
-      - Key: kubernetes.io/role/internal-elb
-        Value: 1
-
-  PublicSubnet01RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PublicSubnet01
-      RouteTableId: !Ref PublicRouteTable
-
-  PublicSubnet02RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PublicSubnet02
-      RouteTableId: !Ref PublicRouteTable
-
-  PrivateSubnet01RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PrivateSubnet01
-      RouteTableId: !Ref PrivateRouteTable01
-
-  PrivateSubnet02RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PrivateSubnet02
-      RouteTableId: !Ref PrivateRouteTable02
-
-  ControlPlaneSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Cluster communication with worker nodes
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-        - Description: Allow all inbound traffic from VS Code Server SecurityGroup
-          IpProtocol: -1  # 모든 트래픽 허용
-          SourceSecurityGroupId: !Ref SecurityGroup
   EksWorkshopIdeLambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -510,15 +313,6 @@ Resources:
                 - ssm.amazonaws.com
             Action:
               - sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonEC2FullAccess  # AWS 관리형 정책 추가
-        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
-        - arn:aws:iam::aws:policy/AmazonVPCFullAccess
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-        - arn:aws:iam::aws:policy/CloudWatchFullAccess
-        - arn:aws:iam::aws:policy/IAMFullAccess
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Policies:
         - PolicyName: ide-password
           PolicyDocument:
@@ -535,7 +329,663 @@ Resources:
               - Effect: Allow
                 Action: secretsmanager:ListSecrets
                 Resource: "*"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: "/"
+  EksWorkshopIamPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Roles:
+        - !Ref EksWorkshopIdeRole
+      ManagedPolicyName: !Sub ${AWS::StackName}-iam
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - iam:CreateRole
+              - iam:GetRolePolicy
+              - iam:DetachRolePolicy
+              - iam:AttachRolePolicy
+              - iam:PutRolePolicy
+              - iam:DeleteRolePolicy
+              - iam:DeleteRole
+              - iam:ListInstanceProfilesForRole
+              - iam:ListAttachedRolePolicies
+              - iam:ListRolePolicies
+              - iam:TagRole
+              - iam:PassRole
+              - sts:AssumeRole
+              - iam:DeleteServiceLinkedRole
+              - iam:GetServiceLinkedRoleDeletionStatus
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/eks-workshop*
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/eksctl-eks-workshop*
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/fis*
+          - Effect: Allow
+            Action:
+              - iam:CreatePolicy
+              - iam:DeletePolicy
+              - iam:GetPolicyVersion
+              - iam:DeletePolicyVersion
+              - iam:ListPolicyVersions
+              - iam:TagPolicy
+              - iam:GetPolicy
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:policy/eks-workshop*
+              - !Sub arn:aws:iam::${AWS::AccountId}:policy/eksctl-eks-workshop*
+          - Effect: Allow
+            Action:
+              - iam:CreateInstanceProfile
+              - iam:DeleteInstanceProfile
+              - iam:GetInstanceProfile
+              - iam:TagInstanceProfile
+              - iam:RemoveRoleFromInstanceProfile
+              - iam:AddRoleToInstanceProfile
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:instance-profile/eks-workshop*
+              - !Sub arn:aws:iam::${AWS::AccountId}:instance-profile/eksctl-eks-workshop*
+              - !Sub arn:aws:iam::${AWS::AccountId}:instance-profile/eks-*
+          - Effect: Allow
+            Action:
+              - iam:CreateUser
+              - iam:DeleteUser
+              - iam:TagUser
+              - iam:GetUser
+              - iam:ListGroupsForUser
+              - iam:AttachUserPolicy
+              - iam:DetachUserPolicy
+              - iam:ListAttachedUserPolicies
+              - iam:*SSHPublicKey
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:user/eks-workshop*
+          - Effect: Allow
+            Action:
+              - iam:ListOpenIDConnectProviders
+              - iam:CreateOpenIDConnectProvider
+              - iam:DeleteOpenIDConnectProvider
+              - iam:TagOpenIDConnectProvider
+              - iam:GetOpenIDConnectProvider
+              - iam:GetRole
+              - iam:ListPolicies
+              - iam:ListRoles
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - iam:CreateServiceLinkedRole
+            Resource: ["*"]
+            Condition:
+              StringEquals:
+                iam:AWSServiceName:
+                  - eks.amazonaws.com
+                  - eks-nodegroup.amazonaws.com
+                  - eks-fargate.amazonaws.com
+                  - guardduty.amazonaws.com
+                  - spot.amazonaws.com
+                  - fis.amazonaws.com
+  EksWorkshopBasePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Roles:
+        - !Ref EksWorkshopIdeRole
+      ManagedPolicyName: !Sub ${AWS::StackName}-base
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - eks:*
+              - ec2:CreateLaunchTemplate
+              - ec2:DeleteLaunchTemplate
+              - sts:GetCallerIdentity
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - cloudformation:CreateStack
+            Resource:
+              - !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/eksctl-eks-workshop*
+            Condition:
+              "Null":
+                cloudformation:RoleARN: "true"
+          - Effect: Allow
+            Action:
+              - cloudformation:DeleteStack
+            Resource:
+              - !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/eksctl-eks-workshop*
+            Condition:
+              "Null":
+                cloudformation:RoleARN: "true"
+          - Effect: Allow
+            Action:
+              - cloudformation:Get*
+              - cloudformation:Describe*
+              - cloudformation:List*
+              - cloudformation:TagResource
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - autoscaling:UpdateAutoScalingGroup
+            Resource: ["*"]
+            Condition:
+              StringLike:
+                aws:ResourceTag/eks:cluster-name:
+                  - eks-workshop
+          - Effect: Allow
+            Action:
+              - autoscaling:Get*
+              - autoscaling:Describe*
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - ecr-public:GetAuthorizationToken
+              - sts:GetServiceBearerToken
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - kms:CreateKey
+              - kms:TagResource
+              - kms:ScheduleKeyDeletion
+              - kms:CreateGrant
+              - kms:EnableKeyRotation
+              - kms:GetKeyPolicy
+              - kms:GetKeyRotationStatus
+              - kms:ListResourceTags
+              - kms:PutKeyPolicy
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:EnableKeyRotation
+              - kms:Encrypt
+              - kms:GenerateDataKey
+              - kms:GenerateDataKeyWithoutPlaintext
+            Resource: ["*"]
+            Condition:
+              StringLike:
+                kms:RequestAlias: ["alias/eks-workshop*", "alias/eks/eks-workshop*"]
+          - Effect: Allow
+            Action:
+              - kms:CreateAlias
+              - kms:DeleteAlias
+            Resource:
+              - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/eks-workshop*
+              - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/eks/eks-workshop*
+              - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+          - Effect: Allow
+            Action:
+              - kms:List*
+              - kms:Get*
+              - kms:Describe*
+            Resource: ["*"]
+  EksWorkshopEc2Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Roles:
+        - !Ref EksWorkshopIdeRole
+      ManagedPolicyName: !Sub ${AWS::StackName}-ec2
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - ec2:Get*
+              - ec2:Describe*
+              - ec2:List*
+              - ec2:RunInstances
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - ec2:StopInstances
+              - ec2:TerminateInstances
+            Resource: ["*"]
+            Condition:
+              StringLike:
+                aws:ResourceTag/env:
+                  - eks-workshop*
+          - Effect: Deny
+            Action: ec2:RunInstances
+            Resource:
+              - !Sub arn:aws:ec2:*:*:instance/*
+            Condition:
+              ForAnyValue:StringNotLike:
+                ec2:InstanceType:
+                  - m5.large
+                  - t4g.medium
+                  - c*.large
+          - Effect: Allow
+            Action:
+              - ec2:CreateVpc
+              - ec2:CreateSubnet
+              - ec2:CreateRouteTable
+              - ec2:CreateRoute
+              - ec2:CreateInternetGateway
+              - ec2:AttachInternetGateway
+              - ec2:AssociateRouteTable
+              - ec2:ModifyVpcAttribute
+              - ec2:CreateSecurityGroup
+              - ec2:AllocateAddress
+              - ec2:ReleaseAddress
+              - ec2:DisassociateAddress
+              - ec2:CreateNetworkAclEntry
+              - ec2:DeleteNetworkAclEntry
+              - ec2:CreateNatGateway
+              - ec2:DeleteNatGateway
+              - ec2:CreateNetworkInterface
+              - ec2:DeleteNetworkInterface
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - ec2:DeleteVpc
+              - ec2:DeleteSubnet
+              - ec2:DeleteRouteTable
+              - ec2:DeleteRoute
+              - ec2:DeleteInternetGateway
+              - ec2:DetachInternetGateway
+              - ec2:DisassociateRouteTable
+              - ec2:ModifyVpcAttribute
+              - ec2:ModifySubnetAttribute
+              - ec2:AuthorizeSecurityGroup*
+              - ec2:UpdateSecurityGroupRuleDescriptionsEgress
+              - ec2:RevokeSecurityGroup*
+              - ec2:DeleteSecurityGroup
+              - ec2:ModifySecurityGroupRules
+              - ec2:UpdateSecurityGroupRuleDescriptionsIngress
+            Resource: ["*"]
+            Condition:
+              StringLike:
+                aws:ResourceTag/env:
+                  - eks-workshop*
+          - Effect: Allow
+            Action:
+              - ec2:AuthorizeSecurityGroup*
+              - ec2:RevokeSecurityGroup*
+            Resource: ["*"]
+            Condition:
+              StringLike:
+                aws:ResourceTag/aws:eks:cluster-name:
+                  - eks-workshop*
+          - Effect: Allow
+            Action:
+              - ec2:CreateTags
+              - ec2:DeleteTags
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - ec2:AssociateVpcCidrBlock
+              - ec2:DisassociateVpcCidrBlock
+            Resource:
+              - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
+            Condition:
+              StringLike:
+                aws:ResourceTag/env:
+                  - eks-workshop*
+  EksWorkshopLabsPolicy1:
+    Type: AWS::IAM::ManagedPolicy
+    DependsOn:
+      - EksWorkshopIdeRole
+    Properties:
+      Roles:
+        - !Ref EksWorkshopIdeRole
+      ManagedPolicyName: !Sub ${AWS::StackName}-labs1
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - aps:CreateWorkspace
+              - aps:TagResource
+            Resource: ["*"]
+            Condition:
+              StringLike:
+                aws:RequestTag/env:
+                  - eks-workshop*
+          - Effect: Allow
+            Action:
+              - aps:DeleteWorkspace
+              - aps:Describe*
+              - aps:List*
+              - aps:QueryMetrics
+            Resource: ["*"]
+            Condition:
+              StringLike:
+                aws:ResourceTag/env:
+                  - eks-workshop*
+          - Effect: Allow
+            Action:
+              - dynamodb:ListTables
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - dynamodb:CreateTable
+              - dynamodb:DeleteTable
+              - dynamodb:DescribeTable
+              - dynamodb:DescribeContinuousBackups
+              - dynamodb:ListTagsOfResource
+              - dynamodb:DescribeTimeToLive
+              - dynamodb:Scan
+              - dynamodb:TagResource
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/eks-workshop*
+          - Effect: Allow
+            Action:
+              - secretsmanager:ListSecrets
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - secretsmanager:CreateSecret
+              - secretsmanager:DeleteSecret
+              - secretsmanager:DescribeSecret
+            Resource:
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:eks-workshop*
+          - Effect: Allow
+            Action:
+              - secretsmanager:ListSecrets
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - sqs:CreateQueue
+              - sqs:DeleteQueue
+              - sqs:GetQueueAttributes
+              - sqs:SetQueueAttributes
+              - sqs:TagQueue
+              - sqs:ListQueueTags
+            Resource:
+              - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:eks-workshop*
+          - Effect: Allow
+            Action:
+              - rds:DescribeDBInstances
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - rds:CreateDBInstance
+              - rds:CreateTenantDatabase
+              - rds:DeleteDBInstance
+              - rds:DeleteTenantDatabase
+              - rds:DescribeDBInstances
+              - rds:AddTagsToResource
+              - rds:ListTagsForResource
+            Resource:
+              - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:eks-workshop*
+          - Effect: Allow
+            Action:
+              - rds:CreateDBInstance
+              - rds:CreateDBSubnetGroup
+              - rds:DeleteDBSubnetGroup
+              - rds:DescribeDBSubnetGroups
+              - rds:AddTagsToResource
+              - rds:ListTagsForResource
+            Resource:
+              - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:subgrp:eks-workshop*
+          - Effect: Allow
+            Action:
+              - lambda:AddPermission
+              - lambda:CreateFunction
+              - lambda:DeleteFunction
+              - lambda:GetFunction
+              - lambda:GetFunctionCodeSigningConfig
+              - lambda:GetPolicy
+              - lambda:GetRuntimeManagementConfig
+              - lambda:ListVersionsByFunction
+              - lambda:RemovePermission
+              - lambda:TagResource
+            Resource:
+              - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:eks-workshop*
+          - Effect: Allow
+            Action:
+              - lambda:GetLayerVersion
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - es:CreateDomain
+              - es:DeleteDomain
+              - es:DescribeDomain
+              - es:DescribeDomainConfig
+              - es:GetCompatibleVersions
+              - es:ListTags
+              - es:AddTags
+            Resource:
+              - !Sub arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/eks-workshop*
+          - Effect: Allow
+            Action:
+              - elasticloadbalancing:Describe*
+              - elasticloadbalancing:Get*
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - cloudwatch:DeleteDashboards
+              - cloudwatch:GetDashboard
+              - cloudwatch:PutDashboard
+            Resource:
+              - !Sub arn:aws:cloudwatch::${AWS::AccountId}:dashboard/*
+          - Effect: Allow
+            Action:
+              - cloudwatch:GetMetricData
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - ecr:CreateRepository
+              - ecr:DeleteRepository
+              - ecr:DescribeRepositories
+              - ecr:ListTagsForResource
+              - ecr:TagResource
+            Resource:
+              - !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/retail-store-sample*
+              - !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/eks-workshop*
+          - Effect: Allow
+            Action:
+              - guardduty:CreateDetector
+              - guardduty:DeleteDetector
+              - guardduty:ListDetectors
+            Resource: ["*"]
+  EksWorkshopLabsPolicy2:
+    Type: AWS::IAM::ManagedPolicy
+    DependsOn:
+      - EksWorkshopIdeRole
+    Properties:
+      Roles:
+        - !Ref EksWorkshopIdeRole
+      ManagedPolicyName: !Sub ${AWS::StackName}-labs2
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:DescribeLogGroups
+              - logs:ListTagsForResource
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:DeleteLogGroup
+              - logs:DeleteSubscriptionFilter
+              - logs:PutRetentionPolicy
+              - logs:PutSubscriptionFilter
+              - logs:TagResource
+              - logs:TagLogGroup
+              - logs:Get*
+              - logs:Describe*
+              - logs:List*
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:eks-workshop*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/eks-workshop*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/eks/eks-workshop*
+          - Effect: Allow
+            Action:
+              - events:DeleteRule
+              - events:DescribeRule
+              - events:ListTagsForResource
+              - events:ListTargetsByRule
+              - events:PutRule
+              - events:PutTargets
+              - events:RemoveTargets
+              - events:TagResource
+            Resource:
+              - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/eks-workshop*
+              - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/eks-workshop*
+              - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/Karpenter*
+          - Effect: Allow
+            Action:
+              - vpc-lattice:List*
+              - vpc-lattice:Get*
+              - vpc-lattice:DeleteServiceNetwork
+              - vpc-lattice:DeleteServiceNetworkVpcAssociation
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - elasticfilesystem:CreateFileSystem
+              - elasticfilesystem:CreateMountTarget
+              - elasticfilesystem:DeleteFileSystem
+              - elasticfilesystem:DeleteMountTarget
+              - elasticfilesystem:DescribeLifecycleConfiguration
+              - elasticfilesystem:DescribeMountTargetSecurityGroups
+              - elasticfilesystem:DescribeMountTargets
+              - elasticfilesystem:CreateTags
+              - elasticfilesystem:TagResource
+              - elasticfilesystem:DescribeFileSystems
+            Resource:
+              - !Sub arn:aws:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:file-system/*
+          - Effect: Allow
+            Action:
+              - ssm:DescribeParameters
+              - ssm:ListTagsForResource
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - ssm:PutParameter
+              - ssm:GetParameter
+              - ssm:GetParameters
+              - ssm:DeleteParameter
+              - ssm:AddTagsToResource
+            Resource:
+              - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/eks-workshop*
+              - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/eksworkshop/eks-workshop*
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+            Resource:
+              - !Sub arn:aws:ssm:${AWS::Region}::parameter/aws/service/eks/optimized-ami/*
+          - Effect: Allow
+            Action:
+              - s3:CreateBucket
+              - s3:DeleteBucket
+              - s3:List*
+              - s3:Get*
+              - s3:PutBucketPublicAccessBlock
+              - s3:PutBucketTagging
+              - s3:DeleteObject
+              - s3:DeleteObjectVersion
+            Resource:
+              - arn:aws:s3:::eks-workshop*
+              - arn:aws:s3:::eks-workshop*/*
+          - Effect: Allow
+            Action:
+              - s3:ListAllMyBuckets
+            Resource: ["*"]
+          - Effect: Allow
+            Action:
+              - codecommit:CreateRepository
+              - codecommit:GetRepository
+              - codecommit:DeleteRepository
+              - codecommit:TagResource
+              - codecommit:ListTagsForResource
+            Resource:
+              - !Sub arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:eks-workshop*
+          - Effect: Allow
+            Action:
+              - codebuild:CreateProject
+              - codebuild:DeleteProject
+              - codebuild:BatchGetProjects
+            Resource:
+              - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/eks-workshop*
+          - Effect: Allow
+            Action:
+              - codepipeline:CreatePipeline
+              - codepipeline:DeletePipeline
+              - codepipeline:GetPipeline
+              - codepipeline:GetPipelineState
+              - codepipeline:ListTagsForResource
+              - codepipeline:TagResource
+            Resource:
+              - !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:eks-workshop*
+  EksWorkshopLabsPolicy3:
+    Type: AWS::IAM::ManagedPolicy
+    DependsOn:
+      - EksWorkshopIdeRole
+    Properties:
+      Roles:
+        - !Ref EksWorkshopIdeRole
+      ManagedPolicyName: !Sub ${AWS::StackName}-labs3
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:CreateBucket
+              - s3:DeleteBucket
+              - s3:PutObject
+              - s3:List*
+              - s3:Get*
+              - s3:GetObjectVersion
+              - s3:PutBucketPublicAccessBlock
+              - s3:PutBucketTagging
+              - s3:DeleteObject
+              - s3:DeleteObjectVersion
+            Resource:
+              - arn:aws:s3:::eks-workshop-*
+              - arn:aws:s3:::aws-synthetics-library*
+          - Effect: Allow
+            Action:
+              - fis:CreateExperimentTemplate
+              - fis:CreateExperimentTemplate
+              - fis:GetExperimentTemplate
+              - fis:ListExperimentTemplates
+              - fis:DeleteExperimentTemplate
+              - fis:UpdateExperimentTemplate
+              - fis:TagResource
+              - fis:UntagResource
+              - fis:StartExperiment
+              - fis:GetExperiment
+              - fis:ListExperiments
+            Resource:
+              - !Sub arn:aws:fis:${AWS::Region}:${AWS::AccountId}:action/aws:eks:*
+              - !Sub arn:aws:fis:${AWS::Region}:${AWS::AccountId}:action/aws:ssm:*
+              - !Sub arn:aws:fis:${AWS::Region}:${AWS::AccountId}:experiment-template/*
+              - !Sub arn:aws:fis:${AWS::Region}:${AWS::AccountId}:experiment/*
+          - Effect: Allow
+            Action:
+              - synthetics:CreateCanary
+              - synthetics:DeleteCanary
+              - synthetics:DescribeCanaries
+              - synthetics:StartCanary
+              - synthetics:StopCanary
+              - synthetics:UpdateCanary
+            Resource:
+              - !Sub arn:aws:synthetics:${AWS::Region}:${AWS::AccountId}:canary:eks-workshop*
+          - Effect: Allow
+            Action:
+              - cloudwatch:PutMetricAlarm
+              - cloudwatch:PutMetricData
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:ListMetrics
+            Resource:
+              - !Sub arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:eks-workshop*
+          - Effect: Allow
+            Action:
+              - lambda:CreateFunction
+              - lambda:UpdateFunctionCode
+              - lambda:GetFunctionConfiguration
+              - lambda:UpdateFunctionConfiguration
+              - lambda:GetFunction
+              - lambda:DeleteFunction
+              - lambda:InvokeFunction
+              - lambda:AddPermission
+              - lambda:RemovePermission
+              - lambda:PublishLayerVersion
+              - lambda:PublishVersion
+            Resource:
+              - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*eks-workshop*
+              - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:*eks-workshop*
   EksWorkshopIdeInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -554,7 +1004,7 @@ Resources:
             DeleteOnTermination: true
             Encrypted: true
           DeviceName: /dev/xvda
-      SubnetId: !Ref PublicSubnet01
+      SubnetId: !Ref PublicSubnet
       SecurityGroupIds:
         - !Ref SecurityGroup
       IamInstanceProfile: !Ref EksWorkshopIdeInstanceProfile
@@ -650,22 +1100,3 @@ Outputs:
     Value: !Sub ${AWS::StackName}-password
   IdeRole:
     Value: !Sub ${EksWorkshopIdeRole.Arn}
-  SecurityGroups:
-    Description: Security group for the cluster control plane communication with worker nodes
-    Value: !Join [ ",", [ !Ref ControlPlaneSecurityGroup ] ]
-
-  VpcId:
-    Description: The VPC Id
-    Value: !Ref VPC
-  PrivateSubnet01:
-    Description: "Private Subnet1 Id"
-    Value: !Ref PrivateSubnet01
-  PrivateSubnet01AZ:
-    Description: "The Availability Zone of the Private Subnet1"
-    Value: !GetAtt PrivateSubnet01.AvailabilityZone
-  PrivateSubnet02:
-    Description: "Private Subnet2 Id"
-    Value: !Ref PrivateSubnet02
-  PrivateSubnet02AZ:
-    Description: "The Availability Zone of the Private Subnet2"
-    Value: !GetAtt PrivateSubnet02.AvailabilityZone

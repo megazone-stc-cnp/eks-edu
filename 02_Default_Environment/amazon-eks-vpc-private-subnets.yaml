@@ -3,7 +3,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Amazon EKS Sample VPC - Private and Public subnets'
 
 Parameters:
-
   VpcBlock:
     Type: String
     Default: 192.168.0.0/16
@@ -41,7 +40,6 @@ Metadata:
           - PublicSubnet02Block
           - PrivateSubnet01Block
           - PrivateSubnet02Block
-
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -52,7 +50,6 @@ Resources:
       Tags:
       - Key: Name
         Value: !Sub '${AWS::StackName}-VPC'
-
   InternetGateway:
     Type: "AWS::EC2::InternetGateway"
 

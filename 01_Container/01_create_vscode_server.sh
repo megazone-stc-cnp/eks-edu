@@ -12,12 +12,13 @@ if [ -n "$PROFILE_NAME" ]; then
 fi
 
 aws cloudformation create-stack \
-  --stack-name eks-edu-${EMPLOY_ID} \
+  --stack-name eks-workshop-${EMPLOY_ID} \
   --template-body file://eks-workshop-vscode-cfn.yaml \
   --capabilities CAPABILITY_NAMED_IAM \
   --region ${AWS_REGION} ${PROFILE_STRING}
 
 echo "생성중....."
 aws cloudformation wait stack-create-complete \
-    --stack-name eks-edu-${EMPLOY_ID}
+    --stack-name eks-workshop-${EMPLOY_ID} \
+    
 echo "생성완료....."    

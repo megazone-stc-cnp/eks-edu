@@ -12,6 +12,6 @@ if [ -n "$PROFILE_NAME" ]; then
 fi
 
 aws secretsmanager get-secret-value \
-    --secret-id eks-edu-9641173-password \
+    --secret-id eks-workshop-${EMPLOY_ID}-password \
     --query SecretString --output text \
     --region ${AWS_REGION} ${PROFILE_STRING} | jq -r .password

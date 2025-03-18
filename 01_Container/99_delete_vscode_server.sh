@@ -12,10 +12,10 @@ if [ -n "$PROFILE_NAME" ]; then
 fi
 
 aws cloudformation delete-stack \
-  --stack-name eks-edu-${EMPLOY_ID} \
+  --stack-name eks-workshop-${EMPLOY_ID} \
   --region ${AWS_REGION} ${PROFILE_STRING}
 
 echo "삭제중....."
 aws cloudformation wait stack-delete-complete \
-    --stack-name eks-edu-${EMPLOY_ID}
+    --stack-name eks-workshop-${EMPLOY_ID}
 echo "삭제 완료....."    
