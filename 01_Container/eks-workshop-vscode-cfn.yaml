@@ -494,11 +494,9 @@ Resources:
                   code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools --force
                   code-server --install-extension redhat.vscode-yaml --force
 
-                  cd ~/environment
-                  git clone https://github.com/megazone-stc-cnp/eks-edu.git
                   EOT
 
-                  systemctl restart code-server@ec2-user                
+                  systemctl restart code-server@ec2-user
   EksWorkshopIdeRole:
     Type: AWS::IAM::Role
     Properties:
