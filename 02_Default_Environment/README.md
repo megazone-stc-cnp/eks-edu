@@ -2,9 +2,13 @@
 - 강의 진행을 위해 기본 인프라 및 EKS Cluster 생성에 대해 익숙해 지기 위한 생성 실습
 
 # 학습 절차
+## 사전 조건
+1. 01_Container/01_create_vscode_server.sh 코드가 실행되어 있어야 함
+2. vscode server 내에서 실행되어야 함
+
 ## 기본 Infra 배포
-    - VPC, Public Subnet 2개, Pivate Subnet 2개, IGW, NatGateway
-    - 01장 01_create_vscode_server.sh 에서 기본 인프라도 생성
+- VPC, Public Subnet 2개, Pivate Subnet 2개, IGW, NatGateway
+- 01장 01_create_vscode_server.sh 에서 기본 인프라도 생성
 
 ## eksctl
 ### eksctl이란
@@ -15,7 +19,6 @@
 1. 기본 인프라 생성 ( VPC / Public Subnet / Private Subnet ) 
 ```
 $ sh 01_default_infra.sh
-
 ```
 
 2. env.sh.sample 파일로  env.sh 를 만들어서, 생성된 정보 세팅
