@@ -1,25 +1,28 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
+availabilityZones:
+  - ap-northeast-1a
+  - ap-northeast-1c
 metadata:
-  name: eks-edu-cluster-${EMPLOY_ID}
-  region: ${AWS_REGION}
+  name: eks-edu-cluster-9641173
+  region: ap-northeast-1
   version: "1.31"
   tags:
-    karpenter.sh/discovery: eks-edu-cluster-${EMPLOY_ID}
+    karpenter.sh/discovery: eks-edu-cluster-9641173
     created-by: eks-workshop-v2
-    env: eks-edu-cluster-${EMPLOY_ID}
+    env: eks-edu-cluster-9641173
 iam:
   withOIDC: true
 vpc:
-  id: "${VPC_ID}"  # (optional, must match VPC ID used for each subnet below)
-  controlPlaneSecurityGroupIDs: ["${EKS_ADDITIONAL_SG}"]  
+  id: "vpc-06262bb722e4aae8d"  # (optional, must match VPC ID used for each subnet below)
+  controlPlaneSecurityGroupIDs: ["sg-093cb155817e304b1"]  
   subnets:
     # must provide 'private' and/or 'public' subnets by availability zone as shown
     private:
-      ${AWS_AZ1}:
-        id: "${AWS_PRIVATE_SUBNET1}"
-      ${AWS_AZ2}:
-        id: "${AWS_PRIVATE_SUBNET2}"
+      ap-northeast-1a:
+        id: "subnet-0d8935f51199087c5"
+      ap-northeast-1c:
+        id: "subnet-05843bae9647258cc"
   clusterEndpoints:
     privateAccess: true
     publicAccess: true

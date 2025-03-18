@@ -11,10 +11,11 @@ if [ ! -f "./env.sh" ];then
 fi
 . ./env.sh
 
-env
 # ==================================================================
 if [ ! -d "template" ];then
   mkdir template
 fi
 
-envsubst < eksctl.template.yaml > template/eksctl.yamlcl
+envsubst < eksctl.template.yaml > template/eksctl.yaml
+
+cat template/eksctl.yaml

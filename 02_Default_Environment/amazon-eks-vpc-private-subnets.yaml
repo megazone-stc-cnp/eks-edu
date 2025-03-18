@@ -282,3 +282,15 @@ Outputs:
   VpcId:
     Description: The VPC Id
     Value: !Ref VPC
+  PrivateSubnet01:
+    Description: "Private Subnet1 Id"
+    Value: !Ref PrivateSubnet01
+  PrivateSubnet01AZ:
+    Description: "The Availability Zone of the Private Subnet1"
+    Value: !GetAtt PrivateSubnet01.AvailabilityZone
+  PrivateSubnet02:
+    Description: "Private Subnet2 Id"
+    Value: !Ref PrivateSubnet02
+  PrivateSubnet02AZ:
+    Description: "The Availability Zone of the Private Subnet2"
+    Value: !GetAtt PrivateSubnet02.AvailabilityZone
