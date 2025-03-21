@@ -6,11 +6,15 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 
+CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 # ==================================================================
 PROFILE_STRING=""
 if [ -n "$PROFILE_NAME" ]; then
     PROFILE_STRING="--profile ${PROFILE_NAME}"
 fi
 
-eksctl create cluster -f template/eksctl.yaml \
-    ${PROFILE_STRING} ${AWS_REGION}
+echo "eksctl get iamidentitymapping --cluster ${CLUSTER_NAME} \\
+    --region ${AWS_REGION} ${PROFILE_STRING}"
+
+eksctl get iamidentitymapping --cluster ${CLUSTER_NAME} \
+    --region ${AWS_REGION} ${PROFILE_STRING}

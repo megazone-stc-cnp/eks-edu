@@ -39,3 +39,6 @@ terraform.rc
 env.sh
 **/env.sh
 **/template/*.yaml
+.idea/
+02_Default_Environment/result.json
+02_Default_Environment/template/eksctl.yamlcl

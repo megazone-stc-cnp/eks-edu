@@ -4,13 +4,14 @@ if [ ! -f "../env.sh" ];then
 	exit 1
 fi
 . ../env.sh
+CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 # ======================================================
 PROFILE_STRING=""
 if [ -n "$PROFILE_NAME" ]; then
     PROFILE_STRING="--profile ${PROFILE_NAME}"
 fi
 
-eksctl delete cluster --name eks-edu-cluster-${EMPLOY_ID} \
+eksctl delete cluster --name ${CLUSTER_NAME} \
 	--region ${AWS_REGION} ${PROFILE_STRING}
 
 echo "EKS 삭제중....."
