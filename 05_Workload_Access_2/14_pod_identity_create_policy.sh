@@ -7,28 +7,29 @@ fi
 . ../env.sh
 
 CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+BUCKET_NAME="pod-secrets-bucket-${EMPLOY_ID}"
+POLICY_NAME=eks-edu-pod-identity-workload-policy-${EMPLOY_ID}
 # ==================================================================
 PROFILE_STRING=""
 if [ -n "$PROFILE_NAME" ]; then
     PROFILE_STRING="--profile ${PROFILE_NAME}"
 fi
 
-POLICY_NAME=eks-edu-irsa-workload-policy-${EMPLOY_ID}
-cat >irsa-workload-policy.json <<EOF
+cat >pod-identity-workload-policy.json <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
         {
             "Effect": "Allow",
             "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::irsa-pod-secrets-bucket-${EMPLOY_ID}"
+            "Resource": "arn:aws:s3:::${BUCKET_NAME}"
         }
     ]
 }
 EOF
 
 echo "aws iam create-policy --policy-name ${POLICY_NAME} \\
-    --policy-document file://irsa-workload-policy.json ${PROFILE_STRING}"
+    --policy-document file://pod-identity-workload-policy.json ${PROFILE_STRING}"
 
 aws iam create-policy --policy-name ${POLICY_NAME} \
-    --policy-document file://irsa-workload-policy.json ${PROFILE_STRING}
+    --policy-document file://pod-identity-workload-policy.json ${PROFILE_STRING}

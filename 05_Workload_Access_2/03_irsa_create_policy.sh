@@ -7,6 +7,7 @@ fi
 . ../env.sh
 
 CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+BUCKET_NAME="pod-secrets-bucket-${EMPLOY_ID}"
 # ==================================================================
 PROFILE_STRING=""
 if [ -n "$PROFILE_NAME" ]; then
@@ -21,7 +22,7 @@ cat >irsa-workload-policy.json <<EOF
         {
             "Effect": "Allow",
             "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::irsa-pod-secrets-bucket-${EMPLOY_ID}"
+            "Resource": "arn:aws:s3:::${BUCKET_NAME}"
         }
     ]
 }

@@ -42,3 +42,6 @@ env.sh
 .idea/
 02_Default_Environment/result.json
 02_Default_Environment/template/eksctl.yamlcl
+05_Workload_Access_2/pod-identity-deployment.yaml
+05_Workload_Access_2/pod-identity-trust-relationship.json
+05_Workload_Access_2/pod-identity-workload-policy.json
