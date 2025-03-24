@@ -12,5 +12,6 @@ if [ -n "$PROFILE_NAME" ]; then
     PROFILE_STRING="--profile ${PROFILE_NAME}"
 fi
 
-eksctl create cluster -f template/eksctl.yaml \
-    ${PROFILE_STRING} ${AWS_REGION}
+echo "eksctl create cluster -f template/eksctl.yaml ${PROFILE_STRING}" 
+
+eksctl create cluster -f template/eksctl.yaml ${PROFILE_STRING}

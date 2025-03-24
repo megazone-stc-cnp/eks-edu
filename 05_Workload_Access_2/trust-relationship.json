@@ -1,0 +1,18 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::539666729110:oidc-provider/D46C3AF613639EF9B338272D7B203165"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "D46C3AF613639EF9B338272D7B203165:aud": "sts.amazonaws.com",
+          "D46C3AF613639EF9B338272D7B203165:sub": "system:serviceaccount:default:eks-edu-service-account-9641173"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# OIDC 값
+export OIDC_ID=<OIDC_ID>
+export EKS_VERSION=<EKS 버전>
