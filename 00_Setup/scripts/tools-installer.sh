@@ -73,8 +73,8 @@ case "$arch" in
 esac
 
 yum install --quiet -y findutils jq tar gzip zsh git diffutils wget \
-  tree unzip openssl gettext bash-completion python3 python3-pip docker \
-  nc yum-utils
+  tree unzip openssl gettext bash-completion python3 python3-pip \
+  nc yum-utils docker
 
 pip3 install -q awscurl==0.28 urllib3==1.26.6
 
@@ -83,9 +83,10 @@ usermod -a -G docker ec2-user
 
 # docker-compose
 DOCKER_CLI_PLUGINS_PATH="/usr/local/lib/docker/cli-plugins"
+download "https://github.com/docker/compose/releases/download/${docker_compose_version}/docker-compose-linux-x86_64" "docker-compose"
+chmod +x ./docker-compose
 mkdir -p $DOCKER_CLI_PLUGINS_PATH
-curl -SL https://github.com/docker/compose/releases/download/${docker_compose_version}/docker-compose-linux-x86_64 -o $DOCKER_CLI_PLUGINS_PATH/docker-compose
-chmod +x $DOCKER_CLI_PLUGINS_PATH/docker-compose
+mv ./docker-compose $DOCKER_CLI_PLUGINS_PATH
 
 # kubectl
 download "https://dl.k8s.io/release/v${kubectl_version}/bin/linux/${arch_name}/kubectl" "kubectl"
@@ -153,8 +154,8 @@ download "https://github.com/hatoo/oha/releases/download/v${oha_version}/oha-lin
 chmod +x ./oha
 mv ./oha /usr/local/bin
 
-REPOSITORY_OWNER=${REPOSITORY_OWNER:-"aws-samples"}
-REPOSITORY_NAME=${REPOSITORY_NAME:-"eks-workshop-v2"}
+REPOSITORY_OWNER="aws-samples"
+REPOSITORY_NAME="eks-workshop-v2"
 
 if [ ! -z "$REPOSITORY_REF" ]; then
   cat << EOT > /usr/local/bin/reset-environment
