@@ -3,19 +3,19 @@ Description: Creates a code-server IDE for the EKS workshop
 Parameters:
   InstanceVolumeSize:
     Type: Number
-    Description: The Size in GB of the Cloud9 Instance Volume.
+    Description: The Size in GB of the code-server Instance Volume.
     Default: 30
   RepositoryOwner:
     Type: String
-    Description: The owner of the GitHub repository to be used to bootstrap Cloud9
+    Description: The owner of the GitHub repository to be used to bootstrap code-server
     Default: "megazone-stc-cnp"
   RepositoryName:
     Type: String
-    Description: The name of the GitHub repository to be used to bootstrap Cloud9
+    Description: The name of the GitHub repository to be used to bootstrap code-server
     Default: "eks-edu"
   RepositoryRef:
     Type: String
-    Description: The Git reference to be used to bootstrap Cloud9
+    Description: The Git reference to be used to bootstrap code-server
     Default: "main"
   ResourcesPrecreated:
     Type: String
@@ -249,7 +249,7 @@ Resources:
       DocumentFormat: YAML
       Content:
         schemaVersion: "2.2"
-        description: Bootstrap Cloud9 Instance
+        description: Bootstrap code-server Instance
         mainSteps:
           - action: aws:runShellScript
             name: EksWorkshopIdebootstrap
@@ -258,6 +258,8 @@ Resources:
                 - !Sub |
                   set -e
 
+                  # Install required packages
+                  yum update -y
                   yum install -y git tar gzip vim nodejs npm make gcc g++ argon2
 
                   source <(curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/hack/lib/common-env.sh)
@@ -342,8 +344,10 @@ Resources:
 
                   curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/lab/scripts/banner.sh | bash
 
+                  code-server --install-extension ms-azuretools.vscode-docker --force
                   code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools --force
                   code-server --install-extension redhat.vscode-yaml --force
+                  code-server --install-extension pkief.material-icon-theme --force
 
                   cd ~/environment
                   git clone https://github.com/megazone-stc-cnp/eks-edu.git
