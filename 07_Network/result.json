@@ -1,0 +1,37 @@
+[
+    {
+        "OutputKey": "SecurityGroups",
+        "OutputValue": "sg-067c49d81647eda89",
+        "Description": "Security group for the cluster control plane communication with worker nodes"
+    },
+    {
+        "OutputKey": "VpcId",
+        "OutputValue": "vpc-0de9c3feb4478fc50",
+        "Description": "The VPC Id"
+    },
+    {
+        "OutputKey": "PrivateSubnet02",
+        "OutputValue": "subnet-010f16872c1d726c1",
+        "Description": "Private Subnet2 Id"
+    },
+    {
+        "OutputKey": "PrivateSubnet01AZ",
+        "OutputValue": "ap-northeast-1a",
+        "Description": "The Availability Zone of the Private Subnet1"
+    },
+    {
+        "OutputKey": "PrivateSubnet01",
+        "OutputValue": "subnet-0650b3a6648e2326e",
+        "Description": "Private Subnet1 Id"
+    },
+    {
+        "OutputKey": "PrivateSubnet02AZ",
+        "OutputValue": "ap-northeast-1c",
+        "Description": "The Availability Zone of the Private Subnet2"
+    },
+    {
+        "OutputKey": "SubnetIds",
+        "OutputValue": "subnet-07ed29c6f6871eaef,subnet-0ebd72088e3da4e79,subnet-0650b3a6648e2326e,subnet-010f16872c1d726c1",
+        "Description": "Subnets IDs in the VPC"
+    }
+]

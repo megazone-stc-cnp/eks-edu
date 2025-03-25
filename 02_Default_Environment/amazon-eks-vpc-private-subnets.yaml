@@ -5,27 +5,27 @@ Description: 'Amazon EKS Sample VPC - Private and Public subnets'
 Parameters:
   VpcBlock:
     Type: String
-    Default: 192.168.0.0/16
+    Default: 192.168.0.0/24
     Description: The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range.
 
   PublicSubnet01Block:
     Type: String
-    Default: 192.168.0.0/18
+    Default: 192.168.0.64/27
     Description: CidrBlock for public subnet 01 within the VPC
 
   PublicSubnet02Block:
     Type: String
-    Default: 192.168.64.0/18
+    Default: 192.168.0.96/27
     Description: CidrBlock for public subnet 02 within the VPC
 
   PrivateSubnet01Block:
     Type: String
-    Default: 192.168.128.0/18
+    Default: 192.168.0.0/27
     Description: CidrBlock for private subnet 01 within the VPC
 
   PrivateSubnet02Block:
     Type: String
-    Default: 192.168.192.0/18
+    Default: 192.168.0.32/27
     Description: CidrBlock for private subnet 02 within the VPC
 
 Metadata:

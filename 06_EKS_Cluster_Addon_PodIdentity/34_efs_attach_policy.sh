@@ -19,7 +19,7 @@ fi
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
 # export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
-EFS_ROLE_NAME=eks-edu-ebs-pod-identity-role-${EMPLOY_ID}
+EFS_ROLE_NAME=eks-edu-efs-pod-identity-role-${EMPLOY_ID}
 # ===============================================
 
 echo "aws iam attach-role-policy \\

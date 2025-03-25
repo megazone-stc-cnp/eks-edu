@@ -12,8 +12,8 @@ fi
 # export EKS_VERSION=1.31
 # export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 
-ADDON_NAME=aws-efs-csi-driver
-EFS_ROLE_NAME=eks-edu-efs-pod-identity-role-${EMPLOY_ID}
+ADDON_NAME=aws-ebs-csi-driver
+EBS_ROLE_NAME=eks-edu-ebs-pod-identity-role-${EMPLOY_ID}
 # ==============================================
 echo "Deleting ${ADDON_NAME} addon from EKS cluster ${CLUSTER_NAME}..."
 
@@ -31,18 +31,18 @@ aws eks delete-addon \
 echo "${ADDON_NAME} addon deleted successfully."
 
 echo "aws iam detach-role-policy \\
-    --role-name ${EFS_ROLE_NAME} \\
-    --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy ${PROFILE_STRING}"
+    --role-name ${EBS_ROLE_NAME} \\
+    --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy ${PROFILE_STRING}"
 
 aws iam detach-role-policy \
-    --role-name ${EFS_ROLE_NAME} \
-    --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy ${PROFILE_STRING}
+    --role-name ${EBS_ROLE_NAME} \
+    --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy ${PROFILE_STRING}
 
 echo "aws iam delete-role \\
-    --role-name ${EFS_ROLE_NAME} ${PROFILE_STRING}"
+    --role-name ${EBS_ROLE_NAME} ${PROFILE_STRING}"
 
 aws iam delete-role \
-    --role-name ${EFS_ROLE_NAME} ${PROFILE_STRING}
+    --role-name ${EBS_ROLE_NAME} ${PROFILE_STRING}
 
 
 
