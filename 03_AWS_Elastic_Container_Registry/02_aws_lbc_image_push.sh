@@ -14,10 +14,6 @@ fi
 REPO_FULLPATH=public.ecr.aws/eks/aws-load-balancer-controller
 ORIGIN_TAG=v2.9.2
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 ORIGIN_IMG=${REPO_FULLPATH}:${ORIGIN_TAG}
 PRIVATE_ECR=${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com

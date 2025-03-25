@@ -18,7 +18,7 @@
 ## 실습
 1. 기본 인프라 생성 ( VPC / Public Subnet / Private Subnet ) 
 ```
-$ sh 01_default_infra.sh
+$ sh 01_default_vpc.sh
 ```
 
 2. env.sh.sample 파일로  env.sh 를 만들어서, 생성된 정보 세팅

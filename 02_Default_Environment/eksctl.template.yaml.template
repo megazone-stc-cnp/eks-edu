@@ -23,8 +23,5 @@ vpc:
   clusterEndpoints:
     privateAccess: true
     publicAccess: true
-managedNodeGroups:
-  - name: ng-1
-    instanceType: t3.medium
-    desiredCapacity: 2
-    privateNetworking: true # if only 'Private' subnets are given, this must be enabled
+addonsConfig:
+  disableDefaultAddons: true

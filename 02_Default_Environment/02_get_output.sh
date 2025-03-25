@@ -7,10 +7,7 @@ fi
 
 STACK_NAME=eks-workshop-vpc-${EMPLOY_ID}
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
+
 
 echo "aws cloudformation describe-stacks \\
     --stack-name ${STACK_NAME} --query "Stacks[0].Outputs" \\
@@ -21,10 +18,13 @@ aws cloudformation describe-stacks \
     --region ${AWS_REGION} ${PROFILE_STRING} --output json | tee result.json
 
 # sh ../01_Container/02_get_output.sh | jq -r '.[] | select(.OutputKey=="VpcId") | .OutputValue'
-echo "env.sh 에 넣어주세요."
-echo "export VPC_ID=$(cat result.json | jq -r '.[] | select(.OutputKey=="VpcId") | .OutputValue')"
-echo "export AWS_AZ1=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet01AZ") | .OutputValue')"
-echo "export AWS_AZ2=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet02AZ") | .OutputValue')"
-echo "export AWS_PRIVATE_SUBNET1=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet01") | .OutputValue')"
-echo "export AWS_PRIVATE_SUBNET2=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet02") | .OutputValue')"
-echo "export EKS_ADDITIONAL_SG=$(cat result.json | jq -r '.[] | select(.OutputKey=="SecurityGroups") | .OutputValue')"
+if [ -f "./local_env.sh" ];then
+    rm -rf local_env.sh
+fi
+echo "#!/bin/bash" >> local_env.sh
+echo "export VPC_ID=$(cat result.json | jq -r '.[] | select(.OutputKey=="VpcId") | .OutputValue')" >> local_env.sh
+echo "export AWS_AZ1=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet01AZ") | .OutputValue')" >> local_env.sh
+echo "export AWS_AZ2=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet02AZ") | .OutputValue')" >> local_env.sh
+echo "export AWS_PRIVATE_SUBNET1=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet01") | .OutputValue')" >> local_env.sh
+echo "export AWS_PRIVATE_SUBNET2=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet02") | .OutputValue')" >> local_env.sh
+echo "export EKS_ADDITIONAL_SG=$(cat result.json | jq -r '.[] | select(.OutputKey=="SecurityGroups") | .OutputValue')" >> local_env.sh

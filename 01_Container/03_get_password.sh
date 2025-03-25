@@ -6,10 +6,6 @@ fi
 . ../env.sh
 
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 aws secretsmanager get-secret-value \
     --secret-id eks-workshop-${EMPLOY_ID}-password \

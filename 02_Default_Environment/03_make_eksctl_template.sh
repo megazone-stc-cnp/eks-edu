@@ -15,7 +15,10 @@ fi
 if [ ! -d "template" ];then
   mkdir template
 fi
+if [ -f "template/eksctl.yaml" ];then
+	rm -rf template/eksctl.yaml
+fi
 
-envsubst < eksctl.template.yaml > template/eksctl.yaml
+envsubst < eksctl.template.yaml.template > template/eksctl.yaml
 
 cat template/eksctl.yaml

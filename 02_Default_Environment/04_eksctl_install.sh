@@ -7,10 +7,6 @@ fi
 . ../env.sh
 
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 echo "eksctl create cluster -f template/eksctl.yaml ${PROFILE_STRING}" 
 

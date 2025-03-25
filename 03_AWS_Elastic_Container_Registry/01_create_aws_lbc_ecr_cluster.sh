@@ -14,10 +14,6 @@ fi
 REPO_FULLPATH=public.ecr.aws/eks/aws-load-balancer-controller
 ORIGIN_TAG=v2.9.2
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 aws ecr create-repository \
     --repository-name ${REPO_FULLPATH} \

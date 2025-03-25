@@ -6,10 +6,6 @@ fi
 . ../env.sh
 
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 aws cloudformation describe-stacks \
     --stack-name eks-workshop-${EMPLOY_ID} --query "Stacks[0].Outputs" \

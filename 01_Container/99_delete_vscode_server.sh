@@ -6,10 +6,6 @@ fi
 . ../env.sh
 
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 aws cloudformation delete-stack \
   --stack-name eks-workshop-${EMPLOY_ID} \

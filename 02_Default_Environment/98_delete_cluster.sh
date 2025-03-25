@@ -4,12 +4,14 @@ if [ ! -f "../env.sh" ];then
 	exit 1
 fi
 . ../env.sh
-CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export AWS_REGION=ap-northeast-1
+# export EMPLOY_ID=9641173
+# export PROFILE_NAME=cnp-key
+# export AWS_REPO_ACCOUNT=539666729110
+# export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
+# export EKS_VERSION=1.31
+# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 # ======================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 eksctl delete cluster --name ${CLUSTER_NAME} \
 	--region ${AWS_REGION} ${PROFILE_STRING}
@@ -20,11 +22,3 @@ aws cloudformation wait stack-delete-complete \
 	--region ${AWS_REGION} ${PROFILE_STRING}
 echo "EKS 삭제 완료....."    
 
-eksctl delete cluster --name eks-workshop-vpc-${EMPLOY_ID} \
-	--region ${AWS_REGION} ${PROFILE_STRING}
-
-echo "VPC 삭제중....."
-aws cloudformation wait stack-delete-complete \
-    --stack-name eks-workshop-vpc-${EMPLOY_ID} \
-	--region ${AWS_REGION} ${PROFILE_STRING}
-echo "VPC 삭제 완료....."

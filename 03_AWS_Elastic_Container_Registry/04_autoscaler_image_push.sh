@@ -14,10 +14,6 @@ fi
 REPO_FULLPATH=registry.k8s.io/autoscaling/cluster-autoscaler
 ORIGIN_TAG=v1.32.0
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 ORIGIN_IMG=${REPO_FULLPATH}:${ORIGIN_TAG}
 PRIVATE_ECR=${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com

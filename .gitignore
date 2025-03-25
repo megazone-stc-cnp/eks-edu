@@ -45,3 +45,6 @@ env.sh
 05_Workload_Access_2/pod-identity-deployment.yaml
 05_Workload_Access_2/pod-identity-trust-relationship.json
 05_Workload_Access_2/pod-identity-workload-policy.json
+06_EKS_Cluster_Addon_Irsa/local_env.sh
+06_EKS_Cluster_Addon_Irsa/aws-ebs-csi-driver-trust-policy.json
+02_Default_Environment/local_env.sh

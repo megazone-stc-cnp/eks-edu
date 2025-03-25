@@ -14,10 +14,6 @@ fi
 REPO_FULLPATH=registry.k8s.io/autoscaling/cluster-autoscaler
 ORIGIN_TAG=v1.32.0
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 aws ecr create-repository \
     --repository-name ${REPO_FULLPATH} \
