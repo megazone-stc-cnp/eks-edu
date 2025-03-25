@@ -24,6 +24,10 @@ Parameters:
     AllowedValues:
       - "false"
       - "true"
+  CodeServerInstanceType:
+    Type: String
+    Description: The instance type to use for code-server
+    Default: "t3a.small"    # 't3a.small' 인스턴스는 2 vCPU, 2GB RAM 이고, code-server 최소 사양(2 cpu, 1GB RAM)을 충족함
   CodeServerVersion:
     Type: String
     Description: Default code-server version to use
@@ -502,7 +506,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref AmiParameterStoreName
-      InstanceType: t3a.medium
+      InstanceType: !Ref CodeServerInstanceType
       BlockDeviceMappings:
         - Ebs:
             VolumeSize: !Ref InstanceVolumeSize
