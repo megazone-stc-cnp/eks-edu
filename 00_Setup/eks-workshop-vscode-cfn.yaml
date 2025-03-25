@@ -1,32 +1,32 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: EKS Workshop을 위한 code-server IDE를 생성합니다.
+Description: Creates a code-server IDE for the EKS workshop
 Parameters:
   InstanceVolumeSize:
     Type: Number
-    Description: code-server IDE 인스턴스 볼륨의 크기(GB 단위)
+    Description: The Size in GB of the Cloud9 Instance Volume.
     Default: 30
   RepositoryOwner:
     Type: String
-    Description: code-server 부트스트랩에 사용될 GitHub 저장소의 소유자
+    Description: The owner of the GitHub repository to be used to bootstrap Cloud9
     Default: "megazone-stc-cnp"
   RepositoryName:
     Type: String
-    Description: code-server 부트스트랩에 사용될 GitHub 저장소의 이름
+    Description: The name of the GitHub repository to be used to bootstrap Cloud9
     Default: "eks-edu"
   RepositoryRef:
     Type: String
-    Description: code-server 부트스트랩에 사용될 Git 브랜치
+    Description: The Git reference to be used to bootstrap Cloud9
     Default: "main"
   ResourcesPrecreated:
     Type: String
-    Description: 실습 인프라가 사전에 프로비저닝되었는지 여부
+    Description: Whether lab infrastructure has been pre-provisioned
     Default: "false"
     AllowedValues:
       - "false"
       - "true"
   CodeServerVersion:
     Type: String
-    Description: 사용할 code-server 버전
+    Description: Default code-server version to use
     Default: "4.98.2" # 2025-03-15
   AmiParameterStoreName:
     Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
