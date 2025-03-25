@@ -10,14 +10,10 @@ fi
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
+# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 
-CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 BUCKET_NAME="pod-secrets-bucket-${EMPLOY_ID}"
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 if aws s3api head-bucket --bucket "${BUCKET_NAME}" 2>/dev/null; then
     echo "S3 버킷 ${BUCKET_NAME}이 이미 존재합니다."

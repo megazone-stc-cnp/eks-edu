@@ -9,17 +9,15 @@ fi
 # export EMPLOY_ID=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
+# export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
+# export EKS_VERSION=1.31
+# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 
-CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 SERVICE_ACCOUNT_NAME=eks-edu-pod-identity-service-account-${EMPLOY_ID}
 POLICY_NAME=eks-edu-pod-identity-workload-policy-${EMPLOY_ID}
 ROLE_NAME=eks-edu-pod-identity-workload-role-${EMPLOY_ID}
 NAMESPACE_NAME=default
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 echo "aws eks create-pod-identity-association \\
     --cluster-name ${CLUSTER_NAME} \\

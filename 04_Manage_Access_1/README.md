@@ -8,7 +8,7 @@
 ```
 2. 기본 VPC 생성
 ```shell
-02_Default_Environment/01_default_infra.sh
+02_Default_Environment/01_default_vpc.sh
 ```
 3. EKS 구축
 ```

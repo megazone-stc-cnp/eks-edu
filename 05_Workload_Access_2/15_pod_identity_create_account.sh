@@ -9,10 +9,6 @@ fi
 SERVICE_ACCOUNT_NAME=eks-edu-pod-identity-service-account-${EMPLOY_ID}
 NAMESPACE_NAME=default
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 cat >eks-edu-pod-identity-service-account.yaml <<EOF
 apiVersion: v1

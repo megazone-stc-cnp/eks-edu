@@ -15,10 +15,6 @@ fi
 CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 ADDON_NAME=eks-pod-identity-agent
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 echo "aws eks describe-addon-versions --kubernetes-version ${EKS_VERSION} \\
     --addon-name ${ADDON_NAME} \\

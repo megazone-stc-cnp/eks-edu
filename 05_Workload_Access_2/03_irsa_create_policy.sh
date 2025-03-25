@@ -9,10 +9,6 @@ fi
 CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 BUCKET_NAME="pod-secrets-bucket-${EMPLOY_ID}"
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 POLICY_NAME=eks-edu-irsa-workload-policy-${EMPLOY_ID}
 cat >irsa-workload-policy.json <<EOF

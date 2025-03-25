@@ -28,7 +28,7 @@
 # 3. 사전 조건
 ## 3-1. 인프라 구성
 ```
-sh 02_Default_Environment/01_default_infra.sh
+sh 02_Default_Environment/01_default_vpc.sh
 
 ```
 # 4. 실습

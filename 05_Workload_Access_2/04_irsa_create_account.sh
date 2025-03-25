@@ -11,10 +11,6 @@ POLICY_NAME=eks-edu-irsa-workload-policy-${EMPLOY_ID}
 ROLE_NAME=eks-edu-irsa-workload-role-${EMPLOY_ID}
 NAMESPACE_NAME=default
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 cat >eks-edu-irsa-service-account.yaml <<EOF
 apiVersion: v1

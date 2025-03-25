@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# 01_get_oidc.sh에서 oidc값 구하기
+export OIDC_ID=<OIDC_ID>

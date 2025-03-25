@@ -11,10 +11,6 @@ POLICY_NAME=eks-edu-pod-identity-workload-policy-${EMPLOY_ID}
 ROLE_NAME=eks-edu-pod-identity-workload-role-${EMPLOY_ID}
 NAMESPACE_NAME=default
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
 
 cat >pod-identity-trust-relationship.json <<EOF
 {
