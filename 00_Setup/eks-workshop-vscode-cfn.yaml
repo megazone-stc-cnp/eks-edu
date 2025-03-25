@@ -288,7 +288,7 @@ Resources:
                   export REPOSITORY_REF="${RepositoryRef}"
                   export RESOURCES_PRECREATED="${ResourcesPrecreated}"
 
-                  curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/lab/scripts/installer.sh | bash
+                  curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/00_Setup/scripts/tools-installer.sh | bash
 
                   cat <<"EOT" | sudo -E -H -u ec2-user bash
                   set -e

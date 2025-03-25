@@ -25,7 +25,7 @@ AWS에 로그인 한 후, CloudShell로 이동하여 다음 명령어를 입력�
    ```shell
    aws cloudformation create-stack \
        --stack-name eks-workshop-${EKS_ID} \
-       --template-body "$(curl -fsSL https://raw.githubusercontent.com/megazone-stc-cnp/eks-edu/refs/heads/main/eks-workshop-vscode-cfn.yaml)" \
+       --template-body "$(curl -fsSL https://raw.githubusercontent.com/megazone-stc-cnp/eks-edu/refs/heads/main/00_Setup/eks-workshop-vscode-cfn.yaml)" \
        --capabilities CAPABILITY_NAMED_IAM \
        --region ${AWS_REGION}
    ```
