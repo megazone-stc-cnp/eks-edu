@@ -83,7 +83,7 @@ usermod -a -G docker ec2-user
 
 # docker-compose
 DOCKER_CLI_PLUGINS_PATH="/usr/local/lib/docker/cli-plugins"
-download "https://github.com/docker/compose/releases/download/${docker_compose_version}/docker-compose-linux-x86_64" "docker-compose"
+download "https://github.com/docker/compose/releases/download/v${docker_compose_version}/docker-compose-linux-${arch_name}" "docker-compose"
 chmod +x ./docker-compose
 mkdir -p $DOCKER_CLI_PLUGINS_PATH
 mv ./docker-compose $DOCKER_CLI_PLUGINS_PATH
