@@ -512,6 +512,7 @@ Resources:
       IamInstanceProfile: !Ref EksWorkshopIdeInstanceProfile
       Tags:
         - Key: Name
+          Value: !Sub ${AWS::StackName}-ide
         - Key: type
           Value: eksworkshop-ide
   EksWorkshopIdePassword:

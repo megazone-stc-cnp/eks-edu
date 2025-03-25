@@ -16,38 +16,31 @@ EKS 교육 진행을 위해 먼저, 사용하실 AWS 계정에 `code-server` 및
 AWS에 로그인 한 후, CloudShell로 이동하여 다음 명령어를 입력해 주세요.
 
 1. 지역 선택
-
+   
    ![지역선택](./00_Setup/images/region.png)
 
 2. CloudShell 검색해 이동
-
+   
    ![CloudShell](./00_Setup/images/cloudshell.png)
 
-3. Git Clone 후 `eks-edu`로 이동
+3. `code-server` 생성용 CloudFormation 실행
 
-   ```$ git clone https://github.com/megazone-stc-cnp/eks-edu.git && cd eks-edu```
-   ![Git Clone](./00_Setup/images/git-clone-change-dir.png)
+   `EKS_ID` 환경 변수에 사용하기를 원하는 ID를 지정합니다.
+   `EKS_ID` 변수는 `code-server` 생성용 CloudFormation에 사용됩니다.
+   ```shell
+   export EKS_ID=mzc-kjh
+   ```
 
-4. `code-server` 생성용 CloudFormation 실행
+   CloudShell 에서 아래 명령을 실행합니다.
 
-    `EKS_ID` 환경 변수에 사용하기를 원하는 ID를 지정합니다.
-    ```shell
-    export EKS_ID=mzc-kjh
-    ```
-    (`code-server` 생성용 CloudFormation에 사용할 'suffix' 입니다.)
-
-    `code-server` 설치용 CloudFormation 파일을 다운로드 받습니다.
-    ```
-    curl
-    ```
-
-    ```shell
-    aws cloudformation create-stack \
-        --stack-name eks-workshop-${EKS_ID} \
-        --template-body $(curl -fsSL https://raw.githubusercontent.com/megazone-stc-cnp/eks-edu/refs/heads/main/01_Container/eks-workshop-vscode-cfn.yaml) \
-        --capabilities CAPABILITY_NAMED_IAM \
-        --region ${AWS_REGION}
-    ```
+   ```shell
+   aws cloudformation create-stack \
+       --stack-name eks-workshop-${EKS_ID} \
+       --template-body "$(curl -fsSL https://raw.githubusercontent.com/megazone-stc-cnp/eks-edu/refs/heads/main/00_Setup/eks-workshop-vscode-cfn.yaml)" \
+       --capabilities CAPABILITY_NAMED_IAM \
+       --region ${AWS_REGION}
+   ```
+   ![AWS CLI - CloudFormation](./00_Setup/images/aws-cli-cloudformation.png)
 
 ## 1. Container 기술 일반
 1. 
