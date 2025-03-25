@@ -598,7 +598,7 @@ Outputs:
     Value: !Sub https://${EksWorkshopIdeCloudFrontDistribution.DomainName}
   IdePasswordSecret:
     Value: !Sub
-      - https://console.aws.amazon.com/secretsmanager/secret?name=${SecretName}
+      - https://${AWS::Region}.console.aws.amazon.com/secretsmanager/secret?name=${SecretName}
       - SecretName: !Sub ${AWS::StackName}-password
   IdePasswordSecretName:
     Value: !Sub ${AWS::StackName}-password
