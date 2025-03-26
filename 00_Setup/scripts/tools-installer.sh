@@ -5,6 +5,9 @@ set -e
 # docker-compose
 docker_compose_version='2.34.0'                 # unknown
 
+# kind
+kind_version='0.27.0'                           # 2025-02-15
+
 # renovate: depName=kubernetes/kubernetes
 kubectl_version='1.31.6'                        # 2025-02-11
 
@@ -34,6 +37,9 @@ ec2_instance_selector_version='3.1.1'           # 2025-02-25
 
 # renovate: depName=hatoo/oha (HTTP load generator)
 oha_version='1.8.0'                             # 2025-02-15
+
+# fzf
+fzf_version='0.60.3'                            # 2025-03-03
 
 download () {
   url=$1
@@ -80,6 +86,8 @@ pip3 install -q awscurl==0.28 urllib3==1.26.6
 
 # docker
 usermod -a -G docker ec2-user
+# systemctl enable --now docker
+service docker start # == systemctl start docker
 
 # docker-compose
 DOCKER_CLI_PLUGINS_PATH="/usr/local/lib/docker/cli-plugins"
@@ -87,6 +95,11 @@ download "https://github.com/docker/compose/releases/download/v${docker_compose_
 chmod +x ./docker-compose
 mkdir -p $DOCKER_CLI_PLUGINS_PATH
 mv ./docker-compose $DOCKER_CLI_PLUGINS_PATH
+
+# kind
+download "https://kind.sigs.k8s.io/dl/v${kind_version}/kind-linux-${arch_name}" "kind"
+chmod +x ./kind
+mv ./kind /usr/local/bin/kind
 
 # kubectl
 download "https://dl.k8s.io/release/v${kubectl_version}/bin/linux/${arch_name}/kubectl" "kubectl"
@@ -153,6 +166,19 @@ mv ./ec2-instance-selector /usr/local/bin/ec2-instance-selector
 download "https://github.com/hatoo/oha/releases/download/v${oha_version}/oha-linux-${arch_name}" "oha"
 chmod +x ./oha
 mv ./oha /usr/local/bin
+
+# fzf
+download "https://github.com/junegunn/fzf/releases/download/v${fzf_version}/fzf-${fzf_version}-linux_${arch_name}.tar.gz" "fzf-${fzf_version}-linux_${arch_name}.tar.gz"
+tar xfz fzf-${fzf_version}-linux_${arch_name}.tar.gz
+chmod +x fzf
+mv ./fzf /usr/local/bin
+rm -rf fzf-${fzf_version}-linux_${arch_name}.tar.gz
+cat << EOT >> ~/.bashrc
+
+# Set up fzf key bindings and fuzzy completion
+eval "\$(fzf --bash)"
+EOT
+
 
 REPOSITORY_OWNER="aws-samples"
 REPOSITORY_NAME="eks-workshop-v2"
