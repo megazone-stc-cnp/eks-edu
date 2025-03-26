@@ -27,7 +27,7 @@ new_subnet_id_1=$(
     aws ec2 create-subnet \
         --vpc-id ${VPC_ID} \
         --availability-zone ${AWS_AZ1} \
-        --cidr-block 192.168.1.0/27 \
+        --cidr-block 192.168.2.0/24 \
         --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=my-eks-custom-networking-vpc-PrivateSubnet01},{Key=kubernetes.io/role/internal-elb,Value=1}]' \
         --query Subnet.SubnetId \
         --region ${AWS_REGION} ${PROFILE_STRING} \
@@ -38,7 +38,7 @@ new_subnet_id_2=$(
     aws ec2 create-subnet \
         --vpc-id ${VPC_ID} \
         --availability-zone ${AWS_AZ2} \
-        --cidr-block 192.168.1.32/27 \
+        --cidr-block 192.168.3.0/24 \
         --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=my-eks-custom-networking-vpc-PrivateSubnet02},{Key=kubernetes.io/role/internal-elb,Value=1}]' \
         --query Subnet.SubnetId \
         --region ${AWS_REGION} ${PROFILE_STRING} \

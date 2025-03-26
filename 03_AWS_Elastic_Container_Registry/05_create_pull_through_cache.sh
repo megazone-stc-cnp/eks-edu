@@ -16,6 +16,6 @@ ORIGIN_TAG=v2.9.2
 # ==================================================================
 
 aws ecr create-pull-through-cache-rule \
-  --name aws-load-balancer-controller-rule \
   --upstream-registry-url public.ecr.aws \
-  --ecr-repository-prefix public-ecr
+  --ecr-repository-prefix public-ecr \
+  --region ${AWS_REGION} ${PROFILE_STRING}

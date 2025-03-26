@@ -10,6 +10,7 @@ fi
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
+# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -22,19 +23,14 @@ fi
 # export AWS_PRIVATE_SUBNET1=subnet-01b7dce75dc1b79e5
 # export AWS_PRIVATE_SUBNET2=subnet-0cf18e5c66c385020
 # export EKS_ADDITIONAL_SG=sg-03290c4da8c08c351
+# export NEW_POD_SUBNET1=subnet-07e90b5d0fd7cf445
+# export NEW_POD_SUBNET2=subnet-03201c33f1b4828bd
+# export EKS_CLUSTER_SG=sg-0452354091f449b82
 
+ADDON_NAME=vpc-cni
+VPC_CNI_ROLE_NAME=eks-edu-vpc-cni-pod-identity-role-${EMPLOY_ID}
 # ==================================================================
-echo "aws ec2 associate-vpc-cidr-block --vpc-id ${VPC_ID} \\
-    --cidr-block 192.168.2.0/23 \\
-    --region ${AWS_REGION} ${PROFILE_STRING}"
-
-aws ec2 associate-vpc-cidr-block --vpc-id ${VPC_ID} \
-    --cidr-block 192.168.2.0/23 \
-    --output json \
-    --region ${AWS_REGION} ${PROFILE_STRING} | tee associate-vpc-cidr-block-result.json
-
-echo "생성 완료"
-aws ec2 describe-vpcs --vpc-ids ${VPC_ID} \
-    --query 'Vpcs[*].CidrBlockAssociationSet[*].{CIDRBlock: CidrBlock, State: CidrBlockState.State}' \
-    --output table \
+aws eks describe-addon \
+    --cluster-name ${CLUSTER_NAME} \
+    --addon-name ${ADDON_NAME} \
     --region ${AWS_REGION} ${PROFILE_STRING}
