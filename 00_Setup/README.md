@@ -68,14 +68,14 @@ AWS에 로그인 한 후, CloudShell로 이동하여 다음 명령어를 입력�
 | Tool | version | release date |
 | ---- | ------- | ------------ |
 | [docker](https://github.com/moby/moby) | 25.0.8 | 2025-02-05 |
-| [docker-compose](https://github.com/docker/compose) | 2.34.0 | ? |
+| [docker-compose](https://github.com/docker/compose) | 2.34.0 | - |
 | [kubectl](https://kubernetes.io/docs/reference/kubectl/) | 1.31.6 | 2025-02-11 |
 | [helm](https://helm.sh) | 3.17.2 | 2025-03-14 |
 | [eksctl](https://github.com/eksctl-io/eksctl) | 0.206.0 | 2025-03-23 |
 | [kubeseal](https://github.com/bitnami-labs/sealed-secrets) | 0.28.0 | 2025-01-16 |
 | [flux](https://github.com/fluxcd) | 2.5.1 | 2025-02-26 |
 | [argocd](https://github.com/argoproj/argo-cd) | 2.14.8 | 2025-03-25 |
-| [AWS CLI](https://aws.amazon.com/ko/cli/) | ? | ? |
+| [AWS CLI](https://aws.amazon.com/ko/cli/) | v2 | - |
 | [yq](https://github.com/mikefarah/yq) | 4.45.1 | 2025-01-12 |
 | [fzf](https://github.com/junegunn/fzf) | 0.60.3 | 2025-03-03 |
 | [terraform](https://www.terraform.io/) | 1.11.2 | 2025-03-12 |
