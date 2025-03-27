@@ -293,7 +293,7 @@ Resources:
                   export RESOURCES_PRECREATED="${ResourcesPrecreated}"
                   export REPOSITORY_URL="https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}"
 
-                  curl -fsSL ${REPOSITORY_URL}/${RepositoryRef}/00_Setup/scripts/installer.sh | bash
+                  curl -fsSL $REPOSITORY_URL/${RepositoryRef}/00_Setup/scripts/installer.sh | bash
 
                   cat <<"EOT" | sudo -E -H -u ec2-user bash
                   set -e
@@ -346,8 +346,8 @@ Resources:
 
                   echo '{ "query": { "folder": "/home/ec2-user/environment" } }' > ~/.local/share/code-server/coder.json
 
-                  curl -fsSL ${REPOSITORY_URL}/${RepositoryRef}/00_Setup/scripts/setup.sh | bash
-                  curl -fsSL ${REPOSITORY_URL}/${RepositoryRef}/00_Setup/scripts/banner.sh | bash
+                  curl -fsSL $REPOSITORY_URL/${RepositoryRef}/00_Setup/scripts/setup.sh | bash
+                  curl -fsSL $REPOSITORY_URL/${RepositoryRef}/00_Setup/scripts/banner.sh | bash
 
                   code-server --install-extension ms-azuretools.vscode-docker --force
                   code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools --force
@@ -355,7 +355,7 @@ Resources:
                   code-server --install-extension pkief.material-icon-theme --force
 
                   cd ~/environment
-                  git clone --depth=1 --single-branch --branch=$REPOSITORY_REF ${REPOSITORY_URL}.git
+                  git clone --depth=1 --single-branch --branch=$REPOSITORY_REF $REPOSITORY_URL.git
                   EOT
 
                   systemctl restart code-server@ec2-user
