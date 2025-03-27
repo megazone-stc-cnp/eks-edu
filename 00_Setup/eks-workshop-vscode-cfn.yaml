@@ -243,7 +243,7 @@ Resources:
                   except Exception as e:
                       status = cfnresponse.FAILED
                       logging.error('Error1: %s', traceback.format_exc())
-                      logging.error('Error2: %s', traceback.format_exc(e)})
+                      logging.error('Error2: %s', traceback.format_exc(e))
                       responseData = {'Error': traceback.format_exc(e)}
                   finally:
                       cfnresponse.send(event, context, status, responseData, 'CustomResourcePhysicalID')
