@@ -3,19 +3,19 @@ Description: Creates a code-server IDE for the EKS workshop
 Parameters:
   InstanceVolumeSize:
     Type: Number
-    Description: The Size in GB of the Cloud9 Instance Volume.
-    Default: 30
+    Description: The Size in GB of the code-server Instance Volume.
+    Default: 15
   RepositoryOwner:
     Type: String
-    Description: The owner of the GitHub repository to be used to bootstrap Cloud9
+    Description: The owner of the GitHub repository to be used to bootstrap code-server
     Default: "megazone-stc-cnp"
   RepositoryName:
     Type: String
-    Description: The name of the GitHub repository to be used to bootstrap Cloud9
+    Description: The name of the GitHub repository to be used to bootstrap code-server
     Default: "eks-edu"
   RepositoryRef:
     Type: String
-    Description: The Git reference to be used to bootstrap Cloud9
+    Description: The Git reference to be used to bootstrap code-server
     Default: "main"
   ResourcesPrecreated:
     Type: String
@@ -24,10 +24,14 @@ Parameters:
     AllowedValues:
       - "false"
       - "true"
+  CodeServerInstanceType:
+    Type: String
+    Description: The instance type to use for code-server
+    Default: "t3a.small"    # 't3a.small' 인스턴스는 2 vCPU, 2GB RAM 이고, code-server 최소 사양(2 cpu, 1GB RAM)을 충족함
   CodeServerVersion:
     Type: String
     Description: Default code-server version to use
-    Default: "4.98.2" # 2025-03-15
+    Default: "4.98.2"       # 2025-03-15
   AmiParameterStoreName:
     Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
     Default: "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
@@ -192,10 +196,11 @@ Resources:
           import cfnresponse
           import logging
           logger = logging.getLogger(__name__)
+          logger.setLevel(logging.INFO)
 
           def lambda_handler(event, context):
-              print(event.values())
-              print('context: {}'.format(context))
+              logging.info(event.values())
+              logging.info('context: {}'.format(context))
               responseData = {}
 
               status = cfnresponse.SUCCESS
@@ -213,7 +218,7 @@ Resources:
 
                       ssm_document = event['ResourceProperties']['SsmDocument']
 
-                      print('Sending SSM command...')
+                      logging.info('Sending SSM command...')
 
                       response = ssm.send_command(
                         InstanceIds=[instance_id],
@@ -237,7 +242,8 @@ Resources:
                       
                   except Exception as e:
                       status = cfnresponse.FAILED
-                      print(traceback.format_exc())
+                      logging.error('Error1: %s', traceback.format_exc())
+                      logging.error('Error2: %s', traceback.format_exc(e))
                       responseData = {'Error': traceback.format_exc(e)}
                   finally:
                       cfnresponse.send(event, context, status, responseData, 'CustomResourcePhysicalID')
@@ -249,7 +255,7 @@ Resources:
       DocumentFormat: YAML
       Content:
         schemaVersion: "2.2"
-        description: Bootstrap Cloud9 Instance
+        description: Bootstrap code-server Instance
         mainSteps:
           - action: aws:runShellScript
             name: EksWorkshopIdebootstrap
@@ -258,6 +264,8 @@ Resources:
                 - !Sub |
                   set -e
 
+                  # Install required packages
+                  yum update -y
                   yum install -y git tar gzip vim nodejs npm make gcc g++ argon2
 
                   source <(curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/hack/lib/common-env.sh)
@@ -285,8 +293,9 @@ Resources:
                   export REPOSITORY_NAME="${RepositoryName}"
                   export REPOSITORY_REF="${RepositoryRef}"
                   export RESOURCES_PRECREATED="${ResourcesPrecreated}"
+                  export REPOSITORY_URL="https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}"
 
-                  curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/lab/scripts/installer.sh | bash
+                  curl -fsSL $REPOSITORY_URL/${RepositoryRef}/00_Setup/scripts/installer.sh | bash
 
                   cat <<"EOT" | sudo -E -H -u ec2-user bash
                   set -e
@@ -323,7 +332,8 @@ Resources:
                     "security.workspace.trust.enabled": false,
                     "task.allowAutomaticTasks": "on",
                     "telemetry.telemetryLevel": "off",
-                    "workbench.startupEditor": "terminal"
+                    "workbench.startupEditor": "terminal",
+                    "workbench.iconTheme": "material-icon-theme",
                   }
                   EOF
 
@@ -338,15 +348,16 @@ Resources:
 
                   echo '{ "query": { "folder": "/home/ec2-user/environment" } }' > ~/.local/share/code-server/coder.json
 
-                  curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/lab/scripts/setup.sh | bash
+                  curl -fsSL $REPOSITORY_URL/${RepositoryRef}/00_Setup/scripts/setup.sh | bash
+                  curl -fsSL $REPOSITORY_URL/${RepositoryRef}/00_Setup/scripts/banner.sh | bash
 
-                  curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/lab/scripts/banner.sh | bash
-
+                  code-server --install-extension ms-azuretools.vscode-docker --force
                   code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools --force
                   code-server --install-extension redhat.vscode-yaml --force
+                  code-server --install-extension pkief.material-icon-theme --force
 
                   cd ~/environment
-                  git clone https://github.com/megazone-stc-cnp/eks-edu.git
+                  git clone --depth=1 --single-branch --branch=$REPOSITORY_REF $REPOSITORY_URL.git
                   EOT
 
                   systemctl restart code-server@ec2-user
@@ -498,7 +509,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref AmiParameterStoreName
-      InstanceType: t3a.medium
+      InstanceType: !Ref CodeServerInstanceType
       BlockDeviceMappings:
         - Ebs:
             VolumeSize: !Ref InstanceVolumeSize
