@@ -196,10 +196,11 @@ Resources:
           import cfnresponse
           import logging
           logger = logging.getLogger(__name__)
+          logger.setLevel(logging.INFO)
 
           def lambda_handler(event, context):
-              print(event.values())
-              print('context: {}'.format(context))
+              logging.info(event.values())
+              logging.info('context: {}'.format(context))
               responseData = {}
 
               status = cfnresponse.SUCCESS
@@ -217,7 +218,7 @@ Resources:
 
                       ssm_document = event['ResourceProperties']['SsmDocument']
 
-                      print('Sending SSM command...')
+                      logging.info('Sending SSM command...')
 
                       response = ssm.send_command(
                         InstanceIds=[instance_id],
@@ -241,7 +242,8 @@ Resources:
                       
                   except Exception as e:
                       status = cfnresponse.FAILED
-                      print(traceback.format_exc())
+                      logging.error('Error1: %s', traceback.format_exc())
+                      logging.error('Error2: %s', traceback.format_exc(e)})
                       responseData = {'Error': traceback.format_exc(e)}
                   finally:
                       cfnresponse.send(event, context, status, responseData, 'CustomResourcePhysicalID')
