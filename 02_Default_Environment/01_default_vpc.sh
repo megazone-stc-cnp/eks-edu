@@ -15,19 +15,14 @@ echo "aws cloudformation create-stack \\
   --capabilities CAPABILITY_NAMED_IAM \\
   --region ${AWS_REGION} ${PROFILE_STRING}"
 
+echo "기본 VPC 생성중....."
 aws cloudformation create-stack \
   --stack-name ${STACK_NAME} \
   --template-body file://amazon-eks-vpc-private-subnets.yaml \
   --capabilities CAPABILITY_NAMED_IAM \
   --region ${AWS_REGION} ${PROFILE_STRING}
 
-echo "기본 VPC 생성중....."
-echo "aws cloudformation wait stack-create-complete \\
-    --stack-name ${STACK_NAME} \\
-    --region ${AWS_REGION} ${PROFILE_STRING}"
-
 aws cloudformation wait stack-create-complete \
     --stack-name ${STACK_NAME} \
     --region ${AWS_REGION} ${PROFILE_STRING}
-    
-echo "기본 VPC 생성완료....."    
+echo "기본 VPC 생성완료....."

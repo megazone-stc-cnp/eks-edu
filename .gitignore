@@ -51,3 +51,4 @@ env.sh
 08_Computing_1/deployment.yaml
 08_Computing_1/local_env.sh
 08_Computing_1/result.json
+**/tmp/*

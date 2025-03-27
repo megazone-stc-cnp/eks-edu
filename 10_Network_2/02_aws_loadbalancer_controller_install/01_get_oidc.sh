@@ -14,7 +14,10 @@ fi
 # export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 # ==================================================================
 
-oidc_id=$(aws eks describe-cluster --name ${CLUSTER_NAME} --query "cluster.identity.oidc.issuer" --output text --region ${AWS_REGION} ${PROFILE_STRING} | cut -d '/' -f 5)
+OIDC_ID=$(aws eks describe-cluster --name ${CLUSTER_NAME} --query "cluster.identity.oidc.issuer" --output text --region ${AWS_REGION} ${PROFILE_STRING} | cut -d '/' -f 5)
 
-echo "OIDC ID : ${oidc_id}"
-echo "이 값을 local_env.sh에 세팅해야 한다. !!"
+if [ -f "./local_env.sh" ];then
+    rm -rf local_env.sh
+fi
+echo "#!/bin/bash" >> local_env.sh
+echo "export OIDC_ID=${OIDC_ID}" >> local_env.sh

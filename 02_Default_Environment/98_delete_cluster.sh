@@ -12,11 +12,10 @@ fi
 # export EKS_VERSION=1.31
 # export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
 # ======================================================
-
+echo "EKS 삭제중....."
 eksctl delete cluster --name ${CLUSTER_NAME} \
 	--region ${AWS_REGION} ${PROFILE_STRING}
 
-echo "EKS 삭제중....."
 aws cloudformation wait stack-delete-complete \
     --stack-name eks-edu-cluster-${EMPLOY_ID} \
 	--region ${AWS_REGION} ${PROFILE_STRING}
