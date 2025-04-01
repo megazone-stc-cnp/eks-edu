@@ -1,0 +1,27 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eks-edu-cluster-${EMPLOY_ID}
+  region: ${AWS_REGION}
+  version: "1.31"
+  tags:
+    karpenter.sh/discovery: eks-edu-cluster-${EMPLOY_ID}
+    created-by: eks-workshop-v2
+    env: eks-edu-cluster-${EMPLOY_ID}
+iam:
+  withOIDC: true
+vpc:
+  id: "${VPC_ID}"  # (optional, must match VPC ID used for each subnet below)
+  controlPlaneSecurityGroupIDs: ["${EKS_ADDITIONAL_SG}"]  
+  subnets:
+    # must provide 'private' and/or 'public' subnets by availability zone as shown
+    private:
+      ${AWS_AZ1}:
+        id: "${AWS_PRIVATE_SUBNET1}"
+      ${AWS_AZ2}:
+        id: "${AWS_PRIVATE_SUBNET2}"
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: true
+addonsConfig:
+  disableDefaultAddons: true
