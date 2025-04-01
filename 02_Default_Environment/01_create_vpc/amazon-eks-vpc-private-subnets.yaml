@@ -79,16 +79,6 @@ Resources:
       - Key: Network
         Value: Private01
 
-  PrivateRouteTable02:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-      Tags:
-      - Key: Name
-        Value: Private Subnet AZ2
-      - Key: Network
-        Value: Private02
-
   PublicRoute:
     DependsOn: VPCGatewayAttachment
     Type: AWS::EC2::Route
@@ -110,12 +100,12 @@ Resources:
   PrivateRoute02:
     DependsOn:
     - VPCGatewayAttachment
-    - NatGateway02
+    - NatGateway01
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PrivateRouteTable02
+      RouteTableId: !Ref PrivateRouteTable01
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGateway02
+      NatGatewayId: !Ref NatGateway01
 
   NatGateway01:
     DependsOn:
@@ -130,27 +120,7 @@ Resources:
       - Key: Name
         Value: !Sub '${AWS::StackName}-NatGatewayAZ1'
 
-  NatGateway02:
-    DependsOn:
-    - NatGatewayEIP2
-    - PublicSubnet02
-    - VPCGatewayAttachment
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt 'NatGatewayEIP2.AllocationId'
-      SubnetId: !Ref PublicSubnet02
-      Tags:
-      - Key: Name
-        Value: !Sub '${AWS::StackName}-NatGatewayAZ2'
-
   NatGatewayEIP1:
-    DependsOn:
-    - VPCGatewayAttachment
-    Type: 'AWS::EC2::EIP'
-    Properties:
-      Domain: vpc
-
-  NatGatewayEIP2:
     DependsOn:
     - VPCGatewayAttachment
     Type: 'AWS::EC2::EIP'
@@ -261,7 +231,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PrivateSubnet02
-      RouteTableId: !Ref PrivateRouteTable02
+      RouteTableId: !Ref PrivateRouteTable01
 
   ControlPlaneSecurityGroup:
     Type: AWS::EC2::SecurityGroup

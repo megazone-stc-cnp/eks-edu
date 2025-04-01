@@ -53,5 +53,3 @@ AWS EKS에 대해 기초부터 고급주제까지 학습하실 수 있도록 교
 ## [18. Backstage 이론](18_Backstage/README.md)
 
 ## [19. Backstage 실습](19_Backstage/README.md)
-
-[TODO] 오토에버 명칭을 제거 ( 범용 )
