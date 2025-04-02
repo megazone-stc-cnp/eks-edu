@@ -10,7 +10,14 @@ if [[ ! -d "~/.bashrc.d" ]]; then
   echo 'for file in ~/.bashrc.d/*.bash; do source "$file"; done' >> ~/.bashrc
 fi
 
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+
+# AWS CLI 환경변수 설정
+cat << EOT > ~/.bashrc.d/aws.bash
+export AWS_PAGER=""
+export AWS_REGION="${AWS_REGION}"
+export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query "Account" --output text)"
+EOT
+
 
 LOCAL_BASH_COMPLETION_DIR=~/.local/share/bash-completion/completions
 mkdir -p $LOCAL_BASH_COMPLETION_DIR

@@ -261,23 +261,55 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
    docker run -dp 127.0.0.1:3000:3000 getting-started
    ```
 
-<details>
-<summary>실행 결과를 확인합니다.</summary>
+   <details>
+   <summary>실행 결과를 확인합니다.</summary>
 
-docker run 실행 후에는 아래와 같은 오류 메세지를 보셨을 겁니다.
-```shell
-$ docker run -dp 127.0.0.1:3000:3000 getting-started
-06a9ac475f9ad9d60cc05a239c345cdbc2ffb0d41e910b3fd2705bbcc79b354f
-docker: Error response from daemon: driver failed programming external connectivity on endpoint nice_babbage (49157a0c6e5e5ae4ee019a15436b86efcdb1b791d4ca6f2804077646b1b7f802): Bind for 127.0.0.1:3000 failed: port is already allocated.
-```
+   docker run 실행 후에는 아래와 같은 오류 메세지를 보셨을 겁니다.
+   ```shell
+   $ docker run -dp 127.0.0.1:3000:3000 getting-started
+   06a9ac475f9ad9d60cc05a239c345cdbc2ffb0d41e910b3fd2705bbcc79b354f
+   docker: Error response from daemon: driver failed programming external connectivity on endpoint nice_babbage (49157a0c6e5e5ae4ee019a15436b86efcdb1b791d4ca6f2804077646b1b7f802): Bind for 127.0.0.1:3000 failed: port is already allocated.
+   ```
 
-![Update app.js](images/updating-app-2.png)
+   ![Update app.js](images/updating-app-2.png)
 
-이 오류가 발생한 원인은 소스 코드를 업데이트하기 이전에 이미 컨테이너가 아직 실행 중이기 때문입니다. 왜냐하면 이전에 실행한 컨테이너가 호스트의 `3000`번 포트를 이미 리스닝 중이기 때문에 새로운 컨테이너를 실행할때에도 `3000`번 포트를 사용하려다가 발생하는 문제입니다.
+   이 오류가 발생한 원인은 소스 코드를 업데이트하기 이전에 이미 컨테이너가 아직 실행 중이기 때문입니다. 왜냐하면 이전에 실행한 컨테이너가 호스트의 `3000`번 포트를 이미 리스닝 중이기 때문에 새로운 컨테이너를 실행할때에도 `3000`번 포트를 사용하려다가 발생하는 문제입니다.
 
-이 문제를 해결하려면 이전에 실행했던 컨테이너를 삭제해야 합니다.
-</details>
+   이 문제를 해결하려면 이전에 실행했던 컨테이너를 삭제해야 합니다.
+   </details>
 
 ### 실습 #2-2. 이전에 실행한 컨테이너 삭제하기
 
-1. 현재 실행중인 컨테이너의 ID를 얻기 위해 `docker ps` 명령을 실행합니다.
+1. `docker ps` 명령을 실행하여 실행중인 컨테이너의 ID를 복사합니다.
+   ```shell
+   docker ps
+   ```
+
+   ![Docker ps](images/updating-app-3.png)
+
+2. `docker stop` 명령을 이용해 실행중인 컨테이너를 종료합니다.
+   ```shell
+   docker stop <컨테이너ID>
+   ```
+
+   ![Docker ps](images/updating-app-4.png)
+
+3. 컨테이너가 종료된 이후, `docker rm` 명령을 이용해 컨테이너를 삭제합니다.
+   ```shell
+   docker rm <컨테이너ID>
+   ```
+
+   ![Docker ps](images/updating-app-5.png)
+
+### 실습 #2-3. 새로 업데이트했던 컨테이너 실행하기
+
+1. "실습 #2-2"를 이용해 컨테이너를 삭제한 이후에는 새로운 컨테이너를 실행할 수 있습니다.
+   ```shell
+   docker run -dp 127.0.0.1:3000:3000 getting-started
+   ```
+
+   ![Docker ps](images/updating-app-6.png)
+
+   `docker run` 명령이 성공적으로 실행되면 다시 "Open in Browser" 버튼이 표시됩니다. 해당 버튼을 클릭하여 영문 메세지가 한글 메세지로 변경되었는지 확인해 주세요.
+
+   
