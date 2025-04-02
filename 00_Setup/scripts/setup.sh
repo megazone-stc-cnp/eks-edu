@@ -12,10 +12,11 @@ fi
 
 
 # AWS CLI 환경변수 설정
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 cat << EOT > ~/.bashrc.d/aws.bash
-export AWS_PAGER=""
+export AWS_PAGER="jq"
 export AWS_REGION="${AWS_REGION}"
-export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query "Account" --output text)"
+export AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID}"
 EOT
 
 

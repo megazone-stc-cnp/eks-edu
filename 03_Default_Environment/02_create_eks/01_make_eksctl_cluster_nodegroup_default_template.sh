@@ -20,6 +20,9 @@ if [ -f "template/eksctl.yaml" ];then
 	rm -rf template/eksctl.yaml
 fi
 
+echo "envsubst < eksctl-cluster-nodegroup-default.yaml.template > template/eksctl.yaml"
+echo ""
+
 envsubst < eksctl-cluster-nodegroup-default.yaml.template > template/eksctl.yaml
 
 cat template/eksctl.yaml
