@@ -118,7 +118,83 @@ Weaveworks가 상업중 운영을 중단한다고 하여, 현재는 AWS에서 �
    ```shell
    eksctl create cluster -f cluster.yaml
    ```
-3. cluster.yaml config 내용 ( nodegroup 생성용 )
+
+## 실습
+
+### 기본 설정 파일 세팅
+
+```shell
+cd ~/environment/eks-edu
+cp env.sh.sample env.sh
+
+# env.sh 파일 설정 필요
+```
+### 기본 인프라 생성 ( VPC / Public Subnet / Private Subnet )
+
+EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성되어 있어야 합니다.
+
+생성은 CloudFormation을 이용해서 생성합니다.
+
+1. vpc 인프라 생성
+
+   ```shell
+   cd ~/environment/eks-edu/03_Default_Environment/01_create_vpc
+   sh 01_default_vpc.sh
+   ```
+
+   위 `01_default_vpc.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   aws cloudformation create-stack \
+       --stack-name eks-workshop-vpc-9641173 \
+       --template-body file://amazon-eks-vpc-private-subnets.yaml \
+       --capabilities CAPABILITY_NAMED_IAM
+   ```
+2. 실행 화면
+   ![1743477021002](image/creating_vpc_infra.png)
+3. 생성 결과 화면
+   ![1743477100419](image/result_vpc_infra.png)
+
+### 생성된 Infra 정보를 env 파일로 저장
+
+1. 생성된 정보를 env 파일로 저장
+
+   ```shell
+   sh 02_get_output.sh
+   ```
+
+   위 `02_get_output.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   aws cloudformation describe-stacks \
+       --stack-name eks-workshop-vpc-9641173 --query Stacks[0].Outputs --output json
+   ```
+2. 실행 화면
+   ![1743477789373](image/get_output.png)
+3. 생성 결과 화면
+   ![1743477850117](image/result_output.png)
+
+### EKS 생성
+
+1. EKS 생성용 yaml에 vpc value 값 매핑해서 template/eksctl.yaml 생성 ( eks cluster + nodegroup + default addon )
+
+   ```shell
+   cd ~/environment/eks-edu/03_Default_Environment/02_create_eks
+   sh 01_make_eksctl_cluster_nodegroup_default_template.sh
+   ```
+
+   위 `01_make_eksctl_cluster_nodegroup_default_template.sh`를 실행하면 생성된 VPC 정보를 매핑해서 template/eksctl.yaml를 생성합니다. (참고용)
+
+   ```shell
+   envsubst < eksctl-cluster-nodegroup-default.yaml.template > template/eksctl.yaml
+   ```
+2. 실행 화면
+
+   ![1743479127302](image/make_template_file.png)
+3. 결과 화면
+
+   ![1743479227584](image/result_template_file.png)
+4. cluster.yaml config 내용 ( nodegroup 생성용 )
 
    ```yaml
    01 apiVersion: eksctl.io/v1alpha5
@@ -146,30 +222,10 @@ Weaveworks가 상업중 운영을 중단한다고 하여, 현재는 AWS에서 �
    23     privateAccess: true
    24     publicAccess: true
    25 managedNodeGroups:
-   26   - name: ops-nodegroup
+   26   - name: app-nodegroup
    27     instanceType: t3.medium
-   28     desiredCapacity: 1
+   28     desiredCapacity: 2
    29     privateNetworking: true
-   30     labels: {role: ops}
-   31   - name: app-nodegroup
-   32     instanceType: t3.medium
-   33     desiredCapacity: 2
-   34     privateNetworking: true
-   35     labels: {role: app}
-   36 addons:
-   37   - name: vpc-cni # no version is specified so it deploys the default version
-   38     attachPolicyARNs:
-   39       - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-   40   - name: coredns
-   41     version: latest # auto discovers the latest available
-   42   - name: kube-proxy
-   43     version: latest
-   44   - name: aws-ebs-csi-driver
-   45     wellKnownPolicies:      # add IAM and service account
-   46       ebsCSIController: true
-   47   - name: aws-efs-csi-driver
-   48     wellKnownPolicies:      # add IAM and service account  
-   49       efsCSIController: true
    ```
 
    - 04 : EKS Cluster 명칭
@@ -178,101 +234,61 @@ Weaveworks가 상업중 운영을 중단한다고 하여, 현재는 AWS에서 �
    - 11 ~ 12 : OIDC 생성
    - 13 ~ 21 : 생성된 VPC/Subnet/Add Cluster SecurityGroup 정보를 설정
    - 22 ~ 24 : Cluster Endpoint 설정
-   - 25 ~ 35 : Managed NodeGroup 설정
-   - 36 ~ 49 : Addon 생성 ( IRSA 방식 )
-
-#### 관련 링크
-
-- [Amazon EKS 클러스터에 대한 Amazon VPC 생성](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/creating-a-vpc.html)
-- [eksctl 공식 홈페이지](https://eksctl.io/)
-
-## 실습
-
-### 기본 인프라 생성 ( VPC / Public Subnet / Private Subnet )
-
-EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성되어 있어야 합니다.
-
-생성은 CloudFormation을 이용해서 생성합니다.
-
-1. vpc 인프라 생성
-
-   ```shell
-   cd ~/environment/eks-edu/02_Default_Environment/01_create_vpc
-   sh 01_default_vpc.sh
-   ```
-
-   위 `01_default_vpc.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
-
-   ```shell
-   aws cloudformation create-stack \
-       --stack-name ${STACK_NAME} \
-       --template-body file://amazon-eks-vpc-private-subnets.yaml \
-       --capabilities CAPABILITY_NAMED_IAM
-   ```
-2. 실행 화면
-   ![1743477021002](image/creating_vpc_infra.png)
-3. 생성 결과 화면
-   ![1743477100419](image/result_vpc_infra.png)
-
-### 생성된 Infra 정보를 env 파일로 저장
-
-1. 생성된 정보를 env 파일로 저장
-
-   ```shell
-   sh 02_get_output.sh
-   ```
-2. 실행 화면
-   ![1743477789373](image/get_output.png)
-3. 생성 결과 화면
-   ![1743477850117](image/result_output.png)
-
-### EKS 생성
-
-1. EKS 생성용 yaml에 vpc 생성 리소스 설정 ( eks cluster + nodegroup + default addon )
-
-   ```shell
-   cd ~/environment/eks-edu/02_Default_Environment/02_create_eks
-   sh 01_make_eksctl_cluster_nodegroup_default_template.sh
-   ```
-2. 실행 화면
-
-   ![1743479127302](image/make_template_file.png)
-3. 결과 화면
-
-   ![1743479227584](image/result_template_file.png)
-4. EKS 생성
+   - 25 ~ 29 : Managed NodeGroup 설정 ( t3.medium * 2대 생성 )
+5. EKS 생성
 
    ```shell
    sh 02_eksctl_install.sh
    ```
-5. 실행 화면 ( 15분 소요 )
+
+   위 `02_eksctl_install.sh`를 실행하면 아래 eksctl cli가 실행됩니다. (참고용)
+
+   ```shell
+   eksctl create cluster -f template/eksctl.yaml 
+   ```
+6. 실행 화면 ( 15분 소요 )
 
    ![1743479348193](image/creating_eksctl_cluster.png)
-6. 결과 화면
+7. 결과 화면
 
 - cloudformation 화면
 
-  ![1743480663213](image/result_eksctl_cloudformation.png)
+  ![1743574233575](image/result_eksctl_cloudformation.png)
 - eks cluster 생성 화면
 
   ![1743480747351](image/result_eksctl_cluster.png)
 - eks nodegroup 생성 화면
 
-  ![1743480814163](image/result_eksctl_nodegroup.png)
-
-### 관련 링크
+  ![1743574400471](image/result_eksctl_nodegroup.png)
 
 ## 정리
 
-1. 리소스 삭제
+1. 리소스 삭제 ( 15분 소요 )
 
    ```shell
-   cd ~/environment/eks-edu/02_Default_Environment/99_delete
+   cd ~/environment/eks-edu/03_Default_Environment/99_delete
    sh 99_delete.sh
    ```
+
+   위 `99_delete.sh`를 실행하면 아래 eksctl cli 와 aws cli가 실행됩니다. (참고용)
+
+   ```shell
+   # eks 삭제
+   eksctl delete cluster --name eks-edu-cluster-9641173 
+
+   # vpc 정보 삭제
+   aws cloudformation delete-stack \
+     --stack-name eks-workshop-vpc-9641173
+   ```
+
 2. 실행 화면
 
    ![1743483981176](image/delete_resource.png)
+
 3. 결과 화면
 
    ![1743484066002](image/result_delete_resource.png)
+
+## 관련 링크
+- [Amazon EKS 클러스터에 대한 Amazon VPC 생성](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/creating-a-vpc.html)
+- [eksctl 공식 홈페이지](https://eksctl.io/)

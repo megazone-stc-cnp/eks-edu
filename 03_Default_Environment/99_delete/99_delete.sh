@@ -20,6 +20,9 @@ aws cloudformation wait stack-delete-complete \
     --stack-name eks-edu-cluster-${IDE_NAME}-cluster ${PROFILE_STRING}
 echo "EKS 삭제 완료....."
 
+echo "aws cloudformation delete-stack \\
+  --stack-name eks-workshop-vpc-${IDE_NAME} ${PROFILE_STRING}"
+
 aws cloudformation delete-stack \
   --stack-name eks-workshop-vpc-${IDE_NAME} ${PROFILE_STRING}
 
