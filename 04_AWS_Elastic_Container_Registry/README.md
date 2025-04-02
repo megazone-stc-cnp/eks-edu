@@ -4,27 +4,30 @@
 
 1. [0. 교육 환경 구성하기](00_Setup/)를 이용해 기본 실습 환경 생성이 되어 있어야 합니다.
 2. [0. 교육 환경 구성하기](00_Setup/)를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
-3. [1. Container 기술 일반](01_Container/04_install_docker.sh)를 이용해 Docker가 설치되어 있어야 합니다.
 
 ## 학습 목표
+
 - ECR의 사용법을 이해하고, Registry 생성 
 - pull through cache 에 배우고, 구축 실습
 - aws loadbalancer controller 와 cluster autoscaler 퍼블릭 이미지를 Private ECR에 복사 실습
 
 ## 이론
+
 ### Amazon Elastic Container Registry란?
+
 Amazon Elastic Container Registry(Amazon ECR)는 안전하고 확장 가능하며 안정적인 **AWS 관리형 컨테이너 이미지 레지스트리 서비스**입니다.
 
-Amazon ECR은 AWS IAM을 사용하여 리소스 기반 권한을 가진 프라이빗 리포지토리를 지원합니다. 따라서 지정된 사용자 또는 Amazon EC2 인스턴스가 컨테이너 리포지토리 및 이미지에 액세스할 수 있습니다.
+Amazon ECR은 **AWS IAM을 사용하여 리소스 기반 권한을 가진 프라이빗 리포지토리를 지원**합니다. 따라서 지정된 사용자 또는 Amazon EC2 인스턴스가 컨테이너 리포지토리 및 이미지에 액세스할 수 있습니다.
 
 원하는 CLI를 사용하여 도커 이미지, Open Container Initiative(OCI) 이미지 및 OCI 호환 아티팩트를 푸시, 풀 및 관리할 수 있습니다.
 
 #### Amazon ECR의 기능
-- 수명 주기 정책은 리포지토리에 있는 이미지의 수명 주기를 관리하는 데 도움이 됩니다.
-- 이미지 스캔은 컨테이너 이미지의 소프트웨어 취약성을 식별하는 데 도움이 됩니다. 각 리포지토리는 푸시 시 스캔하도록 구성할 수 있습니다.
-- 교차 리전 및 교차 계정 복제를 통해 이미지를 필요한 곳에 쉽게 배치할 수 있습니다. 
+- 수명 주기 정책은 리포지토리에 있는 **이미지의 수명 주기를 관리하는 데 도움**이 됩니다.
+- 이미지 **스캔은 컨테이너 이미지의 소프트웨어 취약성을 식별하는 데 도움**이 됩니다. 각 리포지토리는 푸시 시 스캔하도록 구성할 수 있습니다.
+- **교차 리전 및 교차 계정 복제를 통해 이미지를 필요한 곳에 쉽게 배치**할 수 있습니다. 
 
 ### 필수 IAM 권한
+1. 이미지 가져오기 필수 권한
 ```json
 {
     "Version": "2012-10-17",
@@ -43,6 +46,32 @@ Amazon ECR은 AWS IAM을 사용하여 리소스 기반 권한을 가진 프라�
 }
 ```
 
+2. 이미지 푸시 필수 권한
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": [
+           "ecr:CompleteLayerUpload",
+           "ecr:UploadLayerPart",
+           "ecr:InitiateLayerUpload",
+           "ecr:BatchCheckLayerAvailability",
+           "ecr:PutImage",
+           "ecr:BatchGetImage"
+          ],
+          "Resource": "arn:aws:ecr:region:111122223333:repository/repository-name"
+       },
+       {
+         "Effect": "Allow",
+         "Action": "ecr:GetAuthorizationToken",
+         "Resource": "*"
+       }
+     ]
+   }
+   ```
+
 ### Pull Through Cache란?
 
 ![1743490206925](image/pull_through_cache_architect.png)
@@ -56,17 +85,140 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 - GitLab 컨테이너 레지스트리의 경우 Amazon ECR은 GitLab의 서비스형 소프트웨어(SaaS) 오퍼링에서만 풀스루 캐시를 지원합니다
 ====================================================
 ## 실습
-1. ECR에 이미지 입로드
-```
-# 대상
+### ECR Repository 생성
+1. AWS Load Balancer Controller Repository 생성
+   ```shell
+   cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/01_create_repository
+   sh 01_create_aws_lbc_ecr_cluster.sh
+   ```
 
-# ECR 생성
-```
-2. pull through cache 생성
-```
-aws ecr create-pull-through-cache-rule \
-  --name my-cache-rule \
-  --upstream-registry-url registry-1.docker.io \
-  --ecr-repository-prefix my-cache
-```
-## 리소스 삭제
+   위 `01_create_aws_lbc_ecr_cluster.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   aws ecr create-repository \
+        --repository-name public.ecr.aws/eks/aws-load-balancer-controller 
+    ```
+2. 실행 화면
+   ![1743577747455](image/creating_lbc_repository.png)
+
+3. 생성 결과 화면
+   ![1743577874296](image/result_lbc_repository.png)
+
+4. Cluster AutoScaler Repository 생성   
+   ```shell
+   aws ecr create-repository \
+        --repository-name registry.k8s.io/autoscaling/cluster-autoscaler
+   ```
+5. 실행 화면
+   ![1743578043503.png](image/creating_cluster_autoscaler_repository.png)
+
+6. 생성 결과 화면
+   ![1743578210172](image/result_cluster_autoscaler_repository.png)
+
+7. Nginx Repository 생성 
+   ```shell
+   aws ecr create-repository \
+        --repository-name public.ecr.aws/nginx/nginx
+   ```
+
+8. 실행 화면
+   ![1743578426316](image/creating_nginx_repository.png)
+
+9. 생성 결과 화면
+   ![1743578509292](image/result_nginx_repository.png)
+
+### ECR Repository Image Push
+1. AWS Load Balancer Controller Image 업로드
+   ```shell
+   cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/02_image_push
+   sh 01_aws_lbc_image_push.sh
+   ```
+
+   위 `01_aws_lbc_image_push.sh`를 실행하면 아래 명령을 수행하여 Image를 ECR에 업로드 합니다.(참고용)
+
+   ```shell
+   # public ecr에서 aws-load-balancer-controller Image에 v2.9.2 Tag 이미지를 받아옵니다.
+   docker pull public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2
+
+   # Private ECR 로그인
+   aws ecr get-login-password  | docker login --username AWS --password-stdin 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com
+   
+   # Private ECR Repository 경로로 Tagging
+   docker tag public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2
+
+   # Private ECR Repository에 Image Push
+   docker push 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2
+
+   # docker에 존재하는 Image 삭제
+   docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2 public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2
+   ```
+
+2. 실행 화면
+   ![1743579337793](image/lbc_image_push.png)
+
+3. 생성 결과 화면
+   ![1743579411398](image/result_lbc_image_push.png)
+
+4. Cluster AutoScaler Image 업로드
+   ```shell
+   cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/02_image_push
+   sh 02_autoscaler_image_push.sh
+   ```
+
+   위 `02_autoscaler_image_push.sh`를 실행하면 아래 명령을 수행하여 Image를 ECR에 업로드 합니다.(참고용)
+
+   ```shell
+   # registry.k8s.io 에서 cluster-autoscaler Image에 v1.32.0 Tag 이미지를 받아옵니다.
+   docker pull registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0
+
+   # Private ECR 로그인
+   aws ecr get-login-password  | docker login --username AWS --password-stdin 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com
+   
+   # Private ECR Repository 경로로 Tagging
+   docker tag registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0   
+
+   # Private ECR Repository에 Image Push
+   docker push 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0
+
+   # docker에 존재하는 Image 삭제
+   docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0 registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0
+   ```
+
+5. 실행 화면
+   ![1743579830239](image/cluster_autoscaler_image_push.png)
+
+6. 생성 결과 화면
+   ![1743579895596](image/result_cluster_autoscaler_image_push.png)
+
+7. Nginx Image 업로드
+   ```shell
+   cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/02_image_push
+   sh 03_nginx_image_push.sh
+   ```
+
+   위 `03_nginx_image_push.sh`를 실행하면 아래 명령을 수행하여 Image를 ECR에 업로드 합니다.(참고용)
+
+   ```shell
+   # registry.k8s.io 에서 cluster-autoscaler Image에 1.27 Tag 이미지를 받아옵니다.
+   docker pull public.ecr.aws/nginx/nginx:1.27
+
+   # Private ECR 로그인
+   aws ecr get-login-password  | docker login --username AWS --password-stdin 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com
+   
+   # Private ECR Repository 경로로 Tagging
+   docker tag public.ecr.aws/nginx/nginx:1.27 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/nginx/nginx:1.27
+
+   # Private ECR Repository에 Image Push
+   docker push 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/nginx/nginx:1.27
+
+   # docker에 존재하는 Image 삭제
+   docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/nginx/nginx:1.27 public.ecr.aws/nginx/nginx:1.27
+   ```
+
+8. 실행 화면
+   ![1743580289776](image/nginx_image_push.png)
+
+9. 생성 결과 화면
+   ![1743580353708](image/result_nginx_image_push.png)
+
+### ECR Repository Image Push   
