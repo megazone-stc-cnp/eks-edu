@@ -221,4 +221,50 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 9. 생성 결과 화면
    ![1743580353708](image/result_nginx_image_push.png)
 
-### ECR Repository Image Push   
+### Pull Through Cache 실습
+1. Public ECR용 Pull Through Cache 생성
+   ```shell
+   cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/03_create_pull_through_cache
+   sh 01_create_pull_through_cache.sh
+   ```
+
+   위 `01_create_pull_through_cache.sh`를 실행하면 아래 aws cli가 실행이 됩니다.(참고용)
+
+   ```shell
+   # ecr-repository-prefix 에 private ECR에 사용할 Prefix
+   aws ecr create-pull-through-cache-rule \
+       --upstream-registry-url public.ecr.aws \
+       --ecr-repository-prefix public-ecr-9641173
+   ```
+
+2. 실행 화면
+   ![1743582805949](image/creating_pull_through_cache_rule.png)
+
+3. 생성 결과 화면
+   ![1743582919218](image/result_pull_through_cache_rule.png)
+
+4. nginx image pull 
+
+   docker pull 시에 Private ECR 및 Image가 업로드 됩니다.
+   ```shell
+   sh 02_nginx_image_pull.sh
+   ```
+
+   위 `02_nginx_image_pull.sh`를 실행하면 아래 명령어가 실행이 됩니다.(참고용)
+   
+   ```shell
+   # ecr login
+   aws ecr get-login-password --region ap-northeast-1  | docker login --username AWS --password-stdin 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com
+
+   # image pull
+   docker pull 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public-ecr-9641173/nginx/nginx:1.27
+   ```
+5. 실행 화면
+
+   ![1743584365543](image/pull_through_cache_nginx_pull.png)
+
+6. 생성 결과 화면
+
+   ![1743585511177](image/result_pull_through_cache_nginx_pull.png)
+
+## 정리
