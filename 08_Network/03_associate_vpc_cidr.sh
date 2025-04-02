@@ -5,7 +5,7 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
@@ -25,16 +25,13 @@ fi
 
 # ==================================================================
 echo "aws ec2 associate-vpc-cidr-block --vpc-id ${VPC_ID} \\
-    --cidr-block 192.168.2.0/23 \\
-    --region ${AWS_REGION} ${PROFILE_STRING}"
+    --cidr-block 192.168.2.0/23 ${PROFILE_STRING}"
 
 aws ec2 associate-vpc-cidr-block --vpc-id ${VPC_ID} \
     --cidr-block 192.168.2.0/23 \
-    --output json \
-    --region ${AWS_REGION} ${PROFILE_STRING} | tee associate-vpc-cidr-block-result.json
+    --output json ${PROFILE_STRING} | tee associate-vpc-cidr-block-result.json
 
 echo "생성 완료"
 aws ec2 describe-vpcs --vpc-ids ${VPC_ID} \
     --query 'Vpcs[*].CidrBlockAssociationSet[*].{CIDRBlock: CidrBlock, State: CidrBlockState.State}' \
-    --output table \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --output table ${PROFILE_STRING}

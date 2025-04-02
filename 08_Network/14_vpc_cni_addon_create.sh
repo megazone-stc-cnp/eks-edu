@@ -11,12 +11,12 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -34,7 +34,7 @@ fi
 # export EKS_CLUSTER_SG=sg-0452354091f449b82
 
 ADDON_NAME=vpc-cni
-VPC_CNI_ROLE_NAME=eks-edu-vpc-cni-pod-identity-role-${EMPLOY_ID}
+VPC_CNI_ROLE_NAME=eks-edu-vpc-cni-pod-identity-role-${IDE_NAME}
 # ==================================================================
 # echo aws eks create-addon --cluster-name ${EKS_CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${VPC_CNI_VERSION} --configuration-values "{\"env\":{\"AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG\":\"true\",     \"ENABLE_PREFIX_DELEGATION\": \"true\"}, \"EniConfig\": {\"create\": true,\"region\": \"${REGION_NAME}\",\"subnets\": { \"${AZ_1_NAME}\": { \"id\": \"${POD_SUBNET_ID_1}\", \"securityGroups\": [ \"${EKS_ADD_SG}\" ] },\"${AZ_2_NAME}\": { \"id\": \"${POD_SUBNET_ID_2}\", \"securityGroups\": [ \"${EKS_ADD_SG}\" ] } } } }" --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${VPC_CNI_ROLE_NAME} --resolve-conflicts OVERWRITE --profile ${PROFILE_NAME} --region ${REGION_NAME}
 cat >configuration-values.json<<EOF
@@ -64,13 +64,20 @@ cat >configuration-values.json<<EOF
 }
 EOF
 
+echo "aws eks create-addon \\
+    --cluster-name ${CLUSTER_NAME} \\
+    --addon-name ${ADDON_NAME} \\
+    --addon-version ${ADDON_VERSION} \\
+    --configuration-values 'file://configuration-values.json' \\
+    --resolve-conflicts OVERWRITE \\
+    --pod-identity-associations \"serviceAccount=aws-node,roleArn=arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${VPC_CNI_ROLE_NAME}\" ${PROFILE_STRING}"
+
 aws eks create-addon \
     --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --addon-version ${ADDON_VERSION} \
     --configuration-values 'file://configuration-values.json' \
     --resolve-conflicts OVERWRITE \
-    --pod-identity-associations "serviceAccount=aws-node,roleArn=arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${VPC_CNI_ROLE_NAME}" \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --pod-identity-associations "serviceAccount=aws-node,roleArn=arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${VPC_CNI_ROLE_NAME}" ${PROFILE_STRING}
 
 # --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${VPC_CNI_ROLE_NAME} \

@@ -16,5 +16,4 @@ ORIGIN_TAG=v1.32.0
 # ==================================================================
 
 aws ecr create-repository \
-    --repository-name ${REPO_FULLPATH} \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --repository-name ${REPO_FULLPATH} ${PROFILE_STRING}

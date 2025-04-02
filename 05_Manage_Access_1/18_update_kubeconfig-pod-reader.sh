@@ -7,19 +7,17 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 
-CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 # ==================================================================
-PROFILE_NAME=eks-edu-profile-${EMPLOY_ID}
+PROFILE_NAME=eks-edu-profile-${IDE_NAME}
 
 
 echo "aws eks update-kubeconfig \\
 	--name ${CLUSTER_NAME} \\
-	--alias "pod-reader" \\
-	${AWS_REGION} --profile ${PROFILE_NAME}"
+	--alias "pod-reader" --profile ${PROFILE_NAME}"
 
 aws eks update-kubeconfig \
 	--name ${CLUSTER_NAME} \
-	--alias "pod-reader" \
-	--region ${AWS_REGION} --profile ${PROFILE_NAME}
+	--alias "pod-reader" --profile ${PROFILE_NAME}
 
 kubectl config get-contexts

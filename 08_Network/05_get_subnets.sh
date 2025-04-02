@@ -4,7 +4,7 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
@@ -25,10 +25,8 @@ fi
 # ==================================================================
 echo "aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" \\
     --query Subnets[*].{Name: Tags[?Key=='Name'].Value | [0], SubnetId: SubnetId,AvailabilityZone: AvailabilityZone,CidrBlock: CidrBlock} \\
-    --output table \\
-    --region ${AWS_REGION} ${PROFILE_STRING}"
+    --output table ${PROFILE_STRING}"
 
 aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" \
     --query "Subnets[*].{Name: Tags[?Key=='Name'].Value | [0], SubnetId: SubnetId,AvailabilityZone: AvailabilityZone,CidrBlock: CidrBlock}" \
-    --output table \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --output table ${PROFILE_STRING}

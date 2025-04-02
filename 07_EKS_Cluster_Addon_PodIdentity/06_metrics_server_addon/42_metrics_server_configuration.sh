@@ -8,7 +8,7 @@ ADDON_VERSION=$1
 
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
@@ -19,10 +19,8 @@ ADDON_NAME=metrics-server
 
 echo "aws eks describe-addon-configuration \\
     --addon-name ${ADDON_NAME} \\
-    --addon-version ${ADDON_VERSION} \\
-    --region ${AWS_REGION} ${PROFILE_NAME}"
+    --addon-version ${ADDON_VERSION} ${PROFILE_NAME}"
 
 aws eks describe-addon-configuration \
     --addon-name ${ADDON_NAME} \
-    --addon-version ${ADDON_VERSION} \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --addon-version ${ADDON_VERSION} ${PROFILE_STRING}

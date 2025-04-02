@@ -6,6 +6,6 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 
-CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 # ==================================================================
 kubectl get pods -n kube-system | grep 'eks-pod-identity-agent'

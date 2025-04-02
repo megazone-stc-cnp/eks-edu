@@ -5,7 +5,7 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
@@ -23,8 +23,8 @@ fi
 # export AWS_PRIVATE_SUBNET2=subnet-0cf18e5c66c385020
 # export EKS_ADDITIONAL_SG=sg-03290c4da8c08c351
 
-EFS_SG_NAME="eks-edu-efs-sg-${EMPLOY_ID}"
-EFS_NAME="eks-edu-efs-${EMPLOY_ID}"
+EFS_SG_NAME="eks-edu-efs-sg-${IDE_NAME}"
+EFS_NAME="eks-edu-efs-${IDE_NAME}"
 # =================================================================
 # Load VPC information
 if [ ! -f "./local_env.sh" ];then
@@ -38,23 +38,20 @@ echo "Creating security group for EFS..."
 EFS_SG_ID=$(aws ec2 create-security-group \
     --group-name ${EFS_SG_NAME} \
     --description "Security group for EFS in EKS" \
-    --vpc-id ${VPC_ID} \
-    --region ${AWS_REGION} ${PROFILE_STRING} \
+    --vpc-id ${VPC_ID} ${PROFILE_STRING} \
     --output text --query 'GroupId')
 
 echo "Created security group: ${EFS_SG_ID}"
 
 # Add ingress rule to allow NFS traffic from the VPC CIDR
 VPC_CIDR=$(aws ec2 describe-vpcs --vpc-ids ${VPC_ID} \
-    --query 'Vpcs[0].CidrBlock' --output text \
-    --region ${AWS_REGION} ${PROFILE_STRING})
+    --query 'Vpcs[0].CidrBlock' --output text ${PROFILE_STRING})
 
 aws ec2 authorize-security-group-ingress \
     --group-id ${EFS_SG_ID} \
     --protocol tcp \
     --port 2049 \
-    --cidr ${VPC_CIDR} \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --cidr ${VPC_CIDR} ${PROFILE_STRING}
 
 echo "Added ingress rule to allow NFS traffic from ${VPC_CIDR}"
 
@@ -64,8 +61,7 @@ echo "Creating EFS file system..."
 
 EFS_FILE_SYSTEM_ID=$(aws efs create-file-system \
     --performance-mode generalPurpose \
-    --throughput-mode bursting \
-    --region ${AWS_REGION} ${PROFILE_STRING} \
+    --throughput-mode bursting ${PROFILE_STRING} \
     --tags Key=Name,Value=${EFS_NAME} \
     --output text --query 'FileSystemId')
 
@@ -80,14 +76,12 @@ echo "Creating mount targets in private subnets..."
 aws efs create-mount-target \
     --file-system-id ${EFS_FILE_SYSTEM_ID} \
     --subnet-id ${AWS_PRIVATE_SUBNET1} \
-    --security-groups ${EFS_SG_ID} \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --security-groups ${EFS_SG_ID} ${PROFILE_STRING}
 
 aws efs create-mount-target \
     --file-system-id ${EFS_FILE_SYSTEM_ID} \
     --subnet-id ${AWS_PRIVATE_SUBNET2} \
-    --security-groups ${EFS_SG_ID} \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --security-groups ${EFS_SG_ID} ${PROFILE_STRING}
 
 echo "Created mount targets in private subnets"
 

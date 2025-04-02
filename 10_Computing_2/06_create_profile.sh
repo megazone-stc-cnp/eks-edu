@@ -5,12 +5,12 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -26,7 +26,7 @@ fi
 
 NAMESPACE_NAME=app
 FARGATE_PROFILE_NAME=app-ns
-POD_EXECUTION_ROLE_NAME=eks-edu-fargate-execution-role-${EMPLOY_ID}
+POD_EXECUTION_ROLE_NAME=eks-edu-fargate-execution-role-${IDE_NAME}
 # ============================================================================
 
 echo "aws eks create-fargate-profile \\
@@ -34,26 +34,22 @@ echo "aws eks create-fargate-profile \\
   --pod-execution-role-arn arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${POD_EXECUTION_ROLE_NAME} \\
   --fargate-profile-name ${FARGATE_PROFILE_NAME} \\
   --selectors '[{\"namespace\": \"${NAMESPACE_NAME}\"}]' \\
-  --subnets '[\"${AWS_PRIVATE_SUBNET1}\", \"'${AWS_PRIVATE_SUBNET2}\"]' \\
-  --region ${AWS_REGION} ${PROFILE_STRING}"
+  --subnets '[\"${AWS_PRIVATE_SUBNET1}\", \"'${AWS_PRIVATE_SUBNET2}\"]' ${PROFILE_STRING}"
 
 aws eks create-fargate-profile \
     --cluster-name ${CLUSTER_NAME} \
     --pod-execution-role-arn arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${POD_EXECUTION_ROLE_NAME} \
     --fargate-profile-name ${FARGATE_PROFILE_NAME} \
     --selectors "[{\"namespace\": \"${NAMESPACE_NAME}\"}]" \
-    --subnets "[\"${AWS_PRIVATE_SUBNET1}\", \"${AWS_PRIVATE_SUBNET2}\"]" \
-    --region ${AWS_REGION} --profile ${PROFILE_NAME}
+    --subnets "[\"${AWS_PRIVATE_SUBNET1}\", \"${AWS_PRIVATE_SUBNET2}\"]" ${PROFILE_STRING}
 
 echo "${FARGATE_PROFILE_NAME} 생성중"
 
 echo "aws eks wait fargate-profile-active \\
     --cluster-name ${CLUSTER_NAME} \\
-    --fargate-profile-name ${FARGATE_PROFILE_NAME} \\
-    --region ${AWS_REGION} --profile ${PROFILE_NAME}"
+    --fargate-profile-name ${FARGATE_PROFILE_NAME} ${PROFILE_STRING}"
 
 aws eks wait fargate-profile-active \
     --cluster-name ${CLUSTER_NAME} \
-    --fargate-profile-name ${FARGATE_PROFILE_NAME} \
-    --region ${AWS_REGION} --profile ${PROFILE_NAME}
+    --fargate-profile-name ${FARGATE_PROFILE_NAME} ${PROFILE_STRING}
 echo "${FARGATE_PROFILE_NAME} 생성 완료"

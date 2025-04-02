@@ -14,6 +14,6 @@ fi
 # export AWS_PUBLIC_SUBNET2=subnet-0b12d717922b90cc2
 # export TARGET_GROUP_ARN=
 
-TARGET_GROUP_BINDING_NAME=eks-edu-target-group-binding-${EMPLOY_ID}
+TARGET_GROUP_BINDING_NAME=eks-edu-target-group-binding-${IDE_NAME}
 # =========================================================================================
 kubectl delete -f ../04_target_group_binding/tmp/${TARGET_GROUP_BINDING_NAME}.yaml

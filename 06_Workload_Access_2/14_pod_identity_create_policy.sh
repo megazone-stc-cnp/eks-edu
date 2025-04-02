@@ -6,15 +6,15 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
-BUCKET_NAME="pod-secrets-bucket-${EMPLOY_ID}"
-POLICY_NAME=eks-edu-pod-identity-workload-policy-${EMPLOY_ID}
+BUCKET_NAME="pod-secrets-bucket-${IDE_NAME}"
+POLICY_NAME=eks-edu-pod-identity-workload-policy-${IDE_NAME}
 # ==================================================================
 
 cat >pod-identity-workload-policy.json <<EOF

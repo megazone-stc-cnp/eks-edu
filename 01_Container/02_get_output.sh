@@ -8,7 +8,6 @@ fi
 # ==================================================================
 
 aws cloudformation describe-stacks \
-    --stack-name eks-workshop-${EMPLOY_ID} --query "Stacks[0].Outputs" \
-    --region ${AWS_REGION} ${PROFILE_STRING} --output json | tee result.json
+    --stack-name eks-workshop-${IDE_NAME} --query "Stacks[0].Outputs" ${PROFILE_STRING} --output json | tee result.json
 
 cat result.json

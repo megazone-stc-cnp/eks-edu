@@ -5,12 +5,12 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 if [ ! -f "../04_target_group_binding/local_env.sh" ];then
 	echo "../04_target_group_binding/local_env.sh 파일 세팅을 해주세요."
 	exit 1
@@ -28,8 +28,7 @@ echo "NLB 리소스 삭제를 시작합니다..."
 if [ ! -z "${LISTENER_ARN}" ]; then
     echo "리스너 삭제 중: ${LISTENER_ARN}"
     aws elbv2 delete-listener \
-        --listener-arn ${LISTENER_ARN} \
-        --region ${AWS_REGION} ${PROFILE_STRING}
+        --listener-arn ${LISTENER_ARN} ${PROFILE_STRING}
     
     if [ $? -eq 0 ]; then
         echo "리스너가 성공적으로 삭제되었습니다."
@@ -44,8 +43,7 @@ fi
 if [ ! -z "$TARGET_GROUP_ARN" ]; then
     echo "타겟 그룹 삭제 중: ${TARGET_GROUP_ARN}"
     aws elbv2 delete-target-group \
-        --target-group-arn ${TARGET_GROUP_ARN} \
-        --region ${AWS_REGION} ${PROFILE_STRING}
+        --target-group-arn ${TARGET_GROUP_ARN} ${PROFILE_STRING}
     
     if [ $? -eq 0 ]; then
         echo "타겟 그룹이 성공적으로 삭제되었습니다."
@@ -60,8 +58,7 @@ fi
 if [ ! -z "$NLB_ARN" ]; then
     echo "NLB 삭제 중: ${NLB_ARN}"
     aws elbv2 delete-load-balancer \
-        --load-balancer-arn ${NLB_ARN} \
-        --region ${AWS_REGION} ${PROFILE_STRING}
+        --load-balancer-arn ${NLB_ARN} ${PROFILE_STRING}
     
     if [ $? -eq 0 ]; then
         echo "NLB가 성공적으로 삭제되었습니다."
@@ -76,8 +73,7 @@ fi
 if [ ! -z "$NLB_SECURITY_GROUP_ID" ]; then
     echo "보안 그룹 삭제 중: ${NLB_SECURITY_GROUP_ID}"
     aws ec2 delete-security-group \
-        --group-id ${NLB_SECURITY_GROUP_ID} \
-        --region ${AWS_REGION} ${PROFILE_STRING}
+        --group-id ${NLB_SECURITY_GROUP_ID} ${PROFILE_STRING}
     
     if [ $? -eq 0 ]; then
         echo "보안 그룹이 성공적으로 삭제되었습니다."

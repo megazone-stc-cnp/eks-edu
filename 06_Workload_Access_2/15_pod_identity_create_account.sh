@@ -6,7 +6,7 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 
-SERVICE_ACCOUNT_NAME=eks-edu-pod-identity-service-account-${EMPLOY_ID}
+SERVICE_ACCOUNT_NAME=eks-edu-pod-identity-service-account-${IDE_NAME}
 NAMESPACE_NAME=default
 # ==================================================================
 

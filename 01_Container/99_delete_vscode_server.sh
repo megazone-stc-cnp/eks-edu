@@ -8,10 +8,9 @@ fi
 # ==================================================================
 
 aws cloudformation delete-stack \
-  --stack-name eks-workshop-${EMPLOY_ID} \
-  --region ${AWS_REGION} ${PROFILE_STRING}
+  --stack-name eks-workshop-${IDE_NAME} ${PROFILE_STRING}
 
 echo "삭제중....."
 aws cloudformation wait stack-delete-complete \
-    --stack-name eks-workshop-${EMPLOY_ID}
+    --stack-name eks-workshop-${IDE_NAME}
 echo "삭제 완료....."    

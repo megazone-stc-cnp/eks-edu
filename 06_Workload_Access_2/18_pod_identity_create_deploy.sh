@@ -6,13 +6,13 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=
-# export EMPLOY_ID=
+# export IDE_NAME=
 # export PROFILE_NAME=
 # export AWS_REPO_ACCOUNT=
 
-SERVICE_ACCOUNT_NAME=eks-edu-pod-identity-service-account-${EMPLOY_ID}
-POLICY_NAME=eks-edu-workload-policy-${EMPLOY_ID}
-ROLE_NAME=eks-edu-workload-role-${EMPLOY_ID}
+SERVICE_ACCOUNT_NAME=eks-edu-pod-identity-service-account-${IDE_NAME}
+POLICY_NAME=eks-edu-workload-policy-${IDE_NAME}
+ROLE_NAME=eks-edu-workload-role-${IDE_NAME}
 NAMESPACE_NAME=default
 # ==================================================================
 

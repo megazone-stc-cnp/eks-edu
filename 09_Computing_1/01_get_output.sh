@@ -5,7 +5,7 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 
-STACK_NAME=eks-workshop-vpc-${EMPLOY_ID}
+STACK_NAME=eks-workshop-vpc-${IDE_NAME}
 # ==================================================================
 if [ ! -d "tmp" ]; then
     mkdir -p tmp
@@ -13,11 +13,11 @@ fi
 
 echo "aws cloudformation describe-stacks \\
     --stack-name ${STACK_NAME} --query "Stacks[0].Outputs" \\
-    --region ${AWS_REGION} ${PROFILE_STRING} --output json"
+     ${PROFILE_STRING} --output json"
 
 aws cloudformation describe-stacks \
     --stack-name ${STACK_NAME} --query "Stacks[0].Outputs" \
-    --region ${AWS_REGION} ${PROFILE_STRING} --output json | tee tmp/result.json
+     ${PROFILE_STRING} --output json | tee tmp/result.json
 
 # sh ../01_Container/02_get_output.sh | jq -r '.[] | select(.OutputKey=="VpcId") | .OutputValue'
 if [ -f "./local_env.sh" ];then

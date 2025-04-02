@@ -5,12 +5,12 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -27,7 +27,7 @@ fi
 # export AWS_PUBLIC_SUBNET2=subnet-0b12d717922b90cc2
 
 # NLB 이름 설정
-SG_NAME="eks-edu-alb-sg-${EMPLOY_ID}"
+SG_NAME="eks-edu-alb-sg-${IDE_NAME}"
 # ==============================================================
 # NLB에 붙일 Security Group 생성
 echo "Creating Security Group for ALB: ${SG_NAME}"
@@ -35,8 +35,7 @@ echo "Creating Security Group for ALB: ${SG_NAME}"
 SG_ID=$(aws ec2 create-security-group \
     --group-name ${SG_NAME} \
     --description "Security group for ALB ${NLB_NAME}" \
-    --vpc-id ${VPC_ID} \
-    --region ${AWS_REGION} ${PROFILE_STRING} \
+    --vpc-id ${VPC_ID} ${PROFILE_STRING} \
     --query 'GroupId' \
     --output text)
 
@@ -53,8 +52,7 @@ aws ec2 authorize-security-group-ingress \
     --group-id ${SG_ID} \
     --protocol tcp \
     --port 80 \
-    --cidr 0.0.0.0/0 \
-    --region ${AWS_REGION} ${PROFILE_STRING}
+    --cidr 0.0.0.0/0 ${PROFILE_STRING}
 
 echo "Security Group 설정이 완료되었습니다."
 echo "[TODO] EKS Cluster Security Group의 Inbound에 이 Security Group을 등록해야 한다 ( Port: 80 ). 

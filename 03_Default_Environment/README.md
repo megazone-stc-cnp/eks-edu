@@ -202,16 +202,15 @@ EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성
    ```
 
    위 `01_default_vpc.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
    ```shell
    aws cloudformation create-stack \
        --stack-name ${STACK_NAME} \
        --template-body file://amazon-eks-vpc-private-subnets.yaml \
        --capabilities CAPABILITY_NAMED_IAM
    ```
-
 2. 실행 화면
    ![1743477021002](image/creating_vpc_infra.png)
-
 3. 생성 결과 화면
    ![1743477100419](image/result_vpc_infra.png)
 

@@ -6,10 +6,10 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 
-CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
-SERVICE_ACCOUNT_NAME=eks-edu-service-account-${EMPLOY_ID}
-POLICY_NAME=eks-edu-workload-policy-${EMPLOY_ID}
-ROLE_NAME=eks-edu-workload-role-${EMPLOY_ID}
+CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
+SERVICE_ACCOUNT_NAME=eks-edu-service-account-${IDE_NAME}
+POLICY_NAME=eks-edu-workload-policy-${IDE_NAME}
+ROLE_NAME=eks-edu-workload-role-${IDE_NAME}
 NAMESPACE_NAME=default
 # ==================================================================
 

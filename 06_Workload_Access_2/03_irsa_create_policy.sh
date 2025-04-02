@@ -6,11 +6,11 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 
-CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
-BUCKET_NAME="pod-secrets-bucket-${EMPLOY_ID}"
+CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
+BUCKET_NAME="pod-secrets-bucket-${IDE_NAME}"
 # ==================================================================
 
-POLICY_NAME=eks-edu-irsa-workload-policy-${EMPLOY_ID}
+POLICY_NAME=eks-edu-irsa-workload-policy-${IDE_NAME}
 cat >irsa-workload-policy.json <<EOF
 {
     "Version": "2012-10-17",

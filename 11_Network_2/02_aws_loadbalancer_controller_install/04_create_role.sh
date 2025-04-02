@@ -5,12 +5,12 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
 	exit 1
@@ -20,8 +20,8 @@ fi
 
 NAMESPACE_NAME=kube-system
 SERVICE_ACCOUNT_NAME=alb-controller-sa
-POLICY_NAME=eks-edu-aws-load-balancer-controller-policy-${EMPLOY_ID}
-ROLE_NAME=eks-edu-aws-load-balancer-controller-role-${EMPLOY_ID}
+POLICY_NAME=eks-edu-aws-load-balancer-controller-policy-${IDE_NAME}
+ROLE_NAME=eks-edu-aws-load-balancer-controller-role-${IDE_NAME}
 # ==================================================================
 cat >tmp/trust-relationship.json <<EOF
 {

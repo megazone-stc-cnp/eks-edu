@@ -6,7 +6,7 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
@@ -20,10 +20,10 @@ fi
 # AWS_REPO_ACCOUNT=539666729110
 REPO_FULLPATH=public.ecr.aws/eks/aws-load-balancer-controller
 ORIGIN_TAG=v2.9.2
-REPOSITORY_PREFIX=public-ecr-${EMPLOY_ID}
+REPOSITORY_PREFIX=public-ecr-${IDE_NAME}
 UPSTREAM_REPOSITORY_NAME=nginx/nginx
 TAG_NAME=1.27
 # ==================================================================
-aws ecr get-login-password --region ${AWS_REGION} ${PROFILE_STRING} | docker login --username AWS --password-stdin ${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+aws ecr get-login-password ${PROFILE_STRING} | docker login --username AWS --password-stdin ${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
 docker pull ${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPOSITORY_PREFIX}/${UPSTREAM_REPOSITORY_NAME}:${TAG_NAME}

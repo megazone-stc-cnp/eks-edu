@@ -5,12 +5,12 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -39,8 +39,7 @@ echo "eksctl create nodegroup \\
   --nodes-max $((NODE_NUM * 2)) \\
   --enable-ssm \\
   --node-labels "role=ops" \\
-  --node-private-networking \\
-  --region ${AWS_REGION} ${PROFILE_STRING}"
+  --node-private-networking ${PROFILE_STRING}"
 
 eksctl create nodegroup \
   --cluster ${CLUSTER_NAME} \
@@ -52,8 +51,7 @@ eksctl create nodegroup \
   --nodes-max $((NODE_NUM * 2)) \
   --enable-ssm \
   --node-labels "role=ops" \
-  --node-private-networking \
-  --region ${AWS_REGION} ${PROFILE_STRING}
+  --node-private-networking ${PROFILE_STRING}
   
 #   --ssh-access : 
 # control SSH access for nodes. Uses ~/.ssh/id_rsa.pub as default key path if enabled

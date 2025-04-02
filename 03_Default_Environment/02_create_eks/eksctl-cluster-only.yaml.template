@@ -1,13 +1,13 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: eks-edu-cluster-${EMPLOY_ID}
+  name: eks-edu-cluster-${IDE_NAME}
   region: ${AWS_REGION}
   version: "1.31"
   tags:
-    karpenter.sh/discovery: eks-edu-cluster-${EMPLOY_ID}
+    karpenter.sh/discovery: eks-edu-cluster-${IDE_NAME}
     created-by: eks-workshop-v2
-    env: eks-edu-cluster-${EMPLOY_ID}
+    env: eks-edu-cluster-${IDE_NAME}
 iam:
   withOIDC: true
 vpc:

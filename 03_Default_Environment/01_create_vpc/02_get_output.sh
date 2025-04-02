@@ -5,18 +5,16 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
-STACK_NAME=eks-workshop-vpc-${EMPLOY_ID}
+STACK_NAME=eks-workshop-vpc-${IDE_NAME}
 VPC_ENV_FILE_PATH=../../vpc_env.sh
 # ==================================================================
 
 
 echo "aws cloudformation describe-stacks \\
-    --stack-name ${STACK_NAME} --query "Stacks[0].Outputs" \\
-    --region ${AWS_REGION} ${PROFILE_STRING} --output json"
+    --stack-name ${STACK_NAME} --query "Stacks[0].Outputs" ${PROFILE_STRING} --output json"
 
 aws cloudformation describe-stacks \
-    --stack-name ${STACK_NAME} --query "Stacks[0].Outputs" \
-    --region ${AWS_REGION} ${PROFILE_STRING} --output json | tee result.json
+    --stack-name ${STACK_NAME} --query "Stacks[0].Outputs" ${PROFILE_STRING} --output json | tee result.json
 
 # sh ../01_Container/02_get_output.sh | jq -r '.[] | select(.OutputKey=="VpcId") | .OutputValue'
 if [ -f "${VPC_ENV_FILE_PATH}" ];then

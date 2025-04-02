@@ -8,6 +8,5 @@ fi
 # ==================================================================
 
 aws secretsmanager get-secret-value \
-    --secret-id eks-workshop-${EMPLOY_ID}-password \
-    --query SecretString --output text \
-    --region ${AWS_REGION} ${PROFILE_STRING} | jq -r .password
+    --secret-id eks-workshop-${IDE_NAME}-password \
+    --query SecretString --output text ${PROFILE_STRING} | jq -r .password

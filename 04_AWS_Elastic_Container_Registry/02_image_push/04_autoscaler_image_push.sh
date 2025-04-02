@@ -20,8 +20,7 @@ PRIVATE_ECR=${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
 PRIVATE_ECR_IMG=$PRIVATE_ECR/$REPO_FULLPATH:${ORIGIN_TAG}
 
 echo "docker pull ${ORIGIN_IMG}"
-echo aws ecr get-login-password \\
-    --region ${AWS_REGION} ${PROFILE_STRING} | docker login --username AWS --password-stdin $PRIVATE_ECR"
+echo aws ecr get-login-password ${PROFILE_STRING} | docker login --username AWS --password-stdin $PRIVATE_ECR"
 
 echo "docker tag $ORIGIN_IMG $PRIVATE_ECR_IMG"
 
@@ -38,8 +37,7 @@ if [[ $(uname -m) == "arm"* ]] || [[ $(uname -m) == "aarch64" ]]; then
 fi
 
 docker pull ${ORIGIN_IMG}
-aws ecr get-login-password \
-    --region ${AWS_REGION} ${PROFILE_STRING} | docker login --username AWS --password-stdin $PRIVATE_ECR
+aws ecr get-login-password ${PROFILE_STRING} | docker login --username AWS --password-stdin $PRIVATE_ECR
 
 docker tag $ORIGIN_IMG $PRIVATE_ECR_IMG
 

@@ -5,12 +5,12 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -28,8 +28,8 @@ fi
 # export NLB_SECURITY_GROUP_ID=sg-0506823f14c3411f1
 
 # NLB 이름 설정
-NLB_NAME="eks-edu-nlb-${EMPLOY_ID}"
-TARGET_GROUP_NAME="eks-edu-tg-${EMPLOY_ID}"
+NLB_NAME="eks-edu-nlb-${IDE_NAME}"
+TARGET_GROUP_NAME="eks-edu-tg-${IDE_NAME}"
 # ==============================================================
 # NLB 생성
 echo "Creating Network Load Balancer: ${NLB_NAME}"
@@ -37,8 +37,7 @@ NLB_ARN=$(aws elbv2 create-load-balancer \
     --name ${NLB_NAME} \
     --type network \
     --security-groups ${NLB_SECURITY_GROUP_ID} \
-    --subnets "${AWS_PUBLIC_SUBNET1}" "${AWS_PUBLIC_SUBNET2}" \
-    --region ${AWS_REGION} ${PROFILE_STRING} \
+    --subnets "${AWS_PUBLIC_SUBNET1}" "${AWS_PUBLIC_SUBNET2}" ${PROFILE_STRING} \
     --query 'LoadBalancers[0].LoadBalancerArn' \
     --output text)
 
@@ -57,8 +56,7 @@ TG_ARN=$(aws elbv2 create-target-group \
     --protocol TCP \
     --port 80 \
     --vpc-id ${VPC_ID} \
-    --target-type ip \
-    --region ${AWS_REGION} ${PROFILE_STRING} \
+    --target-type ip ${PROFILE_STRING} \
     --query 'TargetGroups[0].TargetGroupArn' \
     --output text)
 
@@ -75,8 +73,7 @@ LISTENER_ARN=$(aws elbv2 create-listener \
     --load-balancer-arn ${NLB_ARN} \
     --protocol TCP \
     --port 80 \
-    --default-actions Type=forward,TargetGroupArn=${TG_ARN} \
-    --region ${AWS_REGION} ${PROFILE_STRING} \
+    --default-actions Type=forward,TargetGroupArn=${TG_ARN} ${PROFILE_STRING} \
     --query 'Listeners[0].ListenerArn' \
     --output text)
 

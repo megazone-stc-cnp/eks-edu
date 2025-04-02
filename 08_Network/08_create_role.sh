@@ -5,12 +5,12 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 # export AWS_REGION=ap-northeast-1
-# export EMPLOY_ID=9641173
+# export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
 # export AWS_REPO_ACCOUNT=539666729110
 # export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
 # export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${EMPLOY_ID}
+# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -25,17 +25,15 @@ fi
 # export EKS_ADDITIONAL_SG=sg-03290c4da8c08c351
 
 # ==================================================================
-VPC_CNI_ROLE_NAME=eks-edu-vpc-cni-pod-identity-role-${EMPLOY_ID}
+VPC_CNI_ROLE_NAME=eks-edu-vpc-cni-pod-identity-role-${IDE_NAME}
 VPC_CNI_FILE_NAME=vpc-cni-trust-relationship.json
 
 echo "aws iam create-role \\
   --role-name ${VPC_CNI_ROLE_NAME} \\
   --assume-role-policy-document file://\"${VPC_CNI_FILE_NAME}\" \\
-  --description \"vpc cni role\" \\
-  --region ${AWS_REGION} ${PROFILE_STRING}"
+  --description \"vpc cni role\" ${PROFILE_STRING}"
 
 aws iam create-role \
   --role-name ${VPC_CNI_ROLE_NAME} \
   --assume-role-policy-document file://"${VPC_CNI_FILE_NAME}" \
-  --description "vpc cni role" \
-  --region ${AWS_REGION} ${PROFILE_STRING}
+  --description "vpc cni role" ${PROFILE_STRING}

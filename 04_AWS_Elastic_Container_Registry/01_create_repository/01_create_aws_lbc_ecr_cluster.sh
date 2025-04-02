@@ -16,14 +16,12 @@ ORIGIN_TAG=v2.9.2
 # ==================================================================
 
 # Check if ECR repository already exists
-if aws ecr describe-repositories --repository-names ${REPO_FULLPATH} --region ${AWS_REGION} ${PROFILE_STRING} &> /dev/null; then
+if aws ecr describe-repositories --repository-names ${REPO_FULLPATH} ${PROFILE_STRING} &> /dev/null; then
     echo "ECR repository ${REPO_FULLPATH} already exists. Skipping creation."
 else
     echo "aws ecr create-repository \\
-        --repository-name ${REPO_FULLPATH} \\
-        --region ${AWS_REGION} ${PROFILE_STRING}"
+        --repository-name ${REPO_FULLPATH} ${PROFILE_STRING}"
 
     aws ecr create-repository \
-        --repository-name ${REPO_FULLPATH} \
-        --region ${AWS_REGION} ${PROFILE_STRING}
+        --repository-name ${REPO_FULLPATH} ${PROFILE_STRING}
 fi
