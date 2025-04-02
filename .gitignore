@@ -74,3 +74,4 @@ vpc_env.sh
 07_Network/configuration-values.json
 07_Network/vpc-cni-trust-relationship.json
 11_Storage_Management/01_dynamic_create_storageclass/local_env.sh
+03_Default_Environment/01_create_vpc/result.json
