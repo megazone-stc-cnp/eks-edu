@@ -18,7 +18,7 @@ AWS에 로그인 한 후, CloudShell로 이동하여 다음 명령어를 입력�
    `IDE_NAME` 환경 변수에 사용하기를 원하는 ID를 지정합니다.
    `IDE_NAME` 변수는 `code-server` 생성용 CloudFormation에 사용됩니다.
    ```shell
-   export IDE_NAME=mzc-jhkim
+   export IDE_NAME=mzc-kjh
    ```
 
    CloudShell 에서 아래 명령을 실행하여 `code-server` 생성을 위한 CloudFormation Stack을 생성합니다. (대략 10분 정도 소요됩니다.)
