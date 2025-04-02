@@ -1,7 +1,7 @@
 # Container 기술 일반
 
 ## 사전 조건
-- [0. 교육 환경 구성하기](00_Setup/)를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
+- [0. 교육 환경 구성하기](/00_Setup/README.md)를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
 
 ## 학습 목표
 - Docker
@@ -81,7 +81,7 @@ EXPOSE 3000
 | [CMD](https://docs.docker.com/reference/dockerfile/#cmd) | 생성된 Docker 이미지가 구동될 때 실행할 명령어를 지정합니다. |
 | [EXPOSE](https://docs.docker.com/reference/dockerfile/#expose) | 컨테이너에서 사용할 포트를 개방합니다. `EXPOSE`를 사용하지 않으면 컨테이너 외부에서 컨테이너 내부의 Application으로 통신이 되지 않습니다. |
 
-Dockerfile 에서 사용할 수 있는 전체 지시문(([Dockerfile reference](https://docs.docker.com/reference/dockerfile/)))은 아래와 같으며 자세한 내용은 각 지시문의 링크를 확인해 주세요. 
+Dockerfile 에서 사용할 수 있는 전체 지시문([Dockerfile reference](https://docs.docker.com/reference/dockerfile/))은 아래와 같으며 자세한 내용은 각 지시문의 링크를 확인해 주세요. 
 
 | 지침 | 설명 |
 |-----|-----|
@@ -109,7 +109,10 @@ Dockerfile 에서 사용할 수 있는 전체 지시문(([Dockerfile reference](
 
 * 실습 목표
 1. Docker CLI 의 기본 명령어에 대해 이해합니다.
-1. DOcker CLI를 이용해 Docker 이미지를 만들고, 실행할 수 있습니다.
+1. Docker CLI를 이용해 Docker 이미지를 만들고, 실행할 수 있습니다.
+
+> [!NOTE]
+> 아래 실습 내용은 docker에서 제공하는 [Docker workshop](https://docs.docker.com/get-started/workshop/)의 내용을 각색해서 제공하였음을 알려드립니다.
 
 ### 실습 #1-1. 실습용 App 다운로드
 Docker 에서 제공하는 실습용 Application인 `todo` App을 이용하여 Docker Image를 생성해 보겠습니다.
@@ -128,13 +131,13 @@ Docker 에서 제공하는 실습용 Application인 `todo` App을 이용하여 D
    ![Git Clone the App](images/git-clone-app.png)
 1. clone된 repository의 내용을 확인합니다. 아래와 같은 내용이 표시되어야 합니다. 
    ```
-   ├── getting-started-app/
-   │ ├── spec/
-   │ ├── src/
-   │ ├── .dockerignore
-   │ ├── package.json
-   │ ├── README.md
-   │ └── yarn.lock
+   └─ getting-started-app/
+      ├── spec/
+      ├── src/
+      ├── .dockerignore
+      ├── package.json
+      ├── README.md
+      └── yarn.lock
    ```
    ![The App Tree](images/gettring-started-app-tree.png)
 
@@ -145,12 +148,6 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
 
    `1-1`에서 clone 한 `getting-started-app` 디렉토리 안에 `Dockerfile`파일을 생성하고 아래 내용을 붙여넣어주세요.
 
-   ![Creating 'Dockerfile' - 1](images/creating-dockerfile-1.png)
-
-   ![Creating 'Dockerfile' - 2](images/creating-dockerfile-2.png)
-
-   ![Creating 'Dockerfile' - 2](images/creating-dockerfile-3.png)
-
    ```dockerfile
    FROM node:lts-alpine
    WORKDIR /app
@@ -160,15 +157,19 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
    EXPOSE 3000
    ```
 
+   ![Creating 'Dockerfile' - 1](images/creating-dockerfile-1.png)
+
+   ![Creating 'Dockerfile' - 2](images/creating-dockerfile-3.png)
+
 
 2. Docker Image 빌드하기
 
    Terminal 에서 `getting-started-app` 디렉토리로 이동합니다.
    ```shell
-   cd ~/environment/01_Container/getting-started-app
+   cd ~/environment/eks-edu/01_Container/getting-started-app
    ```
 
-   `code-server` 환경에서 테스트를 용이하게 하기 위해 `getting-started-app/src/static/js/app.js` 파일의 내용을 아래 명령어를 이용해 변경합니다.
+   `code-server` 환경에서 테스트가 가능하도록 `getting-started-app/src/static/js/app.js` 파일의 내용을 아래 명령어를 이용해 변경합니다.
    ```shell
    sed -i 's/\/items/\/proxy\/3000\/items/g' src/static/js/app.js
    ```
@@ -248,7 +249,12 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
 
 제공된 예제 소스의 내용중 일부 메세지를 한글화 해보겠습니다.
 
-1. `src/static/js/app.js` 파일을 열어 56번째 라인을 내용을 아래와 같이 수정합니다.
+1. `src/static/js/app.js` 파일을 열어 `56번째 라인`을 내용을 아래와 같이 수정합니다.
+   ```JSX
+   // <p className="text-center">No items yet! Add one above!</p>
+   <p className="text-center">아직 할 일 항목이 없습니다! 위에 하나 추가하세요!</p>
+   ```
+
    ![Update app.js](images/updating-app-1.png)
 
 2. `docker build` 명령어를 이용해 Docker 이미지를 다시 빌드합니다.
@@ -268,7 +274,9 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
    ```shell
    $ docker run -dp 127.0.0.1:3000:3000 getting-started
    06a9ac475f9ad9d60cc05a239c345cdbc2ffb0d41e910b3fd2705bbcc79b354f
-   docker: Error response from daemon: driver failed programming external connectivity on endpoint nice_babbage (49157a0c6e5e5ae4ee019a15436b86efcdb1b791d4ca6f2804077646b1b7f802): Bind for 127.0.0.1:3000 failed: port is already allocated.
+   docker: Error response from daemon: driver failed programming external connectivity on endpoint nice_babbage 
+   (49157a0c6e5e5ae4ee019a15436b86efcdb1b791d4ca6f2804077646b1b7f802): 
+   Bind for 127.0.0.1:3000 failed: port is already allocated.
    ```
 
    ![Update app.js](images/updating-app-2.png)
@@ -292,14 +300,14 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
    docker stop <컨테이너ID>
    ```
 
-   ![Docker ps](images/updating-app-4.png)
+   ![Docker stop](images/updating-app-4.png)
 
 3. 컨테이너가 종료된 이후, `docker rm` 명령을 이용해 컨테이너를 삭제합니다.
    ```shell
    docker rm <컨테이너ID>
    ```
 
-   ![Docker ps](images/updating-app-5.png)
+   ![Docker rm](images/updating-app-5.png)
 
 ### 실습 #2-3. 새로 업데이트했던 컨테이너 실행하기
 
@@ -308,8 +316,8 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
    docker run -dp 127.0.0.1:3000:3000 getting-started
    ```
 
-   ![Docker ps](images/updating-app-6.png)
+   ![Docker run](images/updating-app-6.png)
 
    `docker run` 명령이 성공적으로 실행되면 다시 "Open in Browser" 버튼이 표시됩니다. 해당 버튼을 클릭하여 영문 메세지가 한글 메세지로 변경되었는지 확인해 주세요.
 
-   
+   ![Updated Todo App](images/updating-app-7.png)
