@@ -12,7 +12,6 @@ if ! command -v docker &> /dev/null; then
 fi
 # AWS_REPO_ACCOUNT=539666729110
 REPO_FULLPATH=public.ecr.aws/eks/aws-load-balancer-controller
-ORIGIN_TAG=v2.9.2
 # ==================================================================
 
 # Check if ECR repository already exists

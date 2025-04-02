@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ ! -f "../env.sh" ];then
+if [ ! -f "../../env.sh" ];then
 	echo "env.sh 파일 세팅을 해주세요."
 	exit 1
 fi
-. ../env.sh
+. ../../env.sh
 # export AWS_REGION=ap-northeast-1
 # export IDE_NAME=9641173
 # export PROFILE_NAME=cnp-key
@@ -17,11 +17,14 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 # AWS_REPO_ACCOUNT=539666729110
-REPOSITORY_PREFIX=public-ecr-${IDE_NAME}
-UPSTREAM_REPOSITORY_NAME=nginx/nginx
+REPO_FULLPATH=public.ecr.aws/nginx/nginx
 # ==================================================================
-echo "aws ecr create-repository \\
-    --repository-name ${REPOSITORY_PREFIX}/${UPSTREAM_REPOSITORY_NAME} ${PROFILE_STRING}"
+if aws ecr describe-repositories --repository-names ${REPO_FULLPATH} ${PROFILE_STRING} &> /dev/null; then
+    echo "ECR repository ${REPO_FULLPATH} already exists. Skipping creation."
+else
+    echo "aws ecr create-repository \\
+        --repository-name ${REPO_FULLPATH} ${PROFILE_STRING}"
 
-aws ecr create-repository \
-    --repository-name ${REPOSITORY_PREFIX}/${UPSTREAM_REPOSITORY_NAME} ${PROFILE_STRING}
+    aws ecr create-repository \
+        --repository-name ${REPO_FULLPATH} ${PROFILE_STRING}
+fi
