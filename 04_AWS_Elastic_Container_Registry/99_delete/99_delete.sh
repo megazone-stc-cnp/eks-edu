@@ -10,7 +10,7 @@ if ! command -v docker &> /dev/null; then
     echo "[ERROR] docker가 설치되어 있지 않습니다."
     exit 1
 fi
-# AWS_REPO_ACCOUNT=539666729110
+# AWS_ACCOUNT_ID=539666729110
 REPOSITORY_PREFIX=public-ecr-${IDE_NAME}
 # ==================================================================
 # ECR 리포지토리 삭제

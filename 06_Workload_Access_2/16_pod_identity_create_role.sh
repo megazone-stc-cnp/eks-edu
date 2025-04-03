@@ -43,8 +43,8 @@ aws iam create-role \
 
 echo "aws iam attach-role-policy \\
     --role-name ${ROLE_NAME} \\
-    --policy-arn=arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} ${PROFILE_STRING}"
+    --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING}"
 
 aws iam attach-role-policy \
     --role-name ${ROLE_NAME} \
-    --policy-arn=arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} ${PROFILE_STRING}
+    --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING}

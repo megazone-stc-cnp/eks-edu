@@ -4,13 +4,6 @@ if [ ! -f "../../env.sh" ];then
 	exit 1
 fi
 . ../../env.sh
-# export AWS_REGION=ap-northeast-1
-# export IDE_NAME=9641173
-# export PROFILE_NAME=cnp-key
-# export AWS_REPO_ACCOUNT=539666729110
-# export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
-# export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -53,7 +46,7 @@ enableWaf: true
 enableWafv2: true
 image:
   pullPolicy: IfNotPresent
-  repository: ${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_FULLPATH}
+  repository: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_FULLPATH}
   tag: ${ORIGIN_TAG}
 ingressClass: alb
 podDisruptionBudget:
@@ -69,7 +62,7 @@ resources:
     memory: 70Mi
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${ROLE_NAME}
+    eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}
   automountServiceAccountToken: true
   create: true
   name: ${SERVICE_ACCOUNT_NAME}

@@ -10,7 +10,7 @@ if ! command -v docker &> /dev/null; then
     echo "docker가 설치되어 있지 않습니다."
     exit 1
 fi
-# AWS_REPO_ACCOUNT=539666729110
+
 REPO_FULLPATH=public.ecr.aws/eks/aws-load-balancer-controller
 # ==================================================================
 

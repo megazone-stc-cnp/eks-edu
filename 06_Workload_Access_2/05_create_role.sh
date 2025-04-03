@@ -5,10 +5,7 @@ if [ ! -f "../env.sh" ];then
 	exit 1
 fi
 . ../env.sh
-# export AWS_REGION=
-# export IDE_NAME=
-# export PROFILE_NAME=
-# export AWS_REPO_ACCOUNT=
+
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
 	exit 1
@@ -29,7 +26,7 @@ cat >trust-relationship.json <<EOF
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::${AWS_REPO_ACCOUNT}:oidc-provider/${OIDC_ID}"
+        "Federated": "arn:aws:iam::${AWS_ACCOUNT_ID}:oidc-provider/${OIDC_ID}"
       },
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
@@ -55,8 +52,8 @@ aws iam create-role \
 
 echo "aws iam attach-role-policy \\
     --role-name ${ROLE_NAME} \\
-    --policy-arn=arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} ${PROFILE_STRING}"
+    --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING}"
 
 aws iam attach-role-policy \
     --role-name ${ROLE_NAME} \
-    --policy-arn=arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} ${PROFILE_STRING}
+    --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING}

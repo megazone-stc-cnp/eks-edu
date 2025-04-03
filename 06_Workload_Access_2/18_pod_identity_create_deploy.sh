@@ -5,10 +5,6 @@ if [ ! -f "../env.sh" ];then
 	exit 1
 fi
 . ../env.sh
-# export AWS_REGION=
-# export IDE_NAME=
-# export PROFILE_NAME=
-# export AWS_REPO_ACCOUNT=
 
 SERVICE_ACCOUNT_NAME=eks-edu-pod-identity-service-account-${IDE_NAME}
 POLICY_NAME=eks-edu-workload-policy-${IDE_NAME}

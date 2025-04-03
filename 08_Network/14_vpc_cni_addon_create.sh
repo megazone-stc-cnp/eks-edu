@@ -10,13 +10,6 @@ if [ ! -f "../env.sh" ];then
 	exit 1
 fi
 . ../env.sh
-# export AWS_REGION=ap-northeast-1
-# export IDE_NAME=9641173
-# export PROFILE_NAME=cnp-key
-# export AWS_REPO_ACCOUNT=539666729110
-# export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
-# export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -70,7 +63,7 @@ echo "aws eks create-addon \\
     --addon-version ${ADDON_VERSION} \\
     --configuration-values 'file://configuration-values.json' \\
     --resolve-conflicts OVERWRITE \\
-    --pod-identity-associations \"serviceAccount=aws-node,roleArn=arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${VPC_CNI_ROLE_NAME}\" ${PROFILE_STRING}"
+    --pod-identity-associations \"serviceAccount=aws-node,roleArn=arn:aws:iam::${AWS_ACCOUNT_ID}:role/${VPC_CNI_ROLE_NAME}\" ${PROFILE_STRING}"
 
 aws eks create-addon \
     --cluster-name ${CLUSTER_NAME} \
@@ -78,6 +71,6 @@ aws eks create-addon \
     --addon-version ${ADDON_VERSION} \
     --configuration-values 'file://configuration-values.json' \
     --resolve-conflicts OVERWRITE \
-    --pod-identity-associations "serviceAccount=aws-node,roleArn=arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${VPC_CNI_ROLE_NAME}" ${PROFILE_STRING}
+    --pod-identity-associations "serviceAccount=aws-node,roleArn=arn:aws:iam::${AWS_ACCOUNT_ID}:role/${VPC_CNI_ROLE_NAME}" ${PROFILE_STRING}
 
 # --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${VPC_CNI_ROLE_NAME} \

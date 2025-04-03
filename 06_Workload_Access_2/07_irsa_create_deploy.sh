@@ -5,10 +5,7 @@ if [ ! -f "../env.sh" ];then
 	exit 1
 fi
 . ../env.sh
-# export AWS_REGION=
-# export IDE_NAME=
-# export PROFILE_NAME=
-# export AWS_REPO_ACCOUNT=
+
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
 	exit 1

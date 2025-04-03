@@ -10,12 +10,12 @@ if ! command -v docker &> /dev/null; then
     echo "[ERROR] docker가 설치되어 있지 않습니다."
     exit 1
 fi
-# AWS_REPO_ACCOUNT=539666729110
+
 REPO_FULLPATH=public.ecr.aws/eks/aws-load-balancer-controller
 ORIGIN_TAG=v2.9.2
 # ==================================================================
 ORIGIN_IMG=${REPO_FULLPATH}:${ORIGIN_TAG}
-PRIVATE_ECR=${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+PRIVATE_ECR=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 PRIVATE_ECR_IMG=$PRIVATE_ECR/$REPO_FULLPATH:${ORIGIN_TAG}
 
 # Check if the CPU architecture is ARM-based

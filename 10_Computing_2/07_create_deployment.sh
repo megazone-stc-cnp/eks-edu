@@ -4,13 +4,6 @@ if [ ! -f "../env.sh" ];then
 	exit 1
 fi
 . ../env.sh
-# export AWS_REGION=ap-northeast-1
-# export IDE_NAME=9641173
-# export PROFILE_NAME=cnp-key
-# export AWS_REPO_ACCOUNT=539666729110
-# export HOME_DIR=/Users/mzc01-hcseo/00_PARA/01_project/autoever-eks-edu/source/eks-edu
-# export EKS_VERSION=1.31
-# export CLUSTER_NAME=eks-edu-cluster-${IDE_NAME}
 
 if [ ! -f "./local_env.sh" ];then
 	echo "local_env.sh 파일 세팅을 해주세요."
@@ -30,7 +23,7 @@ REPOSITORY_PREFIX=public-ecr-${IDE_NAME}
 UPSTREAM_REPOSITORY_NAME=nginx/nginx
 TAG_NAME=1.27
 # ============================================================================
-ECR_URI=${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPOSITORY_PREFIX}/${UPSTREAM_REPOSITORY_NAME}
+ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPOSITORY_PREFIX}/${UPSTREAM_REPOSITORY_NAME}
 
 echo "kubectl -n ${NAMESPACE_NAME} create deploy app --image=${ECR_URI}:${TAG_NAME} --port=80"
 kubectl -n ${NAMESPACE_NAME} create deploy app --image=${ECR_URI}:${TAG_NAME} --port=80

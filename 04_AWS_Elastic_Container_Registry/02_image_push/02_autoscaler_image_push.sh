@@ -10,12 +10,12 @@ if ! command -v docker &> /dev/null; then
     echo "docker가 설치되어 있지 않습니다."
     exit 1
 fi
-# AWS_REPO_ACCOUNT=539666729110
+
 REPO_FULLPATH=registry.k8s.io/autoscaling/cluster-autoscaler
 ORIGIN_TAG=v1.32.0
 # ==================================================================
 ORIGIN_IMG=${REPO_FULLPATH}:${ORIGIN_TAG}
-PRIVATE_ECR=${AWS_REPO_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+PRIVATE_ECR=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 PRIVATE_ECR_IMG=$PRIVATE_ECR/$REPO_FULLPATH:${ORIGIN_TAG}
 
 echo "docker pull ${ORIGIN_IMG}"

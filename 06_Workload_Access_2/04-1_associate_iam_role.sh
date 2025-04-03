@@ -18,11 +18,11 @@ echo "eksctl create iamserviceaccount \\
     --namespace default \\
     --cluster ${CLUSTER_NAME} \\
     --role-name ${ROLE_NAME} \\
-    --attach-policy-arn arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} --approve"
+    --attach-policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} --approve"
 
 eksctl create iamserviceaccount \
     --name ${SERVICE_ACCOUNT_NAME} \
     --namespace default \
     --cluster ${CLUSTER_NAME} \
     --role-name ${ROLE_NAME} \
-    --attach-policy-arn arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} --approve
+    --attach-policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} --approve
