@@ -79,15 +79,45 @@ AWS에 로그인 한 후, CloudShell로 이동하여 다음 명령어를 입력�
 | [yq](https://github.com/mikefarah/yq) | 4.45.1 | 2025-01-12 |
 | [fzf](https://github.com/junegunn/fzf) | 0.60.3 | 2025-03-03 |
 | [terraform](https://www.terraform.io/) | 1.11.2 | 2025-03-12 |
-|
+
 ## 2. 환경 정리 (삭제)
 
 생성된 자원을 삭제하려면 CloudShell 에서 아래 명령어어를 입력해 주세요.
 
 ```shell
-export IDE_NAME=mzc-jhkim
+export IDE_NAME=mzc-kjh
 
 aws cloudformation delete-stack --stack-name eks-workshop-${IDE_NAME}
 ```
 
 CloudShell이 아닌 CloudFormation에서 직접 Stack 을 선택하여 삭제하셔도 됩니다.
+
+## 3. 정리하지 않고 계속 사용하기 (EC2 중지 후 재시작)
+
+생성된 자원을 삭제하지 않고 `code-server`가 설치된 EC2만 중지 후 재시작하여 사용할 수도 있습니다.
+
+다음의 절차에 따라 CloudFront 정보를 업데이트하시면 됩니다.
+
+1. EC2 Instance 의 퍼블릭 IP DNS 복사
+   
+   EC2가 재시작될 경우, 퍼블릭 IP 주소가 변경되기 때문에 이와 관련된 퍼블릭 IP DNS 주소를 CloudFront 에 업데이트해 주어야 합니다.
+
+   ![EC2 Public IPv4 DNS](images/ec2-public-ipv4-dns.png)
+
+2. CloudFront의 Origin 주소 업데이트
+   
+   복사한 EC2의 퍼블릭 IP DNS를 CLoudFront 에 업데이트해 주세요.
+   
+   1. CloudFront 에서 생성된 배포 ID를 선택합니다.
+      
+      ![CloudFront 1](images/cloudfront-1.png)
+
+   2. 원본(Origins) 탭을 누르고 생성된 원본 선택 후 "편집" 버튼을 클릭합니다.
+      
+      ![CloudFront 2](images/cloudfront-2.png)
+
+   3. "Origin domain" 입력란에 복사한 EC2의 퍼블릭 IP DNS를 붙여넣기 한 후, "변경 사항 저장" 버튼을 클릭하여 적용합니다.
+      
+      ![CloudFront 3](images/cloudfront-3.png)
+
+CloudFront 정보 업데이트 후, 약 2~3분 기다리시면 다시 접속이 가능합니다.
