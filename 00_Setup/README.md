@@ -79,13 +79,13 @@ AWS에 로그인 한 후, CloudShell로 이동하여 다음 명령어를 입력�
 | [yq](https://github.com/mikefarah/yq) | 4.45.1 | 2025-01-12 |
 | [fzf](https://github.com/junegunn/fzf) | 0.60.3 | 2025-03-03 |
 | [terraform](https://www.terraform.io/) | 1.11.2 | 2025-03-12 |
-|
+
 ## 2. 환경 정리 (삭제)
 
 생성된 자원을 삭제하려면 CloudShell 에서 아래 명령어어를 입력해 주세요.
 
 ```shell
-export IDE_NAME=mzc-jhkim
+export IDE_NAME=mzc-kjh
 
 aws cloudformation delete-stack --stack-name eks-workshop-${IDE_NAME}
 ```
