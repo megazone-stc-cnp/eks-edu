@@ -7,7 +7,7 @@
 
 ## 학습 목표
 
-- ECR의 사용법을 이해하고, Registry 생성 
+- ECR의 사용법을 이해하고, Registry 생성
 - pull through cache 에 배우고, 구축 실습
 - aws loadbalancer controller 와 cluster autoscaler 퍼블릭 이미지를 Private ECR에 복사 실습
 
@@ -22,12 +22,15 @@ Amazon ECR은 **AWS IAM을 사용하여 리소스 기반 권한을 가진 프라
 원하는 CLI를 사용하여 도커 이미지, Open Container Initiative(OCI) 이미지 및 OCI 호환 아티팩트를 푸시, 풀 및 관리할 수 있습니다.
 
 #### Amazon ECR의 기능
+
 - 수명 주기 정책은 리포지토리에 있는 **이미지의 수명 주기를 관리하는 데 도움**이 됩니다.
 - 이미지 **스캔은 컨테이너 이미지의 소프트웨어 취약성을 식별하는 데 도움**이 됩니다. 각 리포지토리는 푸시 시 스캔하도록 구성할 수 있습니다.
-- **교차 리전 및 교차 계정 복제를 통해 이미지를 필요한 곳에 쉽게 배치**할 수 있습니다. 
+- **교차 리전 및 교차 계정 복제를 통해 이미지를 필요한 곳에 쉽게 배치**할 수 있습니다.
 
 ### 필수 IAM 권한
+
 1. 이미지 가져오기 필수 권한
+
 ```json
 {
     "Version": "2012-10-17",
@@ -79,14 +82,19 @@ Amazon ECR은 **AWS IAM을 사용하여 리소스 기반 권한을 가진 프라
 풀스루 캐시 규칙을 사용하면 업스트림 레지스트리의 콘텐츠를 Amazon ECR 프라이빗 레지스트리와 동기화할 수 있습니다.
 
 Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐시 규칙 생성을 지원합니다.
+
 - Amazon ECR Public, Kubernetes 컨테이너 이미지 레지스트리 및 Quay(인증 필요 없음)
 - Docker Hub, Microsoft Azure 컨테이너 레지스트리, GitHub 컨테이너 레지스트리 및 GitLab 컨테이너 레지스트리(보안 암호로 AWS Secrets Manager 인증 필요)
 - Amazon ECR( AWS IAM 역할을 사용한 인증 필요)
 - GitLab 컨테이너 레지스트리의 경우 Amazon ECR은 GitLab의 서비스형 소프트웨어(SaaS) 오퍼링에서만 풀스루 캐시를 지원합니다
-====================================================
+  ====================================================
+
 ## 실습
+
 ### ECR Repository 생성
+
 1. AWS Load Balancer Controller Repository 생성
+
    ```shell
    cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/01_create_repository
    sh 01_create_aws_lbc_ecr_cluster.sh
@@ -97,38 +105,36 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    ```shell
    aws ecr create-repository \
         --repository-name public.ecr.aws/eks/aws-load-balancer-controller 
-    ```
+   ```
 2. 실행 화면
    ![1743577747455](image/creating_lbc_repository.png)
-
 3. 생성 결과 화면
    ![1743577874296](image/result_lbc_repository.png)
+4. Cluster AutoScaler Repository 생성
 
-4. Cluster AutoScaler Repository 생성   
    ```shell
    aws ecr create-repository \
         --repository-name registry.k8s.io/autoscaling/cluster-autoscaler
    ```
 5. 실행 화면
    ![1743578043503.png](image/creating_cluster_autoscaler_repository.png)
-
 6. 생성 결과 화면
    ![1743578210172](image/result_cluster_autoscaler_repository.png)
+7. Nginx Repository 생성
 
-7. Nginx Repository 생성 
    ```shell
    aws ecr create-repository \
         --repository-name public.ecr.aws/nginx/nginx
    ```
-
 8. 실행 화면
    ![1743578426316](image/creating_nginx_repository.png)
-
 9. 생성 결과 화면
    ![1743578509292](image/result_nginx_repository.png)
 
 ### ECR Repository Image Push
+
 1. AWS Load Balancer Controller Image 업로드
+
    ```shell
    cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/02_image_push
    sh 01_aws_lbc_image_push.sh
@@ -142,7 +148,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 
    # Private ECR 로그인
    aws ecr get-login-password  | docker login --username AWS --password-stdin 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com
-   
+
    # Private ECR Repository 경로로 Tagging
    docker tag public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2
 
@@ -152,14 +158,12 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    # docker에 존재하는 Image 삭제
    docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2 public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2
    ```
-
 2. 실행 화면
    ![1743579337793](image/lbc_image_push.png)
-
 3. 생성 결과 화면
    ![1743579411398](image/result_lbc_image_push.png)
-
 4. Cluster AutoScaler Image 업로드
+
    ```shell
    cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/02_image_push
    sh 02_autoscaler_image_push.sh
@@ -173,7 +177,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 
    # Private ECR 로그인
    aws ecr get-login-password  | docker login --username AWS --password-stdin 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com
-   
+
    # Private ECR Repository 경로로 Tagging
    docker tag registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0   
 
@@ -183,14 +187,12 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    # docker에 존재하는 Image 삭제
    docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0 registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0
    ```
-
 5. 실행 화면
    ![1743579830239](image/cluster_autoscaler_image_push.png)
-
 6. 생성 결과 화면
    ![1743579895596](image/result_cluster_autoscaler_image_push.png)
-
 7. Nginx Image 업로드
+
    ```shell
    cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/02_image_push
    sh 03_nginx_image_push.sh
@@ -204,7 +206,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 
    # Private ECR 로그인
    aws ecr get-login-password  | docker login --username AWS --password-stdin 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com
-   
+
    # Private ECR Repository 경로로 Tagging
    docker tag public.ecr.aws/nginx/nginx:1.27 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/nginx/nginx:1.27
 
@@ -214,15 +216,15 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    # docker에 존재하는 Image 삭제
    docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/nginx/nginx:1.27 public.ecr.aws/nginx/nginx:1.27
    ```
-
 8. 실행 화면
    ![1743580289776](image/nginx_image_push.png)
-
 9. 생성 결과 화면
    ![1743580353708](image/result_nginx_image_push.png)
 
 ### Pull Through Cache 실습
+
 1. Public ECR용 Pull Through Cache 생성
+
    ```shell
    cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/03_create_pull_through_cache
    sh 01_create_pull_through_cache.sh
@@ -236,22 +238,20 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
        --upstream-registry-url public.ecr.aws \
        --ecr-repository-prefix public-ecr-9641173
    ```
-
 2. 실행 화면
    ![1743582805949](image/creating_pull_through_cache_rule.png)
-
 3. 생성 결과 화면
    ![1743582919218](image/result_pull_through_cache_rule.png)
-
-4. nginx image pull 
+4. nginx image pull
 
    docker pull 시에 Private ECR 및 Image가 업로드 됩니다.
+
    ```shell
    sh 02_nginx_image_pull.sh
    ```
 
    위 `02_nginx_image_pull.sh`를 실행하면 아래 명령어가 실행이 됩니다.(참고용)
-   
+
    ```shell
    # ecr login
    aws ecr get-login-password --region ap-northeast-1  | docker login --username AWS --password-stdin 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com
@@ -262,9 +262,41 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 5. 실행 화면
 
    ![1743584365543](image/pull_through_cache_nginx_pull.png)
-
 6. 생성 결과 화면
 
    ![1743585511177](image/result_pull_through_cache_nginx_pull.png)
 
 ## 정리
+
+1. 리소스 삭제 ( 15분 소요 )
+
+   ```shell
+   cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/99_delete
+   sh 99_delete.sh
+   ```
+
+   위 `99_delete.sh`를 실행하면 아래 aws cli가 실행됩니다. (참고용)
+
+   ```shell
+   # Pull Through Cache Rule 삭제
+   aws ecr delete-pull-through-cache-rule \
+    --ecr-repository-prefix public-ecr-9641173
+
+   # public.ecr.aws/eks/aws-load-balancer-controller 리포지토리 내 이미지 삭제 ( 모든 이미지 목록 삭제)
+   aws ecr batch-delete-image --repository-name public.ecr.aws/eks/aws-load-balancer-controller --image-ids imageDigest=sha256:165f67c8f8cffbeadb70b51558091cc7fa1c7246ed173de7a5a76a67eec092cc
+
+   # public.ecr.aws/eks/aws-load-balancer-controller repository 삭제
+   aws ecr delete-repository --repository-name public.ecr.aws/eks/aws-load-balancer-controller --force
+
+   # registry.k8s.io/autoscaling/cluster-autoscaler, public.ecr.aws/nginx/nginx, public-ecr-9641173/eks/aws-load-balancer-controller 도 위의 항목 삭제 진행
+   ```
+
+2. 실행 화면
+   ![1743642810030](image/delete_resource.png)
+
+3. 결과 화면
+   private repository 목록
+   ![1743642923754](image/result_private_repository.png)
+
+   Pull Through Cache 목록
+   ![1743643037705](image/result_delete_pull_through_cache.png)
