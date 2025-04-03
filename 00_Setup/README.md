@@ -120,4 +120,4 @@ CloudShell이 아닌 CloudFormation에서 직접 Stack 을 선택하여 삭제�
       
       ![CloudFront 3](images/cloudfront-3.png)
 
-CloudFront 정보 업데이트 후, 약 2~3분 기다리시면 다시 접속이 가능합니다.
+CloudFront 정보 업데이트 후, 약 2~3분 후에 `code-server`에 다시 접속이 가능합니다.
