@@ -584,7 +584,8 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AmazonVPCFullAccess
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
-        - arn:aws:iam::aws:policy/IAMFullAccess        
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AmazonElasticFileSystemFullAccess
       Path: "/"
   EksWorkshopBasePolicy:
     Type: AWS::IAM::ManagedPolicy
