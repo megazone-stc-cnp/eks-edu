@@ -28,15 +28,6 @@ else
     echo "EBS_VOLUME_ID가 설정되지 않았습니다."
 fi
 
-# EFS 보안 그룹 삭제
-if [ ! -z "${EFS_SECURITY_GROUP}" ]; then
-    echo "aws ec2 delete-security-group --group-id ${EFS_SECURITY_GROUP} ${PROFILE_STRING}"
-    echo "EFS 보안 그룹 삭제 중..."
-    aws ec2 delete-security-group --group-id ${EFS_SECURITY_GROUP} ${PROFILE_STRING}
-else
-    echo "EFS_SECURITY_GROUP이 설정되지 않았습니다."
-fi
-
 # EFS 마운트 타겟 삭제 (파일 시스템 삭제 전 필요)
 if [ ! -z "${EFS_FILESYSTEM_ID}" ]; then
     echo "EFS 마운트 타겟 삭제 중..."
@@ -50,6 +41,15 @@ if [ ! -z "${EFS_FILESYSTEM_ID}" ]; then
     # 모든 마운트 타겟이 삭제될 때까지 대기
     echo "모든 마운트 타겟이 삭제될 때까지 대기 중..."
     sleep 30
+fi
+
+# EFS 보안 그룹 삭제
+if [ ! -z "${EFS_SECURITY_GROUP}" ]; then
+    echo "aws ec2 delete-security-group --group-id ${EFS_SECURITY_GROUP} ${PROFILE_STRING}"
+    echo "EFS 보안 그룹 삭제 중..."
+    aws ec2 delete-security-group --group-id ${EFS_SECURITY_GROUP} ${PROFILE_STRING}
+else
+    echo "EFS_SECURITY_GROUP이 설정되지 않았습니다."
 fi
 
 # EFS 파일 시스템 삭제

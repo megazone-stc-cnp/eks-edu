@@ -11,7 +11,6 @@ if [ ! -f "../../vpc_env.sh" ];then
 fi
 . ../../vpc_env.sh
 
-PV_NAME=test-pv
 PVC_NAME=efs-dynamic-claim
 VOLUME_SIZE="1"
 STORAGECLASS_NAME=efs-dynamic-sc

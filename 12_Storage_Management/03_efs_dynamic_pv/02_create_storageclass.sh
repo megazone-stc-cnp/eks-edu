@@ -17,8 +17,6 @@ if [ ! -f "../../vpc_env.sh" ];then
 fi
 . ../../vpc_env.sh
 
-PV_NAME=test-pv
-VOLUME_SIZE="1"
 STORAGECLASS_NAME=efs-dynamic-sc
 # ====================================================================
 if [ ! -d "tmp" ]; then
@@ -26,22 +24,25 @@ if [ ! -d "tmp" ]; then
 fi
 
 cat > tmp/efs_dynamic_storageclass.yaml<<EOF
-kind: StorageClass
 apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: ${STORAGECLASS_NAME}
+  name: __STORAGECLASS_NAME__
 provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
-  fileSystemId: ${EFS_ID}
+  fileSystemId: __EFS_ID__
   directoryPerms: "700"
   gidRangeStart: "1000" # optional
   gidRangeEnd: "2000" # optional
   basePath: "/dynamic_provisioning" # optional
-  subPathPattern: "${.PVC.namespace}/${.PVC.name}" # optional
+  subPathPattern: "\${.PVC.namespace}/\${.PVC.name}" # optional
   ensureUniqueDirectory: "true" # optional
   reuseAccessPoint: "false" # optional
 EOF
+
+sed -i "s|__STORAGECLASS_NAME__|$STORAGECLASS_NAME|g" tmp/efs_dynamic_storageclass.yaml
+sed -i "s|__EFS_ID__|$EFS_ID|g" tmp/efs_dynamic_storageclass.yaml
 
 echo "kubectl apply -f tmp/efs_dynamic_storageclass.yaml"
 kubectl apply -f tmp/efs_dynamic_storageclass.yaml

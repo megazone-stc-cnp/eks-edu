@@ -71,13 +71,7 @@ EFS_ID=$(aws efs create-file-system \
 
 echo "Created EFS file system: ${EFS_ID}"
 
-# Wait for the file system to become available
-echo "Waiting for EFS file system to become available..."
-echo "aws efs wait file-system-available \\
-    --file-system-id ${EFS_ID} ${PROFILE_STRING}"
-
-aws efs wait file-system-available \
-    --file-system-id ${EFS_ID} ${PROFILE_STRING}
+sleep 10
 
 # Create mount targets in each subnet
 echo "aws efs create-mount-target \\

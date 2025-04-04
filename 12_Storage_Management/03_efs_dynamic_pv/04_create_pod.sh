@@ -11,7 +11,6 @@ if [ ! -f "../../vpc_env.sh" ];then
 fi
 . ../../vpc_env.sh
 
-PV_NAME=test-pv
 VOLUME_SIZE="1"
 APP_NAME=efs-dynamic-app
 PVC_NAME=efs-dynamic-claim
@@ -28,7 +27,7 @@ metadata:
 spec:
   containers:
     - name: app
-      image: centos
+      image: public.ecr.aws/amazonlinux/amazonlinux
       command: ["/bin/sh"]
       args: ["-c", "while true; do echo $(date -u) >> /data/out; sleep 5; done"]
       volumeMounts:
