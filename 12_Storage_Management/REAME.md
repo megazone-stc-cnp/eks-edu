@@ -54,7 +54,7 @@ Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 �
 
 ## 실습
 
-## EBS Dynamic PV
+## EBS Dynamic Provisioning
 1. EBS StorageClass 생성
    ```shell
    cd ~/environment/eks-edu/12_Storage_Management/01_dynamic_ebs_pv
@@ -195,8 +195,30 @@ Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 �
 
    sh 04_check.sh
    ```
-## 4-1. EBS Dynamic PV
+## EBS Static Provisioning
+1. EBS PV 새성
 
+   ```shell
+   cd ~/environment/eks-edu/12_Storage_Management/01_dynamic_ebs_pv
+   sh 01_create_storageclass.sh
+   ```
+
+   위 `01_create_storageclass.sh`를 실행하면 tmp/ebs_storageclass.yaml를 만들어서 배포를 합니다.(참고용)
+
+   ```yaml
+   apiVersion: storage.k8s.io/v1
+   kind: StorageClass
+   metadata:
+     name: ebs-sc
+   provisioner: ebs.csi.aws.com
+   volumeBindingMode: WaitForFirstConsumer
+   ```
+
+   ```shell
+   # 배포
+   kubectl apply -f tmp/ebs_storageclass.yaml
+   ```
+# ================================================================
 ## 4-2. EBS Static PV
 
 ## 4-3. EFS Dynamic PV
