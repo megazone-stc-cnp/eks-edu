@@ -1,13 +1,13 @@
 #!/bin/bash
 
-PVC_NAME=ebs-claim
-POD_NAME=app
+PVC_NAME=ebs-dynamic-claim
+POD_NAME=ebs-dynamic-app
 # ====================================================================
 if [ ! -d "tmp" ]; then
     mkdir -p tmp
 fi
 
-cat > tmp/ebs_pod.yaml<<EOF
+cat > tmp/ebs_dynamic_pod.yaml<<EOF
 apiVersion: v1
 kind: Pod
 metadata:
@@ -27,7 +27,7 @@ spec:
       claimName: ${PVC_NAME}
 EOF
 
-echo "kubectl apply -f tmp/ebs_pod.yaml"
-kubectl apply -f tmp/ebs_pod.yaml
+echo "kubectl apply -f tmp/ebs_dynamic_pod.yaml"
+kubectl apply -f tmp/ebs_dynamic_pod.yaml
 
 kubectl get pod

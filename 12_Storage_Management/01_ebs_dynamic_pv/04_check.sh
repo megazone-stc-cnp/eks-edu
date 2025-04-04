@@ -1,7 +1,7 @@
 #!/bin/bash
 
-
+POD_NAME=ebs-dynamic-app
 # ====================================================================
-echo "kubectl exec app -- cat /data/out.txt"
+echo "kubectl exec ${POD_NAME} -- cat /data/out.txt"
 
-kubectl exec app -- cat /data/out.txt
+kubectl exec ${POD_NAME} -- cat /data/out.txt
