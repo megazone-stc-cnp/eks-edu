@@ -57,7 +57,7 @@ Docker의 인기가 날로 높아지게 되면서, Docker를 포함한 여러 �
 
 ### 1-5. Dockerfile 이해하기
 
-Docker 이미지를 생성하기 위해서는 컨테이너 이미지에 어떤 내용을 포함해야 할지 알려주어야 합니다.
+Docker 이미지를 생성하기 위해서는 이미지에 어떤 내용을 포함해야 할지 알려주어야 합니다.
 이때 사용하는 파일을 `Dockerfile` 이라고 부르며 다음과 같은 형태를 갖습니다.
 
 ```dockerfile
@@ -106,7 +106,32 @@ Dockerfile 에서 사용할 수 있는 전체 지시문([Dockerfile reference](h
 [WORKDIR](https://docs.docker.com/reference/dockerfile/#workdir) | 작업 디렉토리를 변경합니다. |
 
 
-### 1.6. 실습 #1 - Application을 컨테이너화 하기
+### 1-6. Docker CLI 주요 명령어
+
+Dockerfile 을 이용해 Docker 이미지를 생성할 준비를 마쳤다면, Docker CLI 명령을 이용해 이미지를 만들수 있습니다.
+
+이미지를 만들기 전에 Docker CLI 에서 주로 사용하는 명령어에 대해 살펴보겠습니다.
+
+| 분류        | 명령어                                                      | 설명 |
+| ---------- | ---------------------------------------------------------- | ---------------------------- | 
+| Image      | `docker build -t <image_name> .`                           | Dockerfile로 이미지 빌드 | 
+|            | `docker images`                                            | 이미지 목록보기 |
+|            | `docker rmi <image_name>`                                  | 선택한 이미지 삭제 |
+|            | `docker image prune`                                       | 사용하지 않는 모든 이미지 삭제 |
+| Docker Hub | `docker login -u <username>`                               | Docker Hub에 로그인 |
+|            | `docker pull <image_name>`                                 | 선택한 이미지를 docker hub 에서 다운로드 |
+|            | `docker push <username>/<image_name>`                      | 이미지를 Docker Hub에 Push |
+| Container  | `docker run --name <container_name> <image_name>`          | 도커 이미지를 이용해 컨테이너 생성 및 실행 |
+|            | `docker run -p <host_port>:<container_port> <image_name>`  | 컨테이너 포트를 호스트 머신의 포트로 개방하여 컨테이너 실행 |
+|            | `docker run -d <image_name>`                               | 컨테이너를 백그라운드로 실행(데몬) |
+|            | `docker start\|stop <container_name> (또는 <container_id>)` | 기존 컨테이너를 시작하거나 중지 |
+|            | `docker rm <container_name>`                               | 중지된 컨테이너 삭제 |
+|            | `docker exec -it <container_name> sh`                      | 실행중인 컨테이너 안에서 shell 실행 |
+|            | `docker logs -f <container_name>`                          | 컨테이너 로그 출력 |
+|            | `docker ps`                                                | 현재 실행 중인 컨테이너 목록 보기 |
+
+
+### 1.7. 실습 #1 - Application을 컨테이너화 하기
 
 * 실습 목표
 1. Docker CLI 의 기본 명령어에 대해 이해합니다.
@@ -115,7 +140,7 @@ Dockerfile 에서 사용할 수 있는 전체 지시문([Dockerfile reference](h
 > [!NOTE]
 > 아래 실습 내용은 docker에서 제공하는 [Docker workshop](https://docs.docker.com/get-started/workshop/)의 내용을 각색해서 제공하였음을 알려드립니다.
 
-#### 1.6. 실습 #1-1. 실습용 App 다운로드
+#### 1.7. 실습 #1-1. 실습용 App 다운로드
 Docker 에서 제공하는 실습용 Application인 `todo` App을 이용하여 Docker Image를 생성해 보겠습니다.
 
 1. `code-server`에 접속합니다.
@@ -132,6 +157,7 @@ Docker 에서 제공하는 실습용 Application인 `todo` App을 이용하여 D
    ![Git Clone the App](images/git-clone-app.png)
 1. clone된 repository의 내용을 확인합니다. 아래와 같은 내용이 표시되어야 합니다. 
    ```
+   .
    └─ getting-started-app/
       ├── spec/
       ├── src/
@@ -142,7 +168,7 @@ Docker 에서 제공하는 실습용 Application인 `todo` App을 이용하여 D
    ```
    ![The App Tree](images/gettring-started-app-tree.png)
 
-#### 1.6. 실습 #1-2. App용 이미지 빌드하기
+#### 1.7. 실습 #1-2. App용 이미지 빌드하기
 Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이 `Dockerfile`이 필요합니다.
 
 1. `Dockerfile` 만들기
@@ -196,7 +222,7 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
 
    ![Docker Image Check](images/docker-image-check.png)
 
-#### 1-6. 실습 #1-3. 컨테이너 실행하기
+#### 1-7. 실습 #1-3. 컨테이너 실행하기
 
 1. 컨테이너 실행하기
 
@@ -242,11 +268,11 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
    8fe40f192a79   getting-started   "docker-entrypoint.s…"   9 minutes ago   Up 9 minutes   127.0.0.1:3000->3000/tcp   inspiring_wing
    ```
 
-#### 1.6. 실습 #2-1 - 소스 코드 업데이트하기
+#### 1.7. 실습 #2-1 - 소스 코드 업데이트하기
 
 제공된 예제 소스의 내용중 일부 메세지를 한글화 해보겠습니다.
 
-1. `src/static/js/app.js` 파일을 열어 `56번째 라인`을 내용을 아래와 같이 수정합니다.
+1. `src/static/js/app.js` 파일을 열어 `56번째 라인`의 내용을 아래와 같이 수정합니다.
    ```JSX
    // <p className="text-center">No items yet! Add one above!</p>
    <p className="text-center">아직 할 일 항목이 없습니다! 위에 하나 추가하세요!</p>
@@ -283,7 +309,7 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
    이 문제를 해결하려면 이전에 실행했던 컨테이너를 삭제해야 합니다.
    </details>
 
-#### 1.6. 실습 #2-2. 이전에 실행한 컨테이너 삭제하기
+#### 1.7. 실습 #2-2. 이전에 실행한 컨테이너 삭제하기
 
 1. `docker ps` 명령을 실행하여 실행중인 컨테이너의 ID를 복사합니다.
    ```shell
@@ -306,7 +332,7 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
 
    ![Docker rm](images/updating-app-5.png)
 
-#### 1.6. 실습 #2-3. 새로 업데이트했던 컨테이너 실행하기
+#### 1.7. 실습 #2-3. 새로 업데이트했던 컨테이너 실행하기
 
 1. "실습 #2-2"를 이용해 컨테이너를 삭제한 이후에는 새로운 컨테이너를 실행할 수 있습니다.
    ```shell
@@ -328,10 +354,10 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
 Kubernetes 에서는 다음과 같이 정의하고 있습니다.
 
 > [!NOTE]
-> Kubernetes는 컨테이너화된 워크로드와 서비스를 관리하기 위한 이식할 수 있고,
+> Kubernetes는 컨테이너화된 워크로드와 서비스를 관리하기 위한 이식할 수 있고,<br/>
 > 확장 가능한 오픈소스 플랫폼으로, 선언적 구성과 자동화를 모두 지원한다.
 > 
-> Kubernetes란 명칭은 키잡이(helmsman)나 파일럿을 뜻하는 그리스어에서 유래했으며,
+> Kubernetes란 명칭은 키잡이(helmsman)나 파일럿을 뜻하는 그리스어에서 유래했으며,<br/>
 > K8s라는 표기로도 사용되는데, "K"와 "s", 그 사이에 있는 8글자를 나타내는 약식 표기이다.
 
 ### 2-2. Kubernetes 로의 진화 과정
@@ -374,7 +400,7 @@ Kubernetes는 컨트롤 플레인(Control Plane) 컴포넌트와 워커 노드(W
 | 컴포넌트 | 설명 |
 | -------- | --- |
 | API 서버 (kube-apiserver) | Kubernetes의 **모든 API 요청을 처리**하는 중앙 인터페이스 |
-| 컨트롤러 매니저 (kube-controller-manager) | 다양한 컨트롤러를 실행하여 클러스터의 상태를 **원하는 상태(desired state)**로 유지 |
+| 컨트롤러 매니저 (kube-controller-manager) | 다양한 컨트롤러를 실행하여 클러스터의 상태를 **원하는 상태(desired state)** 로 유지 |
 | 스케줄러 (kube-scheduler) | CPU, 메모리 등의 리소스 요청과 현재 노드 상태를 고려하여 **최적 노드를 선택하여 파드(Pod)를 배치(Deployment)** |
 | 클라우드 컨트롤러 매니저(cloud-controller-manager) | 클라우드 환경(AWS, GCP, Azure 등)과의 연동을 담당 |
 | etcd | Kubernetes의 모든 클러스터 데이터를 저장하는 **Key-Value 저장소** |
@@ -387,9 +413,9 @@ Kubernetes는 컨트롤 플레인(Control Plane) 컴포넌트와 워커 노드(W
 
 | 컴포넌트 | 설명 |
 | -------- | --- |
-| kubelet | <ul><li>각 노드에서 실행되는 Kubernetes의 핵심 Agent.</li><li>컨트롤 플레인과 통신하여 파드(Pod)를 관리</li></ul> |
-| Container Runtime | <ul><li>컨테이너 실행 담당</li><li>[CRI(Container Runtime Interface)](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/container-runtime-interface.md)를 지원하게 하여, [containerd](https://containerd.io/docs/), [CRI-O](https://cri-o.io/#what-is-cri-o) 와 같은 컨테이너 런타임 구현체들에게 위임</li></ul> |
-| kube-proxy | <ul><li>클러스터의 각 노드에서 실행되는 네트워크 프록시</li><li>네트워크 라우팅 및 서비스간 통신 담당</li> |
+| **kubelet** | <ul><li>각 노드에서 실행되는 Kubernetes의 핵심 Agent.</li><li>컨트롤 플레인과 통신하여 파드(Pod)를 관리</li></ul> |
+| **Container Runtime** | <ul><li>컨테이너 실행 담당</li><li>[CRI(Container Runtime Interface)](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/container-runtime-interface.md)를 지원하게 하여, [containerd](https://containerd.io/docs/), [CRI-O](https://cri-o.io/#what-is-cri-o) 와 같은 컨테이너 런타임 구현체들에게 위임</li></ul> |
+| **kube-proxy** | <ul><li>클러스터의 각 노드에서 실행되는 네트워크 프록시</li><li>네트워크 라우팅 및 서비스간 통신 담당</li> |
 
 ### 2-5. Kubernetes 주요 용어
 
@@ -404,4 +430,112 @@ Kubernetes는 컨트롤 플레인(Control Plane) 컴포넌트와 워커 노드(W
 | Namespace | 클러스터 내 리소스들을 논리적으로 그룹화하여 격리하고 관리하는 방법 제공 |
 | kubectl | Kubernetes 클러스터를 관리하는 Command Line Tool |
 
-### 2-5. 실습 #1
+### 2-6. 실습 #1. 클러스터 생성
+
+#### 실습 목표
+ - Kind 가 무엇인지 배우기
+ - Kind 를 이용하여 Kubernetes 클러스터 생성
+
+#### Kind 란?
+> [!NOTE]
+> `kind`는 "Kubernetes in Docker"의 약자이며, Docker를 이용한 컨테이너 노드에서 Kubernetes 클러스터를 실행하는 오픈소스 프로젝트입니다.<br>
+> 주로 로컬 개발이나 Kubernetes 테스트 목적으로 경량화된 Kubernetes 클러스터를 생성/관리하는 도구입니다.
+
+> [!WARNING]
+> 실습 목적으로 사용하기에는 `kind`가 훌륭한 도구이지만, 실제 서비스 목적의 운영 환경(Production environment)에서는 kind 보다는
+> `kubeadm`등을 이용하여 온프레미스에서 직접 Kubernetes 클러스터를 구축하거나, Cloud 사업자(AWS, Azure, GCP)가 제공하는 관리형 >Kubernetes 서비스들(AWS:[EKS](https://aws.amazon.com/ko/eks/), Azure:[AKS](https://azure.microsoft.com/ko-kr/products/kubernetes-service), GCP:[GKE](https://cloud.google.com/kubernetes-engine?hl=ko))을 이용하시는 것을 추천합니다.
+
+> Kubernetes 클러스터 실습을 위해 `kind`를 `code-server`에 미리 설치해 두었습니다. `kind` 설치에 대한 자세한 안내는 [이곳](https://kind.sigs.k8s.io/docs/user/quick-start)에서 확인해 주세요.
+
+#### Kubernets 클러스터 생성
+
+클러스터 생성은 `kind create cluster` 명령을 이용해 간단히 생성이 가능합니다.
+
+```shell
+$ kind create cluster
+
+Creating cluster "kind" ...
+ ✓ Ensuring node image (kindest/node:v1.32.2) 🖼 
+ ✓ Preparing nodes 📦  
+ ✓ Writing configuration 📜 
+ ✓ Starting control-plane 🕹️ 
+ ✓ Installing CNI 🔌 
+ ✓ Installing StorageClass 💾 
+Set kubectl context to "kind-kind"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-kind
+
+Thanks for using kind! 😊
+```
+
+![Kind-Create Cluster](images/kind-1.png)
+
+Kubernetes Cluster가 생성되었습니다.🎉🎉🎉
+
+생성된 Kubernetes Cluster를 접근하기 위한 설정은 cluster가 생성될때 자동으로 설정됩니다.
+
+생성된 cluster 정보는 `kubectl cluster-info` 명령을 이용해 확인할 수 있습니다.
+
+```shell
+kubectl cluster-info
+```
+
+![Kubectl-cluster-info](images/kubectl-1.png)
+
+생성된 클러스터의 논리적인 모습은 다음과 같습니다.
+
+![Kubernetes cluster diagram 1](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_01_cluster.svg)
+
+### 2.7. 실습 #2. 앱 배포하기
+
+#### 실습 목표
+- 컨테이너화된 Application을 Kubernetes에 배포하기 위한 Deployment에 대해 학습
+- `kubectl`을 이용해 Application을 Kubernetes에 배포 실습
+
+#### Deployment 란?
+
+- Deployment는 Kubernetes에 Application을 배포하기 위한 설정입니다. <br/>
+- Deployment에는 Kubernetes가 Applicaiton의 인스턴스를 어떻게 생성하고 업데이트해야 하는지를 명시하며, Application 인스턴스는 **Pod**라는 단위로 관리합니다.
+- Deployment를 통해 배포된 Application(Pod)는 지속적으로 모니터링되며, 배포가 된 노드가 다운되거나 삭제되면 Kubernetes 클러스터 내부의 다른 노드로 교체됩니다. (**Self-healing**)
+
+#### Kubernetes 에 Application 배포하기
+
+Kubernets 클러스터를 관리하기 위해서는 `kubectl` 이라는 CLI를 사용합니다.
+
+마찬가지로 Application을 배포하려면 `kubectl` 을 이용해 Deployment를 생성하고 관리할 수 있습니다.
+
+1. Deployment 생성하기
+   
+   Deployment를 생성하기 위해서는 YAML 문법을 이용한 Kubernetes 매니페스트(manifest) 파일을 이용합니다.<br/>
+   
+   실습을 위해 미리 `01_Container/deployment.yaml` 파일을 미리 만들어 준비해 두었습니다.
+   ```yaml
+    1:  apiVersion: apps/v1
+    2:  kind: Deployment
+    3:  metadata:
+    4:  name: nginx-deployment
+    5:  labels:
+    6:     app: nginx
+    7:  spec:
+    8:  replicas: 3
+    9:  selector:
+   10:     matchLabels:
+   11:        app: nginx
+   12:  template:
+   13:     metadata:
+   14:        labels:
+   15:        app: nginx
+   16:     spec:
+   17:        containers:
+   18:        - name: nginx
+   19:        image: nginx:latest
+   20:        ports:
+   21:        - containerPort: 80
+   ```
+   위 내용은 
+   - `nginx` 웹서버용 Container 이미지를 사용 (line 19)
+   - 3개의 Pod를 실행 (line 8)
+   - `80` 번 포트를 사용 (line 21)
+   
+   하는 내용입니다.
