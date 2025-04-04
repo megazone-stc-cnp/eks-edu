@@ -260,3 +260,6 @@ Outputs:
   PublicSubnet02:
     Description: "Public Subnet2 Id"
     Value: !Ref PublicSubnet02
+  VpcCidr:
+    Description: "The CIDR range of the VPC"
+    Value: !Ref VpcBlock

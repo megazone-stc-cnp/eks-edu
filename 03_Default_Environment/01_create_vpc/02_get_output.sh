@@ -29,3 +29,4 @@ echo "export AWS_PRIVATE_SUBNET2=$(cat result.json | jq -r '.[] | select(.Output
 echo "export EKS_ADDITIONAL_SG=$(cat result.json | jq -r '.[] | select(.OutputKey=="SecurityGroups") | .OutputValue')" >> ${VPC_ENV_FILE_PATH}
 echo "export AWS_PUBLIC_SUBNET1=$(cat result.json | jq -r '.[] | select(.OutputKey=="PublicSubnet01") | .OutputValue')" >> ${VPC_ENV_FILE_PATH}
 echo "export AWS_PUBLIC_SUBNET2=$(cat result.json | jq -r '.[] | select(.OutputKey=="PublicSubnet02") | .OutputValue')" >> ${VPC_ENV_FILE_PATH}
+echo "export VPC_CIDR=$(cat result.json | jq -r '.[] | select(.OutputKey=="VpcCidr") | .OutputValue')" >> ${VPC_ENV_FILE_PATH}
