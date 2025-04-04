@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PV_NAME=test-pv
+PV_NAME=ebs-static-pv
 PVC_NAME=ebs-static-claim
 VOLUME_SIZE="1"
 APP_NAME=ebs-static-app
@@ -9,7 +9,7 @@ if [ ! -d "tmp" ]; then
     mkdir -p tmp
 fi
 
-cat > tmp/ebs_pod.yaml<<EOF
+cat > tmp/ebs_static_pod.yaml<<EOF
 apiVersion: v1
 kind: Pod
 metadata:
@@ -28,3 +28,8 @@ spec:
     persistentVolumeClaim:
       claimName: ${PVC_NAME}
 EOF
+
+echo "kubectl apply -f tmp/ebs_static_pod.yaml"
+kubectl apply -f tmp/ebs_static_pod.yaml
+
+kubectl get pod

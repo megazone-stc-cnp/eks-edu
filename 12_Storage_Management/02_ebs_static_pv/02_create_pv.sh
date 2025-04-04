@@ -5,11 +5,11 @@ if [ -z "$1" ]; then
 fi
 VOLUME_ID=$1
 
-if [ ! -f "../env.sh" ];then
+if [ ! -f "../../env.sh" ];then
 	echo "env.sh 파일 세팅을 해주세요."
 	exit 1
 fi
-. ../env.sh
+. ../../env.sh
 
 if [ ! -f "../../vpc_env.sh" ];then
 	echo "01_create_vpc 를 진행해 주세요."
@@ -17,18 +17,18 @@ if [ ! -f "../../vpc_env.sh" ];then
 fi
 . ../../vpc_env.sh
 
-PV_NAME=test-pv
+PV_NAME=ebs-static-pv
 VOLUME_SIZE="1"
 # ====================================================================
 if [ ! -d "tmp" ]; then
     mkdir -p tmp
 fi
 
-cat > tmp/ebs_pv.yaml<<EOF
+cat > tmp/ebs_static_pv.yaml<<EOF
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: test-pv
+  name: ${PV_NAME}
 spec:
   accessModes:
   - ReadWriteOnce
@@ -48,7 +48,7 @@ spec:
                 - ${AWS_AZ1}
 EOF
 
-echo "kubectl apply -f tmp/ebs_pv.yaml"
-kubectl apply -f tmp/ebs_pv.yaml
+echo "kubectl apply -f tmp/ebs_static_pv.yaml"
+kubectl apply -f tmp/ebs_static_pv.yaml
 
 kubectl get pv
