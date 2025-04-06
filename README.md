@@ -3,6 +3,11 @@
 ## 사전 조건
 1. AWS 계정
 
+## 접속 링크
+
+<img src="images/eks-edu-qr.png" width="300"><br/>
+(https://bit.ly/eks-edu)
+
 <!-- 
 ## 문서 작성 포맷
 1. 목표
