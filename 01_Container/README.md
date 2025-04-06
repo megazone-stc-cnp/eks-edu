@@ -613,6 +613,12 @@ kubectl cluster-info
 
 ---
 
+Deployment 가 배포된 후에는 다음과 같은 논리적인 모습을 갖게 됩니다.
+
+![h:600](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_02_first_app.svg)
+
+---
+
 #### Kubernetes 에 Application 배포하기
 
 Kubernets 클러스터를 관리하기 위해서는 `kubectl` 이라는 CLI를 사용합니다.
@@ -672,9 +678,50 @@ Kubernets 클러스터를 관리하기 위해서는 `kubectl` 이라는 CLI를 �
    kubectl apply -f manifests/deployment.yaml
    ```
 
-   ![h:400](images/kubectl-2.png)
-
-
+   ![](images/kubectl-2.png)
 
 ---
 
+   kubectl get deployments 명령을 실행해서 Deployment가 생성되었는지 확인합니다.
+   ```bash
+   kubectl get deployments
+   ```
+
+   ![](images/kubectl-3.png)
+
+---
+
+   출력된 각 필드의 의미는 다음과 같습니다.
+
+   | 필드 | 설명 |
+   | --- | --- |
+   | `NAME` | Deployment 이름 |
+   | `READY` | Pod의 복제본 수. "3/3" 이라는 의미는 "ready/desired"를 뜻함 |
+   | `UP-TO-DATE` | 의도한 상태를 얻기 위해 업데이트된 복제본 수 |
+   | `AVAILABLE` | 현재 실행 중인 복제본 수 |
+   | `AGE` | Deployment가 실행된 시간 |
+
+---
+
+2. Pod 확인
+
+   `deployment.yaml` 파일을 통해 생성된 pod 목록을 보기 위해 아래 명령어를 실행합니다.
+   (manifest 파일에 지정한 `app=nginx` Label을 지정)
+   
+   ```bash
+   kubectl get pods -l app=nginx
+   ```
+
+   ![](images/kubectl-5.png)
+
+---
+
+   생성된 Pod의 논리적인 모습은 다음과 같습니다.
+
+   ![](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_pods.svg)
+
+---
+
+   파드는 노드에서 동작하게 되며, 노드의 논리적인 모습은 다음과 같습니다.
+
+   ![h:500](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg)
