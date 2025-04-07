@@ -694,6 +694,19 @@ kubectl get deployments
 
 ---
 
+`deployment.yaml` 파일을 통해 생성된 pod 목록을 보기 위해 아래 명령어를 실행합니다.
+(manifest 파일에 지정한 `app=nginx` Label을 지정)
+
+```bash
+kubectl get pods -l app=nginx
+```
+
+![w:1200 h:480](images/kubectl-5.png)
+
+
+
+---
+
 출력된 각 필드의 의미는 다음과 같습니다.
 
 | 필드 | 설명 |
@@ -776,7 +789,7 @@ Pod는
 kubectl get pods -l app=nginx-pod
 ```
 
-![w:1200 h:480](images/kubectl-5.png)
+![w:1200 h:480](images/kubectl-8.png)
 
 ---
 
@@ -819,4 +832,8 @@ Node는 Kubernetes 에서 워커 노드를 말하며, Cluster가 구성된 환�
 
 ---
 
-`kubectl exec` 명령을 이용해 Pod의 Container에 명령을 실행해 보겠습니다.
+문제가 발생한 경우를 가정하기 위해 아래 명령을 이용해 새로운 pod를 생성해 보겠습니다.
+
+```bash
+kubectl apply -f pod-trouble.yaml
+```
