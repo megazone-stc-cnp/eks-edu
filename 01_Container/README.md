@@ -876,11 +876,12 @@ kubectl describe pod/nginx-trouble
 10:       image: nginx:lastest
 ```
 
-아래와 같이 수정 후, 다시 pod 를 생성해 보겠습니다.
+아래와 같이 수정 후, 
 ```yaml
 10:       image: nginx:latest
 ```
 
+다시 pod 를 생성해 보겠습니다.
 ```bash
 kubectl apply -f ~/environment/eks-edu/01_Container/manifests/pod-trouble.yaml
 ```
