@@ -3,7 +3,7 @@ kind: ClusterConfig
 metadata:
   name: eks-edu-cluster-${IDE_NAME}
   region: ${AWS_REGION}
-  version: "1.31"
+  version: "${EKS_VERSION}"
   tags:
     karpenter.sh/discovery: eks-edu-cluster-${IDE_NAME}
     created-by: eks-workshop-v2
