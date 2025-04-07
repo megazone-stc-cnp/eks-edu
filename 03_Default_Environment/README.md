@@ -11,7 +11,7 @@
   - EKS 구성을 위한 기본 VPC 구성 실습 ( CloudFormation )
     - VPC 생성 ( 192.168.0.0/24 )
     - 두개의 AZ의 Public / Private Subnet ( /27 cidr )
-    - 각 AZ 별로 Nat Gateway 구성
+    - 하나의 AZ에 Nat Gateway 구성
 - EKS
   - EKS 구성을 위한 eksctl 지식 습득
   - EKS Cluster 생성 실습 ( eksctl )
@@ -167,7 +167,8 @@ EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성
 
    ```shell
    aws cloudformation describe-stacks \
-       --stack-name eks-workshop-vpc-9641173 --query Stacks[0].Outputs --output json
+       --stack-name eks-workshop-vpc-9641173 --query Stacks[0].Outputs \
+       --output json
    ```
 2. 실행 화면
    ![1743477789373](image/get_output.png)
@@ -228,13 +229,13 @@ EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성
    29     privateNetworking: true
    ```
 
-   - 04 : EKS Cluster 명칭
-   - 05 : region 정보
-   - 06 : EKS Version
-   - 11 ~ 12 : OIDC 생성
-   - 13 ~ 21 : 생성된 VPC/Subnet/Add Cluster SecurityGroup 정보를 설정
-   - 22 ~ 24 : Cluster Endpoint 설정
-   - 25 ~ 29 : Managed NodeGroup 설정 ( t3.medium * 2대 생성 )
+   - 04 lines : EKS Cluster 명칭
+   - 05 lines : region 정보
+   - 06 lines : EKS Version
+   - 11 ~ 12 lines : OIDC 생성
+   - 13 ~ 21 lines : 생성된 VPC/Subnet/Add Cluster SecurityGroup 정보를 설정
+   - 22 ~ 24 lines : Cluster Endpoint 설정
+   - 25 ~ 29 lines : Managed NodeGroup 설정 ( t3.medium * 2대 생성 )
 5. EKS 생성
 
    ```shell
