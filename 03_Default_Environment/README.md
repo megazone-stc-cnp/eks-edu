@@ -236,6 +236,7 @@ EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성
    - 13 ~ 21 lines : 생성된 VPC/Subnet/Add Cluster SecurityGroup 정보를 설정
    - 22 ~ 24 lines : Cluster Endpoint 설정
    - 25 ~ 29 lines : Managed NodeGroup 설정 ( t3.medium * 2대 생성 )
+   - 기타 : default addon : kube-proxy, aws-node, coredns 설치됨
 5. EKS 생성
 
    ```shell
