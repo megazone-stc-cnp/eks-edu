@@ -345,7 +345,7 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
 
 2. `docker build` 명령어를 이용해 Docker 이미지를 다시 빌드합니다.
    ```bash
-   docker build -t getting-started .
+   docker build -t getting-started ~/environment/eks-edu/00_Setup/.
    ```
 
 3. 새로 업데이트된 이미지를 이용해 새로운 컨테이너를 실행합니다.
@@ -452,7 +452,7 @@ Kubernetes 에서는 다음과 같이 정의하고 있습니다.
 ---
 <style scoped>
    table {
-      font-size: 22px;
+      font-size: 23px;
    }
 </style>
 
@@ -528,13 +528,20 @@ Kubernetes는 컨트롤 플레인(Control Plane) 컴포넌트와 워커 노드(W
 
 ### 2-6. 실습 #1. 클러스터 생성
 
-#### 실습 목표
+#### 2-6-1. 실습 목표
  - Kind 가 무엇인지 배우기
  - Kind 를 이용하여 Kubernetes 클러스터 생성
 
 ---
 
-#### Kind 란?
+#### 2-6-2. Kind 란?
+
+<style scoped>
+   p {
+      font-size: 25px;
+   }
+</style>
+
 > [!NOTE]
 > `kind`는 "Kubernetes in Docker"의 약자이며, Docker를 이용한 컨테이너 노드에서 Kubernetes 클러스터를 실행하는 오픈소스 프로젝트입니다.<br>
 > 주로 로컬 개발이나 Kubernetes 테스트 목적으로 경량화된 Kubernetes 클러스터를 생성/관리하는 도구입니다.
@@ -543,13 +550,11 @@ Kubernetes는 컨트롤 플레인(Control Plane) 컴포넌트와 워커 노드(W
 > 실습 목적으로 사용하기에는 `kind`가 훌륭한 도구이지만, 실제 서비스 목적의 운영 환경(Production environment)에서는 kind 보다는
 > `kubeadm`등을 이용하여 온프레미스에서 직접 Kubernetes 클러스터를 구축하거나, Cloud 사업자(AWS, Azure, GCP)가 제공하는 관리형 >Kubernetes 서비스들(AWS:[EKS](https://aws.amazon.com/ko/eks/), Azure:[AKS](https://azure.microsoft.com/ko-kr/products/kubernetes-service), GCP:[GKE](https://cloud.google.com/kubernetes-engine?hl=ko))을 이용하시는 것을 추천합니다.
 
----
-
 > Kubernetes 클러스터 실습을 위해 `kind`를 `code-server`에 미리 설치해 두었습니다. `kind` 설치에 대한 자세한 안내는 [이곳](https://kind.sigs.k8s.io/docs/user/quick-start)에서 확인해 주세요.
 
 ---
 
-#### Kubernets 클러스터 생성
+#### 2-6-3. Kubernets 클러스터 생성
 
 클러스터 생성은 `kind create cluster` 명령을 이용해 간단히 생성이 가능합니다.
 
@@ -597,15 +602,15 @@ kubectl cluster-info
 
 ---
 
-### 2.7. 실습 #2. 앱 배포하기
+### 2-7. 실습 #2. 앱 배포하기
 
-#### 실습 목표
+#### 2-7-1. 실습 목표
 - 컨테이너화된 Application을 Kubernetes에 배포하기 위한 Deployment에 대해 학습
 - `kubectl`을 이용해 Application을 Kubernetes에 배포 실습
 
 ---
 
-#### Deployment 란?
+#### 2-7-2. Deployment 란?
 
 - Deployment는 Kubernetes에 Application을 배포하기 위한 설정입니다. <br/>
 - Deployment에는 Kubernetes가 Applicaiton의 인스턴스를 어떻게 생성하고 업데이트해야 하는지를 명시하며, Application 인스턴스는 **Pod**라는 단위로 관리합니다.
@@ -619,15 +624,13 @@ Deployment 가 배포된 후에는 다음과 같은 논리적인 모습을 갖�
 
 ---
 
-#### Kubernetes 에 Application 배포하기
+#### 2-7-3. 앱 배포하기
 
 Kubernets 클러스터를 관리하기 위해서는 `kubectl` 이라는 CLI를 사용합니다.
 
 마찬가지로 Application을 배포하려면 `kubectl` 을 이용해 Deployment를 생성하고 관리할 수 있습니다.
 
-1. Deployment 생성하기
-   
-   Deployment를 생성하기 위해서는 YAML 문법을 이용한 Kubernetes 매니페스트(manifest) 파일을 이용합니다.<br/>
+Deployment를 생성하기 위해서는 YAML 문법을 이용한 Kubernetes 매니페스트(manifest) 파일을 이용합니다.<br/>
    
 ---
 <style scoped>
@@ -636,7 +639,7 @@ Kubernets 클러스터를 관리하기 위해서는 `kubectl` 이라는 CLI를 �
    }
 </style>
 
-   실습을 위해 미리 `01_Container/manifests/deployment.yaml` 파일을 미리 만들어 준비해 두었습니다.
+실습을 위해 미리 `~/environment/eks-edu/01_Container/manifests/deployment.yaml` 파일을 미리 만들어 준비해 두었습니다.
    ```yaml
 1:  apiVersion: apps/v1
 2:  kind: Deployment
@@ -663,65 +666,157 @@ Kubernets 클러스터를 관리하기 위해서는 `kubectl` 이라는 CLI를 �
 
 ---
 
-   위 내용은 
-   - `nginx` 웹서버용 Container 이미지를 사용 (line 19)
-   - 3개의 Pod를 실행 (line 8)
-   - `80` 번 포트를 사용 (line 21)
-   
-   하는 내용입니다.
+위 내용은 
+- `nginx` 웹서버용 Container 이미지를 사용 (line 19)
+- 3개의 Pod를 실행 (line 8)
+- `80` 번 포트를 사용 (line 21)
+
+하는 내용입니다.
 
 ---
 
-   이제 준비된 deployment 용 매니페스트를 kubernetes 클러스터에 생성해 보겠습니다.
+이제 준비된 deployment 용 매니페스트를 kubernetes 클러스터에 생성해 보겠습니다.
 
-   ```bash
-   kubectl apply -f manifests/deployment.yaml
+```bash
+kubectl apply -f ~/environment/eks-edu/01_Container/manifests/deployment.yaml
+```
+
+![](images/kubectl-2.png)
+
+---
+
+kubectl get deployments 명령을 실행해서 Deployment가 생성되었는지 확인합니다.
+```bash
+kubectl get deployments
+```
+
+![](images/kubectl-3.png)
+
+---
+
+출력된 각 필드의 의미는 다음과 같습니다.
+
+| 필드 | 설명 |
+| --- | --- |
+| `NAME` | Deployment 이름 |
+| `READY` | Pod의 복제본 수. "3/3" 이라는 의미는 "ready/desired"를 뜻함 |
+| `UP-TO-DATE` | 의도한 상태를 얻기 위해 업데이트된 복제본 수 |
+| `AVAILABLE` | 현재 실행 중인 복제본 수 |
+| `AGE` | Deployment가 실행된 시간 |
+
+---
+
+### 2-8. 실습 #3. 앱 확인하기
+
+#### 2-8.1. 실습 목표
+- Po에 대해 학습
+- Node에 대해 학습
+- 배포된 Application의 문제 해결 방법 학습
+
+---
+
+#### 2-8-2. Pod 개요
+
+`2-7`에서 Deployment를 생성했을 때, Kubernetes 클러스터에는 Pod라고 불리는 Component가 생성됩니다.
+
+Pod는 
+
+- 하나 이상의 Container들의 그룹을 나타내는 추상적 개념
+- 컨테이너의 자원을 일부 공유
+- Kubernets 클러스터에서 최소 단위
+
+를 뜻합니다.
+
+---
+
+생성된 Pod의 논리적인 모습은 다음과 같습니다.
+
+![](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_pods.svg)
+
+---
+
+#### 2-8-3. Pod 배포하기
+
+   Pod 배포는 Deployment manifest 와 마찬가지로 YAML 문법을 이용해 아래와 같은 형태로 정의하여 생성할 수 있습니다.
+   (실습을 위해 미리 `~/environment/eks-edu/01_Container/manifests/pod.yaml` 파일을 미리 만들어 준비해 두었습니다.)
+
+   ```yaml
+   apiVersion: v1
+   kind: Pod
+   metadata:
+   name: nginx-pod
+   labels:
+      app: nginx-pod
+   spec:
+   containers:
+      - name: nginx
+         image: nginx:latest
+         ports:
+         - containerPort: 80
    ```
 
-   ![](images/kubectl-2.png)
-
 ---
 
-   kubectl get deployments 명령을 실행해서 Deployment가 생성되었는지 확인합니다.
+   이제 준비된 pod 용 매니페스트를 kubernetes 클러스터에 생성해 보겠습니다.
+
    ```bash
-   kubectl get deployments
+   kubectl apply -f ~/environment/eks-edu/01_Container/manifests/pod.yaml
    ```
 
-   ![](images/kubectl-3.png)
+   ![](images/kubectl-6.png)
 
 ---
 
-   출력된 각 필드의 의미는 다음과 같습니다.
+#### 2-8-4. 배포된 Pod 확인하기
 
-   | 필드 | 설명 |
-   | --- | --- |
-   | `NAME` | Deployment 이름 |
-   | `READY` | Pod의 복제본 수. "3/3" 이라는 의미는 "ready/desired"를 뜻함 |
-   | `UP-TO-DATE` | 의도한 상태를 얻기 위해 업데이트된 복제본 수 |
-   | `AVAILABLE` | 현재 실행 중인 복제본 수 |
-   | `AGE` | Deployment가 실행된 시간 |
+`pod.yaml` 파일을 통해 생성된 pod 목록을 보기 위해 아래 명령어를 실행합니다.
+(manifest 파일에 지정한 `app=nginx-pod` Label을 지정)
 
----
+```bash
+kubectl get pods -l app=nginx-pod
+```
 
-2. Pod 확인
-
-   `deployment.yaml` 파일을 통해 생성된 pod 목록을 보기 위해 아래 명령어를 실행합니다.
-   (manifest 파일에 지정한 `app=nginx` Label을 지정)
-   
-   ```bash
-   kubectl get pods -l app=nginx
-   ```
-
-   ![](images/kubectl-5.png)
+![w:1200 h:480](images/kubectl-5.png)
 
 ---
 
-   생성된 Pod의 논리적인 모습은 다음과 같습니다.
+### 2-8-5. Node 개요
 
-   ![](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_pods.svg)
+Node는 Kubernetes 에서 워커 노드를 말하며, Cluster가 구성된 환경에 따라 가상 또는 물리 머신이 될 수 있습니다.
+
+각 Node는 
+
+- 컨트롤 플레인에 의해 관리되며, Pod 스케줄링 등을 자동으로 처리하는 등의 관리를 받습니다.
+- 하나의 Node는 여러개의 Pod를 가질 수 있습니다.
 
 ---
 
-   파드는 노드에서 동작하게 되며, 노드의 논리적인 모습은 다음과 같습니다.
+모든 Kubernetes의 Node들은 최소한 다음과 같이 동작합니다.
 
-   ![h:500](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg)
+- Node에는 `kubelet`과 `Container Runetime`으로 구성
+- **Kubelet**은 컨트롤 플레인과 노드 간 통신을 담당
+- **Kubelet**은 하나의 머신 상에서 동작하는 파드와 컨테이너를 관리
+- **Container runtime**(ex: `containerd`)은 Container Image Registry에서 컨테이너 이미지를 가져와 애플리케이션을 동작시키는 책임을 맡는다.
+
+---
+
+   노드의 논리적인 모습은 다음과 같습니다.
+
+   ![h:600](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg)
+
+---
+
+### 2-8-6. 배포된 Application의 문제 해결 방법
+
+배포된 다양한 자원들(pod,deployment 등)의 동작에 문제가 발생할 경우 주로 다음의 명령을 사용합니다.
+
+| 명령 | 설명 |
+| --- | --- |
+| `kubectl get <resource>` | resource 목록을 조회 |
+| `kubectl describe <resource>` | resource에 대한 상세 정보 조회 |
+| `kubectl logs <container>` | Pod 안의 Container 로그를 출력 |
+| `kubectl exec <container>` | Pod 안의 COntainer에 대한 명령 실행 |
+
+---
+
+`kubectl exec` 명령을 이용해 Pod의 Container에 명령을 실행해 보겠습니다.
