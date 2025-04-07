@@ -835,5 +835,58 @@ Node는 Kubernetes 에서 워커 노드를 말하며, Cluster가 구성된 환�
 문제가 발생한 경우를 가정하기 위해 아래 명령을 이용해 새로운 pod를 생성해 보겠습니다.
 
 ```bash
-kubectl apply -f pod-trouble.yaml
+kubectl apply -f ~/environment/eks-edu/01_Container/manifests/pod-trouble.yaml
 ```
+
+![](images/kubectl-9.png)
+
+---
+
+새롭게 배포된 pod의 상태를 확인해 보겠습니다.
+
+```bash
+kubectl get pods -l app=nginx-pod-trouble
+```
+
+![](images/kubectl-10.png)
+
+---
+
+확인해 보니, 해당 Pod 의 상태가 `ImagePullBackOff` 라고 표시됩니다.
+
+`ImagePullBackOff` 는 Container Runtime에서 Container Image를 가져올때 주로 발생하는 문제입니다.
+
+해당 Pod의 자세한 상황을 확인하기 위해 아래 명령을 추가로 실행해 보겠습니다.
+
+```bash
+kubectl describe pod/nginx-trouble
+```
+
+---
+
+![](images/kubectl-11.png)
+
+결과 마지막의 Events 항목을 확인해 보니, `nginx:lastest` 라는 이미지를 가져올때 찾지 못해 `not found`라는 결과를 출력하면서 동작을 멈춘것으로 보입니다.
+
+---
+
+확인해 보니, `pod-trouble.yaml` 파일에 컨테이너 이미지의 tag 이름에 오타(lastest)가 있었네요.
+
+```yaml
+10:       image: nginx:lastest
+```
+
+아래와 같이 수정 후, 다시 pod 를 생성해 보겠습니다.
+```yaml
+10:       image: nginx:latest
+```
+
+```bash
+kubectl apply -f ~/environment/eks-edu/01_Container/manifests/pod-trouble.yaml
+```
+
+---
+
+![](images/kubectl-12.png)
+
+실행 결과를 확인해 보니 Pod의 상태가 정상적으로 `Running` 상태로 된 것을 확인할 수 있습니다.
