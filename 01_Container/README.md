@@ -644,24 +644,24 @@ Deployment를 생성하기 위해서는 YAML 문법을 이용한 Kubernetes 매�
 1:  apiVersion: apps/v1
 2:  kind: Deployment
 3:  metadata:
-4:  name: nginx-deployment
-5:  labels:
-6:     app: nginx
+4:    name: nginx-deployment
+5:    labels:
+6:      app: nginx
 7:  spec:
 8:    replicas: 3
 9:    selector:
-10:       matchLabels:
-11:          app: nginx
-12:    template:
-13:       metadata:
-14:          labels:
-15:          app: nginx
-16:       spec:
-17:          containers:
-18:          - name: nginx
-19:          image: nginx:latest
-20:          ports:
-21:          - containerPort: 80
+10:     matchLabels:
+11:       app: nginx
+12:   template:
+13:     metadata:
+14:       labels:
+15:         app: nginx
+16:     spec:
+17:       containers:
+18:       - name: nginx
+19:         image: nginx:latest
+20:         ports:
+21:         - containerPort: 80
    ```
 
 ---
@@ -702,8 +702,6 @@ kubectl get pods -l app=nginx
 ```
 
 ![w:1200 h:480](images/kubectl-5.png)
-
-
 
 ---
 
@@ -750,33 +748,33 @@ Pod는
 
 #### 2-8-3. Pod 배포하기
 
-   Pod 배포는 Deployment manifest 와 마찬가지로 YAML 문법을 이용해 아래와 같은 형태로 정의하여 생성할 수 있습니다.
-   (실습을 위해 미리 `~/environment/eks-edu/01_Container/manifests/pod.yaml` 파일을 미리 만들어 준비해 두었습니다.)
+Pod 배포는 Deployment manifest 와 마찬가지로 YAML 문법을 이용해 아래와 같은 형태로 정의하여 생성할 수 있습니다.
+(실습을 위해 미리 `~/environment/eks-edu/01_Container/manifests/pod.yaml` 파일을 미리 만들어 준비해 두었습니다.)
 
-   ```yaml
-   apiVersion: v1
-   kind: Pod
-   metadata:
-   name: nginx-pod
-   labels:
-      app: nginx-pod
-   spec:
-   containers:
-      - name: nginx
-         image: nginx:latest
-         ports:
-         - containerPort: 80
-   ```
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx-pod
+spec:
+  containers:
+    - name: nginx
+      image: nginx:latest
+      ports:
+        - containerPort: 80
+```
 
 ---
 
-   이제 준비된 pod 용 매니페스트를 kubernetes 클러스터에 생성해 보겠습니다.
+이제 준비된 pod 용 매니페스트를 kubernetes 클러스터에 생성해 보겠습니다.
 
-   ```bash
-   kubectl apply -f ~/environment/eks-edu/01_Container/manifests/pod.yaml
-   ```
+```bash
+kubectl apply -f ~/environment/eks-edu/01_Container/manifests/pod.yaml
+```
 
-   ![](images/kubectl-6.png)
+![](images/kubectl-6.png)
 
 ---
 
