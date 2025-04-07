@@ -722,7 +722,7 @@ kubectl get pods -l app=nginx
 ### 2-8. 실습 #3. 앱 확인하기
 
 #### 2-8.1. 실습 목표
-- Po에 대해 학습
+- Pod에 대해 학습
 - Node에 대해 학습
 - 배포된 Application의 문제 해결 방법 학습
 
