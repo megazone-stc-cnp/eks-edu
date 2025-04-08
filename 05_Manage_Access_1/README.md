@@ -74,6 +74,84 @@ Amazon EKS 클러스터를 생성할 경우, 클러스터를 생성하는 IAM �
 ![구성도](image/diagram.png)
 
 ### 기본 환경 구성
+1. 현재 context 확인
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/01_common
+   sh 01_current_context.sh
+   ```
+
+   위 `01_current_context.sh`를 실행하면 아래 kubectl 명령이 실행됩니다.(참고용)
+
+   ```shell
+   kubectl config current-context
+   ```
+
+2. 실행 화면
+   ![current_context](image/current_context.png)
+
+3. 생성 결과 화면
+   ![alt text](image/result_current_context.png)
+
+4. `eks-edu-cluster-${IDE_NAME}` 이름으로 context 변경
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/01_common
+   sh 02_update_kubeconfig.sh
+   ```
+
+   위 `02_update_kubeconfig.sh`를 실행하면 아래 aws cli 명령이 실행됩니다.(참고용)
+
+   ```shell
+   aws eks update-kubeconfig \
+        --name eks-edu-cluster-9641173 \
+        --alias eks-edu-cluster-9641173
+
+   # context 목록 출력
+   kubectl config get-contexts        
+   ```
+
+5. 실행 화면
+   ![alt text](image/update_kubeconfig.png)
+
+6. 생성 결과 화면
+   ![alt text](image/result_update_kubeconfig.png)
+
+7. aws-auth configmaps 내용 확인
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/01_common
+   sh 03_get_aws-auth-configmap.sh
+   ```
+
+   위 `03_get_aws-auth-configmap.sh`를 실행하면 아래 kubectl 명령이 실행됩니다.(참고용)
+
+   ```shell
+   kubectl -n kube-system get configmap aws-auth -oyaml
+   ```
+
+5. 실행 화면
+   ![alt text](image/get_aws_auth_configmap.png)
+
+6. 생성 결과 화면
+   ![alt text](image/result_get_aws_auth_configmap.png)
+
+### ConfigMap을 사용하여 사용자 권한 설정
+1. `eks-edu-user-<사번>` IAM User 생성
+
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/02_user_permission_configmap
+   sh 01_create_user.sh
+   ```
+
+   위 `01_create_user.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   aws iam create-user \
+    --user-name eks-edu-user-9641173
+   ```
+   
+2. 실행 화면
+   ![1743477021002](image/creating_vpc_infra.png)
+3. 생성 결과 화면
+   ![1743477100419](image/result_vpc_infra.png)
 
 ## 관련 링크
 - [Full Configuration Format](https://github.com/kubernetes-sigs/aws-iam-authenticator#full-configuration-format)
