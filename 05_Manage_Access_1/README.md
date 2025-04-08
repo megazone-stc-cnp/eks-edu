@@ -149,9 +149,211 @@ Amazon EKS 클러스터를 생성할 경우, 클러스터를 생성하는 IAM �
    ```
    
 2. 실행 화면
-   ![1743477021002](image/creating_vpc_infra.png)
+   ![alt text](image/create_user.png)
 3. 생성 결과 화면
-   ![1743477100419](image/result_vpc_infra.png)
+   ![result_create_user](image/result_create_user.png)
+
+4. User에 Access Key 생성
+
+   ```shell
+   sh 02_create_access_key.sh
+   ```
+
+   위 `02_create_access_key.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   aws iam create-access-key \
+    --user-name eks-edu-user-9641173 --output json
+   ```
+   
+5. 실행 화면
+   ![alt text](image/create_access_key.png)
+
+6. 생성 결과 화면
+   tmp/access_key.json에 key 정보가 보관되어 있습니다.
+   ![alt text](image/result_create_access_key.png)
+
+7. User에 eks:DescribeCluster 권한을 등록 합니다.
+
+   ```shell
+   sh 03_attach_policy.sh
+   ```
+
+   위 `03_attach_policy.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   >> tmp/eks-edu-user-policy.json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": "eks:DescribeCluster",
+         "Resource": "*"
+       }
+     ]
+   }
+
+   aws iam create-policy --policy-name eks-edu-user-policy-9641173 \
+        --policy-document file://tmp/eks-edu-user-policy.json
+
+   aws iam attach-user-policy \
+        --user-name eks-edu-user-9641173 \
+        --policy-arn arn:aws:iam::539666729110:policy/eks-edu-user-policy-9641173
+   ```
+   
+8. 실행 화면
+   ![alt text](image/attach_policy.png)
+
+9. 생성 결과 화면
+   ![alt text](image/result_attach_policy.png)
+
+10. User에 eks:DescribeCluster 권한을 등록 합니다.
+
+   ```shell
+   sh 04_get_iamidentitymapping.sh
+   ```
+
+   위 `04_get_iamidentitymapping.sh`를 실행하면 아래 eksctl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   # configmap에 등록된 정보 조회
+   eksctl get iamidentitymapping --cluster eks-edu-cluster-9641173
+   ```
+   
+11. 실행 화면
+   ![alt text](image/get_iamidentitymapping.png)
+
+12. 생성 결과 화면
+   ![alt text](image/result_get_iamidentitymapping.png)
+
+13. User에 권한 할당
+
+   ```shell
+   sh 05_create_iamidentitymapping.sh
+   ```
+
+   위 `05_create_iamidentitymapping.sh`를 실행하면 아래 eksctl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   eksctl create iamidentitymapping \
+      --cluster eks-edu-cluster-9641173 \
+      --arn arn:aws:iam::539666729110:user/eks-edu-user-9641173 \
+      --username eks-edu-user-9641173 
+   ```
+   - arn는 user의 arn이며 삭제시에 key로 사용됨
+   - username은 AWS IAM User
+   
+14. 실행 화면
+   ![alt text](image/create_iamidentitymapping.png)
+
+15. 생성 결과 화면
+   ![alt text](image/result_create_iamidentitymapping.png)
+
+16. User에 할당할 ClusterRole / ClusterRoleBinding 생성
+
+   ```shell
+   sh 06_create_cluster_role_binding.sh
+   ```
+
+   위 `06_create_cluster_role_binding.sh`를 실행하면 tmp/cluster-role-info.yaml를 만들어서 배포를 합니다.(참고용)
+
+   ```yaml
+   apiVersion: rbac.authorization.k8s.io/v1
+   kind: ClusterRole
+   metadata:
+     name: pod-reader
+   rules:
+     - apiGroups: [""]
+       resources: ["pods"]
+       verbs: ["get", "list"]
+   ---
+   apiVersion: rbac.authorization.k8s.io/v1
+   kind: ClusterRoleBinding
+   metadata:
+     name: pod-reader-binding
+   subjects:
+     - kind: User
+       name: eks-edu-user-9641173  # aws-auth에서 매핑한 User명
+       apiGroup: rbac.authorization.k8s.io
+   roleRef:
+     kind: ClusterRole
+     name: pod-reader
+     apiGroup: rbac.authorization.k8s.io
+   ```
+
+   ```shell
+   # 배포
+   kubectl apply -f tmp/cluster-role-info.yaml
+   ```
+   
+17. 실행 화면
+   ![alt text](image/create_cluster_role_binding.png)
+
+18. 생성 결과 화면
+   ![alt text](image/result_create_cluster_role_binding.png)
+
+19. `eks-edu-user-<사번>` 의 aws profile eks-edu-profile-<사번> 생성
+
+   ```shell
+   sh 07_create_cli_profile.sh
+   ```
+
+   위 `07_create_cli_profile.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   aws configure set region ap-northeast-1 --profile eks-edu-profile-9641173
+   aws configure set output yaml --profile eks-edu-profile-9641173
+   aws configure set aws_access_key_id XXXXXXXXXX --profile eks-edu-profile-9641173
+   aws configure set aws_secret_access_key XXXXXXXXXXXXXXXXXXXX --profile eks-edu-profile-9641173
+   ```
+   
+20. 실행 화면
+   ![alt text](image/create_cli_profile.png)
+
+21. 생성 결과 화면
+   ```shell
+   aws sts get-caller-identity --profile eks-edu-profile-9641173
+   ```
+   ![alt text](image/result_create_cli_profile.png)
+
+22. `eks-edu-user-<사번>` Profile을 이용해서 kubectl config 설정
+
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/02_user_permission_configmap
+   sh 08_update_kubeconfig-pod-reader.sh
+   ```
+
+   위 `08_update_kubeconfig-pod-reader.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   aws eks update-kubeconfig \
+        --name eks-edu-cluster-9641173 \
+        --alias pod-reader --profile eks-edu-profile-9641173
+   ```
+23. 실행 화면
+   ![alt text](image/update_kubeconfig_pod_reader.png)
+
+24. 생성 결과 화면
+   ![alt text](image/result_update_kubeconfig_pod_reader.png)
+
+25. pod get 권한 체크
+
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/02_user_permission_configmap
+   sh 09_get_nodes.sh
+   ```
+
+   위 `09_get_nodes-pod-reader.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   kubectl get nodes
+   ```
+23. 실행 화면
+   ![alt text](image/get_nodes.png)
+
+24. 생성 결과 화면
+   ![alt text](image/result_get_nodes.png)
 
 ## 관련 링크
 - [Full Configuration Format](https://github.com/kubernetes-sigs/aws-iam-authenticator#full-configuration-format)
