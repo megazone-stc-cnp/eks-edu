@@ -17,7 +17,6 @@ helm_version='3.17.2'                           # 2025-03-14
 # renovate: depName=eksctl-io/eksctl
 eksctl_version='0.206.0'                        # 2025-03-23
 
-# [TODO] krew 설치 필요
 # renovate: depName=bitnami-labs/sealed-secrets
 kubeseal_version='0.28.0'                       # 2025-01-16
 
@@ -56,6 +55,7 @@ download_and_verify () {
   rm "$out_file.sha256"
 }
 
+os="$(uname | tr '[:upper:]' '[:lower:]')"
 arch=$(uname -m)
 arch_name=""
 
@@ -122,11 +122,19 @@ unzip -o -q awscliv2.zip -d /tmp
 rm -rf /tmp/aws awscliv2.zip
 
 # kubeseal
+KREW="krew-${OS}_${ARCH}"
 download "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${kubeseal_version}/kubeseal-${kubeseal_version}-linux-${arch_name}.tar.gz" "kubeseal.tar.gz"
 tar xfz kubeseal.tar.gz
 chmod +x kubeseal
 mv ./kubeseal /usr/local/bin
 rm -rf kubeseal.tar.gz
+
+# krew
+download "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_${arch_name}.tar.gz" "krew.tar.gz"
+mkdir -p /tmp/krew-install
+mv krew.tar.gz /tmp/krew-install && cd /tmp/krew-install
+tar zxvf "krew.tar.gz"
+./krew-linux_${arch_name} install krew
 
 # yq
 download "https://github.com/mikefarah/yq/releases/download/v${yq_version}/yq_linux_${arch_name}" "yq"
@@ -144,16 +152,6 @@ rm -f terraform.zip
 download "https://github.com/argoproj/argo-cd/releases/download/v${argocd_version}/argocd-linux-${arch_name}" "argocd"
 chmod +x ./argocd
 mv ./argocd /usr/local/bin/argocd
-
-# ec2 instance selector
-download "https://github.com/aws/amazon-ec2-instance-selector/releases/download/v${ec2_instance_selector_version}/ec2-instance-selector-linux-${arch_name}" "ec2-instance-selector"
-chmod +x ./ec2-instance-selector
-mv ./ec2-instance-selector /usr/local/bin/ec2-instance-selector
-
-# oha
-download "https://github.com/hatoo/oha/releases/download/v${oha_version}/oha-linux-${arch_name}" "oha"
-chmod +x ./oha
-mv ./oha /usr/local/bin
 
 # fzf
 download "https://github.com/junegunn/fzf/releases/download/v${fzf_version}/fzf-${fzf_version}-linux_${arch_name}.tar.gz" "fzf-${fzf_version}-linux_${arch_name}.tar.gz"
