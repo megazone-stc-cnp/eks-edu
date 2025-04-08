@@ -18,10 +18,10 @@ fi
 echo "aws iam create-user \\
     --user-name ${IAM_USER} ${PROFILE_STRING}"
 
+echo "${IAM_USER} User 생성중..."
+
 aws iam create-user \
     --user-name ${IAM_USER} ${PROFILE_STRING}
-
-echo "${IAM_USER} User 생성중..."
 
 aws iam wait user-exists \
     --user-name ${IAM_USER} ${PROFILE_STRING}

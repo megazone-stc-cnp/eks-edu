@@ -8,4 +8,6 @@ fi
 
 # ==================================================================
 
+echo "kubectl -n kube-system get configmap aws-auth -oyaml"
+
 kubectl -n kube-system get configmap aws-auth -oyaml
