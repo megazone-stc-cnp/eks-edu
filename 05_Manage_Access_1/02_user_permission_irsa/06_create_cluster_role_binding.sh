@@ -1,6 +1,11 @@
 #!/bin/bash
 
-cat <<EOF | kubectl apply -f -
+# ==================================================================
+if [ ! -d "tmp" ]; then
+    mkdir -p tmp
+fi
+
+cat >tmp/cluster-role-info.yaml <<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -23,5 +28,7 @@ roleRef:
   name: pod-reader
   apiGroup: rbac.authorization.k8s.io
 EOF
+
+kubectl apply -f tmp/cluster-role-info.yaml
 
 kubectl describe clusterrole pod-reader

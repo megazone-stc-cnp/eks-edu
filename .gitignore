@@ -76,3 +76,7 @@ vpc_env.sh
 11_Storage_Management/01_dynamic_create_storageclass/local_env.sh
 03_Default_Environment/01_create_vpc/result.json
 12_Storage_Management/delete_env.sh
+01_Container/01_create_vscode_server.sh
+01_Container/02_get_output.sh
+01_Container/03_get_password.sh
+01_Container/99_delete_vscode_server.sh
