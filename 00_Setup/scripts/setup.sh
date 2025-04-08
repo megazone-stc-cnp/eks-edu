@@ -37,3 +37,5 @@ echo "complete -o default -F __start_kubectl k" >> ~/.bashrc.d/kubectl.bash
 echo "eval \"\$(fzf --bash)\"" > ~/.bashrc.d/fzf.bash
 
 echo "complete -C /usr/local/bin/terraform terraform" > ~/.bashrc.d/terraform.bash
+
+echo "export PATH=\"\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH\"" > ~/.bashrc.d/krew.bash
