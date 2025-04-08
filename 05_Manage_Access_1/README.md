@@ -355,5 +355,145 @@ Amazon EKS 클러스터를 생성할 경우, 클러스터를 생성하는 IAM �
 24. 생성 결과 화면
    ![alt text](image/result_get_nodes.png)
 
+### Access Entry를 사용하여 사용자 권한 설정
+1. Clusters 를 선택
+   ![alt text](image/click_cluster.png)
+   
+2. Addon 메뉴 선택
+   ![alt text](image/select_add-on.png)
+
+3. Get more add-ons 버튼 클릭
+   ![alt text](image/click_get_more_add_ons.png)
+
+4. Amazon EKS Pod Identity Agent 메뉴의 checkbox 선택
+   ![alt text](image/check_amazon_eks_pod_identity_agent.png)
+
+5. Next 버튼 클릭
+   ![alt text](image/click_next.png)
+
+6. 버전 선택하고 Next 클릭
+   ![alt text](image/check_version.png)
+
+7. Create 버튼 클릭
+   ![alt text](image/create_button.png)
+
+8. admin 권한의 access entry 생성
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
+   sh 02_create_admin_access_entry.sh
+   ```
+
+   위 `02_create_admin_access_entry.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   # Access Entry 생성
+   aws eks create-access-entry \
+      --cluster-name eks-edu-cluster-9641173 \
+      --principal-arn arn:aws:iam::539666729110:user/eks-edu-user-9641173 \
+      --type STANDARD \
+      --username eks-edu-user-9641173
+
+   # AmazonEKSClusterAdminPolicy 권한 연동
+   aws eks associate-access-policy \
+      --cluster-name eks-edu-cluster-9641173 \
+      --principal-arn arn:aws:iam::539666729110:user/eks-edu-user-9641173 \
+      --access-scope type=cluster \
+      --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy 
+   ```
+9. 실행 화면
+   ![alt text](image/create_access_entry.png)
+
+10. 생성 결과 화면
+   ![alt text](image/result_create_access_entry.png)
+
+11. node 조회 권한 체크
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
+   sh 03_get_nodes.sh
+   ```
+
+   위 `03_get_nodes.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   kubectl get nodes
+   ```
+
+12. 실행 화면
+   ![alt text](image/kubectl_get_nodes.png)
+
+13. 생성 결과 화면
+   ![alt text](image/result_kubectl_get_nodes.png)
+
+14. cluster role 권한으로 변경
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
+   sh 04_update_pod_reader_access_entry.sh
+   ```
+
+   위 `04_update_pod_reader_access_entry.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   aws eks update-access-entry \
+      --cluster-name eks-edu-cluster-9641173 \
+      --principal-arn arn:aws:iam::539666729110:user/eks-edu-user-9641173 \
+      --username eks-edu-user-9641173 
+   ```
+
+15. 실행 화면
+   ![alt text](image/update_pod_reader_access_entry.png)
+
+16. 생성 결과 화면
+   ![alt text](image/result_update_pod_reader_access_entry.png)
+
+17. aws get nodes 명령 
+   ```shell
+   sh 03_get_nodes.sh
+   ```
+
+   위 `04_update_pod_reader_access_entry.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   kubectl get nodes
+   ```
+
+15. 실행 화면
+   ![alt text](image/pod_reader_get_nodes.png)
+
+16. 생성 결과 화면
+   ![alt text](image/result_pod_reader_get_nodes.png)
+
+## 정리
+
+1. 리소스 삭제
+
+   ```shell
+   cd ~/environment/eks-edu/05_Manage_Access_1/99_delete
+   sh 99_delete.sh
+   ```
+
+   위 `99_delete.sh`를 실행하면 아래 aws cli가 실행됩니다. (참고용)
+
+   ```shell
+   # eks-edu-user-9641173 IAM 사용자 액세스 키 삭제
+   aws iam delete-access-key --user-name eks-edu-user-9641173 --access-key-id XXXXXXX 
+   # login Profile 삭제
+   aws iam delete-login-profile --user-name eks-edu-user-9641173 
+   # eks-edu-user-9641173 연결된 정책 분리
+   aws iam detach-user-policy --user-name eks-edu-user-9641173 --policy-arn arn:aws:iam::539666729110:policy/eks-edu-user-policy-9641173 
+   # eks-edu-user-9641173 Inline Policy 삭제
+   # eks-edu-user-9641173 USER 삭제
+   aws iam delete-user --user-name eks-edu-user-9641173 
+   ```
+
+2. 실행 화면
+
+   ![alt text](image/delete_resource.png)
+
+3. 결과 화면
+
+   ![1743484066002](image/result_delete_resource.png)
+
+4. EKS 삭제는 03_Default_Environment 에서 삭제 진행
+
 ## 관련 링크
 - [Full Configuration Format](https://github.com/kubernetes-sigs/aws-iam-authenticator#full-configuration-format)
