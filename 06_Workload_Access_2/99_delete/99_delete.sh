@@ -15,42 +15,43 @@ IRSA_ROLE_NAME=eks-edu-irsa-workload-role-${IDE_NAME}
 POD_IDENTITY_POLICY_NAME=eks-edu-pod-identity-workload-policy-${IDE_NAME}
 POD_IDENTITY_ROLE_NAME=eks-edu-pod-identity-workload-role-${IDE_NAME}
 # ================================================
-IRSA_POLICIES=$(aws iam list-attached-role-policies --role-name "$IRSA_ROLE_NAME" --query 'AttachedPolicies[].PolicyArn' --output text ${PROFILE_STRING})
+IRSA_ROLE_EXISTS=$(aws iam get-role --role-name ${IRSA_ROLE_NAME} ${PROFILE_STRING} 2>&1 || echo "ROLE_NOT_FOUND")
+if [[ ! "$IRSA_ROLE_EXISTS" == *"ROLE_NOT_FOUND"* ]]; then
+    IRSA_POLICIES=$(aws iam list-attached-role-policies --role-name "$IRSA_ROLE_NAME" --query 'AttachedPolicies[].PolicyArn' --output text ${PROFILE_STRING})
 
-for POLICY_ARN in $IRSA_POLICIES; do
-  echo "aws iam detach-role-policy --role-name $IRSA_ROLE_NAME --policy-arn $POLICY_ARN ${PROFILE_STRING}"
-  aws iam detach-role-policy --role-name "$IRSA_ROLE_NAME" --policy-arn "$POLICY_ARN" ${PROFILE_STRING}
-done
+    for POLICY_ARN in $IRSA_POLICIES; do
+        echo "aws iam detach-role-policy --role-name $IRSA_ROLE_NAME --policy-arn $POLICY_ARN ${PROFILE_STRING}"
+        aws iam detach-role-policy --role-name "$IRSA_ROLE_NAME" --policy-arn "$POLICY_ARN" ${PROFILE_STRING}
+    done
 
-IRSA_INLINE_POLICIES=$(aws iam list-role-policies --role-name "$IRSA_ROLE_NAME" --query 'PolicyNames[]' --output text ${PROFILE_STRING})
+    IRSA_INLINE_POLICIES=$(aws iam list-role-policies --role-name "$IRSA_ROLE_NAME" --query 'PolicyNames[]' --output text ${PROFILE_STRING})
 
-for POLICY_NAME in $IRSA_INLINE_POLICIES; do
-  echo "aws iam delete-role-policy --role-name $IRSA_ROLE_NAME --policy-name $POLICY_NAME ${PROFILE_STRING}"
-  aws iam delete-role-policy --role-name "$IRSA_ROLE_NAME" --policy-name "$POLICY_NAME" ${PROFILE_STRING}
-done
+    for POLICY_NAME in $IRSA_INLINE_POLICIES; do
+      echo "aws iam delete-role-policy --role-name $IRSA_ROLE_NAME --policy-name $POLICY_NAME ${PROFILE_STRING}"
+      aws iam delete-role-policy --role-name "$IRSA_ROLE_NAME" --policy-name "$POLICY_NAME" ${PROFILE_STRING}
+    done
 
-ROLE_EXISTS=$(aws iam get-role --role-name ${IRSA_ROLE_NAME} ${PROFILE_STRING} 2>&1 || echo "ROLE_NOT_FOUND")
-if [[ ! "$ROLE_EXISTS" == *"ROLE_NOT_FOUND"* ]]; then
 	echo "aws iam delete-role --role-name $IRSA_ROLE_NAME ${PROFILE_STRING}"
 	aws iam delete-role --role-name $IRSA_ROLE_NAME ${PROFILE_STRING}
 fi
 
-POD_IDENTITY_POLICIES=$(aws iam list-attached-role-policies --role-name "$POD_IDENTITY_ROLE_NAME" --query 'AttachedPolicies[].PolicyArn' --output text ${PROFILE_STRING})
+POD_IDENTITY_ROLE_EXISTS=$(aws iam get-role --role-name ${POD_IDENTITY_ROLE_NAME} ${PROFILE_STRING} 2>&1 || echo "ROLE_NOT_FOUND")
+if [[ ! "$POD_IDENTITY_ROLE_EXISTS" == *"ROLE_NOT_FOUND"* ]]; then
 
-for POLICY_ARN in $POD_IDENTITY_POLICIES; do
-  echo "aws iam detach-role-policy --role-name $POD_IDENTITY_ROLE_NAME --policy-arn $POLICY_ARN ${PROFILE_STRING}"
-  aws iam detach-role-policy --role-name "$POD_IDENTITY_ROLE_NAME" --policy-arn "$POLICY_ARN" ${PROFILE_STRING}
-done
+    POD_IDENTITY_POLICIES=$(aws iam list-attached-role-policies --role-name "$POD_IDENTITY_ROLE_NAME" --query 'AttachedPolicies[].PolicyArn' --output text ${PROFILE_STRING})
 
-POD_IDENTITY_INLINE_POLICIES=$(aws iam list-role-policies --role-name "$POD_IDENTITY_ROLE_NAME" --query 'PolicyNames[]' --output text ${PROFILE_STRING})
+    for POLICY_ARN in $POD_IDENTITY_POLICIES; do
+      echo "aws iam detach-role-policy --role-name $POD_IDENTITY_ROLE_NAME --policy-arn $POLICY_ARN ${PROFILE_STRING}"
+      aws iam detach-role-policy --role-name "$POD_IDENTITY_ROLE_NAME" --policy-arn "$POLICY_ARN" ${PROFILE_STRING}
+    done
 
-for POLICY_NAME in $POD_IDENTITY_INLINE_POLICIES; do
-  echo "aws iam delete-role-policy --role-name $POD_IDENTITY_ROLE_NAME --policy-name $POLICY_NAME ${PROFILE_STRING}"
-  aws iam delete-role-policy --role-name "$POD_IDENTITY_ROLE_NAME" --policy-name "$POLICY_NAME" ${PROFILE_STRING}
-done
+    POD_IDENTITY_INLINE_POLICIES=$(aws iam list-role-policies --role-name "$POD_IDENTITY_ROLE_NAME" --query 'PolicyNames[]' --output text ${PROFILE_STRING})
 
-ROLE_EXISTS=$(aws iam get-role --role-name ${POD_IDENTITY_ROLE_NAME} ${PROFILE_STRING} 2>&1 || echo "ROLE_NOT_FOUND")
-if [[ ! "$ROLE_EXISTS" == *"ROLE_NOT_FOUND"* ]]; then
+    for POLICY_NAME in $POD_IDENTITY_INLINE_POLICIES; do
+      echo "aws iam delete-role-policy --role-name $POD_IDENTITY_ROLE_NAME --policy-name $POLICY_NAME ${PROFILE_STRING}"
+      aws iam delete-role-policy --role-name "$POD_IDENTITY_ROLE_NAME" --policy-name "$POLICY_NAME" ${PROFILE_STRING}
+    done
+
 	echo "aws iam delete-role --role-name $POD_IDENTITY_ROLE_NAME ${PROFILE_STRING}"
 	aws iam delete-role --role-name $POD_IDENTITY_ROLE_NAME ${PROFILE_STRING}
 fi
