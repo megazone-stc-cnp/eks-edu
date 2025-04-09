@@ -19,7 +19,6 @@ export AWS_REGION="${AWS_REGION}"
 export AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID}"
 EOT
 
-
 LOCAL_BASH_COMPLETION_DIR=~/.local/share/bash-completion/completions
 mkdir -p $LOCAL_BASH_COMPLETION_DIR
 /usr/local/bin/kubectl completion bash > $LOCAL_BASH_COMPLETION_DIR/kubectl
@@ -44,4 +43,12 @@ then
     PATH="\$HOME/.krew/bin:\$PATH"
 fi
 export PATH
+EOT
+
+# Aliases for 'ls'
+cat << EOT > ~/.bashrc.d/aliases.bash
+# List directories first
+alias ls='ls -F --color=auto --group-directories-first'
+alias ll='ls -al'
+alias l='ll'
 EOT

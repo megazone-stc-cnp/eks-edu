@@ -6,12 +6,13 @@ if [ -z "$1" ]; then
 fi
 ADDON_VERSION=$1
 
-if [ ! -f "../env.sh" ];then
+if [ ! -f "../../env.sh" ];then
 	echo "env.sh 파일 세팅을 해주세요."
 	exit 1
 fi
-. ../env.sh
+. ../../env.sh
 
+set -x
 ADDON_NAME=coredns
 # ============================================================
 aws eks describe-addon-configuration \
