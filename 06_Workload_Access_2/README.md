@@ -135,26 +135,133 @@
 
    ```shell
    cd ~/environment/eks-edu/06_Workload_Access_2/01_app_irsa
-   sh 04_irsa_create_account.sh
+   sh 05_create_role.sh
    ```
 
-   위 `04_irsa_create_account.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+   위 `05_create_role.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
 
    ```shell
-   >> tmp/eks-edu-irsa-service-account.yaml
-   apiVersion: v1
-   kind: ServiceAccount
-   metadata:
-     name: eks-edu-irsa-service-account-9641173
-     namespace: default
+   >>tmp/trust-relationship.json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Principal": {
+           "Federated": "arn:aws:iam::539666729110:oidc-provider/oidc.eks..amazonaws.com/id/6C602CB94089F9B90D056D1D92D47CBE"
+         },
+         "Action": "sts:AssumeRoleWithWebIdentity",
+         "Condition": {
+           "StringEquals": {
+             "oidc.eks.ap-northeast-1.amazonaws.com/id/6C602CB94089F9B90D056D1D92D47CBE:aud": "sts.amazonaws.com",
+             "oidc.eks.ap-northeast-1.amazonaws.com/id/6C602CB94089F9B90D056D1D92D47CBE:sub": "system:serviceaccount:default:eks-edu-service-account-9641173"
+           }
+         }
+       }
+     ]
+   }
+   
+   # Role 생성
+   aws iam create-role \
+      --role-name eks-edu-workload-role-9641173 \
+       --assume-role-policy-document file://tmp/trust-relationship.json \
+       --description eks-edu-workload-role-9641173-description
 
-   kubectl apply -f tmp/eks-edu-irsa-service-account.yaml
+   # 생성했던 Policy를 연동
+   aws iam attach-role-policy \
+      --role-name eks-edu-workload-role-9641173 \
+      --policy-arn=arn:aws:iam::539666729110:policy/eks-edu-workload-policy-9641173    
    ```
+
 14. 실행 화면
-   ![alt text](image/irsa_create_account.png)
+   ![alt text](image/create_role.png)
 
 15. 생성 결과 화면
-   ![alt text](image/result_irsa_create_account.png)
+   ![alt text](image/result_create_role.png)
+
+16. Service Account에 role annotation 연동하기
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/01_app_irsa
+   sh 06_annotate_serviceaccount.sh
+   ```
+
+   위 `06_annotate_serviceaccount.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   kubectl -n default annotate serviceaccount eks-edu-irsa-service-account-9641173 \
+      eks.amazonaws.com/role-arn=arn:aws:iam::539666729110:role/eks-edu-workload-role-9641173
+   ```
+17. 실행 화면
+   ![alt text](image/annotate_serviceaccount.png)
+
+18. 생성 결과 화면
+   ![alt text](image/result_annotate_serviceaccount.png)
+
+19. deployment 배포
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/01_app_irsa
+   sh 07_irsa_create_deploy.sh
+   ```
+
+   위 `07_irsa_create_deploy.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   >>tmp/irsa-deployment.yaml을 배포
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: irsa-app
+     namespace: default
+   spec:
+     selector:
+       matchLabels:
+         app: irsa-app
+     template:
+       metadata:
+         labels:
+           app: irsa-app
+       spec:
+         serviceAccountName: eks-edu-irsa-service-account-9641173
+         containers:
+         - name: my-app
+           image: public.ecr.aws/nginx/nginx:1.27
+
+   kubectl apply -f tmp/irsa-deployment.yaml
+   ```
+20. 실행 화면
+   ![alt text](image/irsa_create_deploy.png)
+
+21. 생성 결과 화면
+   ![alt text](image/result_irsa_create_deploy.png)
+
+22. irsa에 잘 적용되었는지 확인
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/01_app_irsa
+   sh 08_irsa_check.sh
+   ```
+
+   위 `08_irsa_check.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   # irsa pods 배포 상태
+   kubectl get pods -l app=irsa-app
+
+   # pod에 AWS_ROLE_ARN 환경 변수가 있는지 확인
+   kubectl describe pod/irsa-app-57c768dd9d-vxqkt | grep AWS_ROLE_ARN:
+
+   # pod에 AWS_WEB_IDENTITY_TOKEN_FILE 환경 변수가 있는지 확인
+   kubectl describe pod/irsa-app-57c768dd9d-vxqkt | grep AWS_WEB_IDENTITY_TOKEN_FILE:
+   ```
+
+20. 실행 화면
+   ![alt text](image/irsa_check.png)
+
+21. 생성 결과 화면
+   ![alt text](image/result_irsa_check.png)
+
 ### Pod에 Pod Identity 권한 적용
 
 ### IRSA에서 Pod Identity Migration
