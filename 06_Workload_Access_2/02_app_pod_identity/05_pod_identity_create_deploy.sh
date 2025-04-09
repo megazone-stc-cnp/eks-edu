@@ -40,3 +40,6 @@ echo "kubectl apply -f tmp/pod-identity-deployment.yaml"
 echo ""
 
 kubectl apply -f tmp/pod-identity-deployment.yaml
+echo ""
+
+kubectl get pods -n ${NAMESPACE_NAME}
