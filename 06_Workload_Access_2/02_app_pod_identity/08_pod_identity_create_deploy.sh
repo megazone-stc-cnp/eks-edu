@@ -1,30 +1,34 @@
 #!/bin/bash
 
-if [ ! -f "../env.sh" ];then
+if [ ! -f "../../env.sh" ];then
 	echo "env.sh 파일 세팅을 해주세요."
 	exit 1
 fi
-. ../env.sh
+. ../../env.sh
 
 SERVICE_ACCOUNT_NAME=eks-edu-pod-identity-service-account-${IDE_NAME}
 POLICY_NAME=eks-edu-workload-policy-${IDE_NAME}
 ROLE_NAME=eks-edu-workload-role-${IDE_NAME}
 NAMESPACE_NAME=default
+APP_NAME=pod-identity-app
 # ==================================================================
+if [ ! -d "tmp" ]; then
+    mkdir -p tmp
+fi
 
-cat >pod-identity-deployment.yaml <<EOF
+cat >tmp/pod-identity-deployment.yaml <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pod-identity-app
+  name: ${APP_NAME}
 spec:
   selector:
     matchLabels:
-      app: pod-identity-app
+      app: ${APP_NAME}
   template:
     metadata:
       labels:
-        app: pod-identity-app
+        app: ${APP_NAME}
     spec:
       serviceAccountName: ${SERVICE_ACCOUNT_NAME}
       containers:
@@ -32,4 +36,7 @@ spec:
         image: public.ecr.aws/nginx/nginx:1.27
 EOF
 
-kubectl apply -f pod-identity-deployment.yaml
+echo "kubectl apply -f tmp/pod-identity-deployment.yaml"
+echo ""
+
+kubectl apply -f tmp/pod-identity-deployment.yaml
