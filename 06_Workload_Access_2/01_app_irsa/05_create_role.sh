@@ -13,8 +13,8 @@ else
 fi
 
 SERVICE_ACCOUNT_NAME=eks-edu-service-account-${IDE_NAME}
-POLICY_NAME=eks-edu-workload-policy-${IDE_NAME}
-ROLE_NAME=eks-edu-workload-role-${IDE_NAME}
+POLICY_NAME=eks-edu-irsa-workload-policy-${IDE_NAME}
+ROLE_NAME=eks-edu-irsa-workload-role-${IDE_NAME}
 NAMESPACE_NAME=default
 # ==================================================================
 if [ ! -d "tmp" ]; then

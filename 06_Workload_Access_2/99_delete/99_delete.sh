@@ -9,8 +9,8 @@ fi
 BUCKET_NAME="pod-secrets-bucket-${IDE_NAME}"
 
 
-IRSA_POLICY_NAME=eks-edu-workload-policy-${IDE_NAME}
-IRSA_ROLE_NAME=eks-edu-workload-role-${IDE_NAME}
+IRSA_POLICY_NAME=eks-edu-irsa-workload-policy-${IDE_NAME}
+IRSA_ROLE_NAME=eks-edu-irsa-workload-role-${IDE_NAME}
 
 POD_IDENTITY_POLICY_NAME=eks-edu-pod-identity-workload-policy-${IDE_NAME}
 POD_IDENTITY_ROLE_NAME=eks-edu-pod-identity-workload-role-${IDE_NAME}
