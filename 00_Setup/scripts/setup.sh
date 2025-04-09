@@ -38,4 +38,11 @@ echo "eval \"\$(fzf --bash)\"" > ~/.bashrc.d/fzf.bash
 
 echo "complete -C /usr/local/bin/terraform terraform" > ~/.bashrc.d/terraform.bash
 
-echo "export PATH=\"\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH\"" > ~/.bashrc.d/krew.bash
+cat << EOT > ~/.bashrc.d/krew.bash
+if ! [[ "\$PATH" =~ "\$HOME/.krew/bin:" ]]
+then
+    PATH="\$HOME/.local/bin:\$HOME/bin:\$PATH"
+    PATH="\$HOME/.krew/bin:\$PATH"
+fi
+export PATH
+EOT
