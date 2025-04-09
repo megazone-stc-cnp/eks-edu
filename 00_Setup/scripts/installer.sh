@@ -122,7 +122,6 @@ unzip -o -q awscliv2.zip -d /tmp
 rm -rf /tmp/aws awscliv2.zip
 
 # kubeseal
-KREW="krew-${OS}_${ARCH}"
 download "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${kubeseal_version}/kubeseal-${kubeseal_version}-linux-${arch_name}.tar.gz" "kubeseal.tar.gz"
 tar xfz kubeseal.tar.gz
 chmod +x kubeseal
@@ -130,11 +129,12 @@ mv ./kubeseal /usr/local/bin
 rm -rf kubeseal.tar.gz
 
 # krew
+KREW_INSTALL_ROOT=/tmp/krew-install
 download "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_${arch_name}.tar.gz" "krew.tar.gz"
 mkdir -p /tmp/krew-install
-mv krew.tar.gz /tmp/krew-install && cd /tmp/krew-install
+mv krew.tar.gz $KREW_INSTALL_ROOT && cd $KREW_INSTALL_ROOT
 tar zxvf "krew.tar.gz"
-./krew-linux_${arch_name} install krew
+sudo -u ec2-user $KREW_INSTALL_ROOT/krew-linux_${arch_name} install krew
 
 # yq
 download "https://github.com/mikefarah/yq/releases/download/v${yq_version}/yq_linux_${arch_name}" "yq"
