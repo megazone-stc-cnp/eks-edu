@@ -22,7 +22,7 @@ else
         echo "aws s3api create-bucket --bucket ${BUCKET_NAME} \\
                 --region ${AWS_REGION} \\
                 --create-bucket-configuration LocationConstraint=${AWS_REGION}"
-
+        echo ""
         aws s3api create-bucket --bucket "${BUCKET_NAME}" \
                 --region "${AWS_REGION}" \
                 --create-bucket-configuration LocationConstraint="${AWS_REGION}"

@@ -36,7 +36,7 @@
 
 Amazon EKS 클러스터를 생성할 경우, 클러스터를 생성하는 IAM 보안 주체에게는 Amazon EKS 제어 영역의 클러스터 역할 기반 액세스 제어(RBAC) 구성에 system:masters 권한이 자동으로 부여
 
-### 3.2 EKS Access Entry란 ?
+### EKS Access Entry란 ?
 - EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자격 증명에 연결
 
 #### 장점
