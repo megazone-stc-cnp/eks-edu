@@ -34,12 +34,20 @@ cat >tmp/pod-identity-trust-relationship.json <<EOF
 }
 EOF
 
+# Check if role exists
+aws iam get-role --role-name ${ROLE_NAME} ${PROFILE_STRING} >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "Role ${ROLE_NAME} 이 존재합니다."
+    exit 1
+fi
+
 echo "aws iam create-role \\
     --role-name ${ROLE_NAME} \\
     --assume-role-policy-document file://tmp/pod-identity-trust-relationship.json \\
     --description "${ROLE_NAME}-description" ${PROFILE_STRING}"
 echo ""
 
+echo "${ROLE_NAME} 생성중..."
 aws iam create-role \
     --role-name ${ROLE_NAME} \
     --assume-role-policy-document file://tmp/pod-identity-trust-relationship.json \
@@ -53,3 +61,4 @@ echo ""
 aws iam attach-role-policy \
     --role-name ${ROLE_NAME} \
     --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING}
+echo "${ROLE_NAME} 생성 완료..."

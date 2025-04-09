@@ -7,18 +7,66 @@ fi
 . ../../env.sh
 
 BUCKET_NAME="pod-secrets-bucket-${IDE_NAME}"
-POLICY_NAME=eks-edu-irsa-workload-policy-${IDE_NAME}
+
+
+IRSA_POLICY_NAME=eks-edu-workload-policy-${IDE_NAME}
+IRSA_ROLE_NAME=eks-edu-workload-role-${IDE_NAME}
+
+POD_IDENTITY_POLICY_NAME=eks-edu-pod-identity-workload-policy-${IDE_NAME}
+POD_IDENTITY_ROLE_NAME=eks-edu-pod-identity-workload-role-${IDE_NAME}
 # ================================================
-echo "aws iam delete-policy \\
-        --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING}"
-echo ""
-aws iam delete-policy \
-    --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING}
+IRSA_ROLE_TRUST_POLICY=$(aws iam list-role-policies --role-name ${IRSA_ROLE_NAME} --query 'PolicyNames[*]' --output text ${PROFILE_STRING} 2>/dev/null)
+if [ ! -z "$IRSA_ROLE_TRUST_POLICY" ]; then
+    for policy in $IRSA_ROLE_TRUST_POLICY; do
+        echo "aws iam delete-role-policy \
+                --role-name ${IRSA_ROLE_NAME} \
+                --policy-name ${policy} ${PROFILE_STRING}"
+        echo ""
+        aws iam delete-role-policy \
+                --role-name ${IRSA_ROLE_NAME} \
+                --policy-name ${policy} ${PROFILE_STRING}
+    done
+fi
 
-# Delete all objects in the bucket first
-echo "aws s3 rm s3://${BUCKET_NAME} --recursive ${PROFILE_STRING}"
-aws s3 rm s3://${BUCKET_NAME} --recursive ${PROFILE_STRING}
+IRSA_ROLE_EXISTS=$(aws iam get-role --role-name ${IRSA_ROLE_NAME} ${PROFILE_STRING} >/dev/null 2>&1)
+if [ $? -eq 0 ]; then
+    # Check and delete trust relationship policy for IRSA role
+    echo "aws iam delete-role \\
+            --role-name ${IRSA_ROLE_NAME} ${PROFILE_STRING}"
+    echo ""
+    aws iam delete-role \
+        --role-name ${IRSA_ROLE_NAME} ${PROFILE_STRING}    
+fi
 
-# Delete the bucket
-echo "aws s3 rb s3://${BUCKET_NAME} ${PROFILE_STRING}"
-aws s3 rb s3://${BUCKET_NAME} ${PROFILE_STRING}
+POD_IDENTITY_TRUST_POLICY=$(aws iam list-role-policies --role-name ${POD_IDENTITY_ROLE_NAME} --query 'PolicyNames[*]' --output text ${PROFILE_STRING} 2>/dev/null)
+
+if [ ! -z "$POD_IDENTITY_TRUST_POLICY" ]; then
+    for policy in $POD_IDENTITY_TRUST_POLICY; do
+        echo "aws iam delete-role-policy \
+                --role-name ${POD_IDENTITY_ROLE_NAME} \
+                --policy-name ${policy} ${PROFILE_STRING}"
+        echo ""
+        aws iam delete-role-policy \
+                --role-name ${POD_IDENTITY_ROLE_NAME} \
+                --policy-name ${policy} ${PROFILE_STRING}
+    done
+fi
+
+POD_IDENTITY_ROLE_EXISTS=$(aws iam get-role --role-name ${POD_IDENTITY_ROLE_NAME} ${PROFILE_STRING} >/dev/null 2>&1)
+if [ $? -eq 0 ]; then
+    echo "aws iam delete-role \\
+            --role-name ${POD_IDENTITY_ROLE_NAME} ${PROFILE_STRING}"
+    echo ""
+    aws iam delete-role \
+        --role-name ${POD_IDENTITY_ROLE_NAME} ${PROFILE_STRING}    
+fi
+
+if aws s3api head-bucket --bucket "${BUCKET_NAME}" 2>/dev/null; then
+    # Delete all objects in the bucket first
+    echo "aws s3 rm s3://${BUCKET_NAME} --recursive ${PROFILE_STRING}"
+    aws s3 rm s3://${BUCKET_NAME} --recursive ${PROFILE_STRING}
+
+    # Delete the bucket
+    echo "aws s3 rb s3://${BUCKET_NAME} ${PROFILE_STRING}"
+    aws s3 rb s3://${BUCKET_NAME} ${PROFILE_STRING}
+fi

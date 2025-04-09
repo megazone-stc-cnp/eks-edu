@@ -263,8 +263,233 @@
    ![alt text](image/result_irsa_check.png)
 
 ### Pod에 Pod Identity 권한 적용
+1. S3에 Object을 읽을 수 있는 Policy 생성
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/02_app_pod_identity/
+   sh 01_pod_identity_create_policy.sh
+   ```
+
+   위 `01_pod_identity_create_policy.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   >> tmp/pod-identity-workload-policy.json
+   {
+       "Version": "2012-10-17",
+       "Statement": [
+           {
+               "Effect": "Allow",
+               "Action": "s3:GetObject",
+               "Resource": "arn:aws:s3:::pod-secrets-bucket-9641173"
+           }
+       ]
+   }
+
+   aws iam create-policy --policy-name eks-edu-pod-identity-workload-policy-9641173 \
+      --policy-document file://tmp/pod-identity-workload-policy.json
+   ```
+2. 실행 화면
+   ![alt text](image/pod_identity_create_policy.png)
+
+3. 생성 결과 화면
+   ![alt text](image/result_pod_identity_create_policy.png)
+
+4. App 배포시 사용할 service account 생성
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/02_app_pod_identity/
+   sh 02_pod_identity_create_account.sh
+   ```
+
+   위 `02_pod_identity_create_account.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   >> tmp/eks-edu-pod-identity-service-account.yaml
+   apiVersion: v1
+   kind: ServiceAccount
+   metadata:
+     name: eks-edu-pod-identity-service-account-9641173
+     namespace: default
+
+   kubectl apply -f tmp/eks-edu-pod-identity-service-account.yaml
+   ```
+11. 실행 화면
+   ![alt text](image/pod_identity_create_account.png)
+
+12. 생성 결과 화면
+   ![alt text](image/result_pod_identity_create_account.png)
+
+13. Role 생성
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/02_app_pod_identity
+   sh 03_pod_identity_create_role.sh
+   ```
+
+   위 `03_pod_identity_create_role.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   >>tmp/pod-identity-trust-relationship.json
+   {
+       "Version": "2012-10-17",
+       "Statement": [
+           {
+               "Sid": "AllowEksAuthToAssumeRoleForPodIdentity",
+               "Effect": "Allow",
+               "Principal": {
+                   "Service": "pods.eks.amazonaws.com"
+               },
+               "Action": [
+                   "sts:AssumeRole",
+                   "sts:TagSession"
+               ]
+           }
+       ]
+   }
+   
+   # Role 생성
+   aws iam create-role \
+      --role-name eks-edu-pod-identity-workload-role-9641173 \
+      --assume-role-policy-document file://tmp/pod-identity-trust-relationship.json \
+      --description eks-edu-pod-identity-workload-role-9641173-description
+
+   # S3에 GetObject 권한이 있던 Policy를 연동
+   aws iam attach-role-policy \
+      --role-name eks-edu-pod-identity-workload-role-9641173 \
+      --policy-arn=arn:aws:iam::539666729110:policy/eks-edu-pod-identity-workload-policy-9641173
+   ```
+
+14. 실행 화면
+   ![alt text](image/pod_identity_create_role.png)
+
+15. 생성 결과 화면
+   ![alt text](image/result_pod_identity_create_role.png)
+
+16. Role 과 Service Account 연동
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/02_app_pod_identity
+   sh 04_pod_identity_association.sh
+   ```
+
+   위 `04_pod_identity_association.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
+   # Role과 Service Account 연동
+   aws eks create-pod-identity-association \
+      --cluster-name eks-edu-cluster-9641173 \
+      --role-arn arn:aws:iam::539666729110:role/eks-edu-pod-identity-workload-role-9641173 \
+      --namespace default \
+      --service-account eks-edu-pod-identity-service-account-9641173
+   ```
+
+17. 실행 화면
+   ![alt text](image/pod_identity_association.png)
+
+18. 생성 결과 화면
+   ![alt text](image/result_pod_identity_association.png)   
+
+19. deployment 배포
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/02_app_pod_identity
+   sh 05_pod_identity_create_deploy.sh
+   ```
+
+   위 `05_pod_identity_create_deploy.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   >>tmp/irsa-deployment.yaml을 배포
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: pod-identity-app
+   spec:
+     selector:
+       matchLabels:
+         app: pod-identity-app
+     template:
+       metadata:
+         labels:
+           app: pod-identity-app
+       spec:
+         serviceAccountName: eks-edu-pod-identity-service-account-9641173
+         containers:
+         - name: my-app
+           image: public.ecr.aws/nginx/nginx:1.27
+
+   kubectl apply -f tmp/pod-identity-deployment.yaml
+   ```
+20. 실행 화면
+   ![alt text](image/pod_identity_create_deploy.png)
+
+21. 생성 결과 화면
+   ![alt text](image/result_pod_identity_create_deploy.png)
+
+22. pod 에 권한이 설정되었는지 확인
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/02_app_pod_identity
+   sh 06_pod_identity_check.sh
+   ```
+
+   위 `06_pod_identity_check.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+
+   ```shell
+   # Pod 이름 조회
+   kubectl -n default get pods -l app=pod-identity-app -oname
+
+   kubectl -n default describe pod/pod-identity-app-7c6dfc9789-hg2ts | grep AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE
+   ```
+20. 실행 화면
+   ![alt text](image/pod_identity_check.png)
+
+21. 생성 결과 화면
+   ![alt text](image/result_pod_identity_check.png)
 
 ### IRSA에서 Pod Identity Migration
-# 5. 관련 링크
+- 숙제
+
+## 정리
+
+1. 리소스 삭제
+
+   ```shell
+   cd ~/environment/eks-edu/06_Workload_Access_2/99_delete
+   sh 99_delete.sh
+   ```
+
+   위 `99_delete.sh`를 실행하면 아래 aws cli가 실행됩니다. (참고용)
+
+   ```shell
+   # irsa role에 
+   aws iam detach-role-policy \
+      --role-name eks-edu-workload-role-9641173 \
+      --policy-arn arn:aws:iam::539666729110:policy/eks-edu-workload-policy-9641173 
+
+   aws iam delete-policy \
+      --policy-arn arn:aws:iam::539666729110:policy/eks-edu-workload-policy-9641173
+
+aws iam detach-role-policy \
+            --role-name eks-edu-pod-identity-workload-role-9641173 \
+            --policy-arn arn:aws:iam::539666729110:policy/eks-edu-pod-identity-workload-policy-9641173 
+
+aws iam delete-policy \
+            --policy-arn arn:aws:iam::539666729110:policy/eks-edu-pod-identity-workload-policy-9641173 
+
+aws iam delete-role \
+            --role-name eks-edu-pod-identity-workload-role-9641173
+   ```
+
+2. 실행 화면      
+   ![1743484066002](image/delete.png)
+
+3. 결과 화면
+
+   
+
+4. EKS 삭제는 03_Default_Environment 에서 삭제 진행
+
+## 관련 링크
 - [서비스 계정에 대한 IAM 역할](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/iam-roles-for-service-accounts.html)
 - [EKS Pod Identity가 포드에 AWS 서비스에 대한 액세스 권한을 부여하는 방법 알아보기](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/pod-identities.html)
