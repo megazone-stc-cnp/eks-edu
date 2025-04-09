@@ -41,7 +41,6 @@ echo "complete -C /usr/local/bin/terraform terraform" > ~/.bashrc.d/terraform.ba
 cat << EOT > ~/.bashrc.d/krew.bash
 if ! [[ "\$PATH" =~ "\$HOME/.krew/bin:" ]]
 then
-    PATH="\$HOME/.local/bin:\$HOME/bin:\$PATH"
     PATH="\$HOME/.krew/bin:\$PATH"
 fi
 export PATH
