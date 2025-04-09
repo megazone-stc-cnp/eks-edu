@@ -462,34 +462,33 @@
    위 `99_delete.sh`를 실행하면 아래 aws cli가 실행됩니다. (참고용)
 
    ```shell
-   # irsa role에 
-   aws iam detach-role-policy \
-      --role-name eks-edu-workload-role-9641173 \
-      --policy-arn arn:aws:iam::539666729110:policy/eks-edu-workload-policy-9641173 
-
-   aws iam delete-policy \
-      --policy-arn arn:aws:iam::539666729110:policy/eks-edu-workload-policy-9641173
-
-aws iam detach-role-policy \
-            --role-name eks-edu-pod-identity-workload-role-9641173 \
-            --policy-arn arn:aws:iam::539666729110:policy/eks-edu-pod-identity-workload-policy-9641173 
-
-aws iam delete-policy \
-            --policy-arn arn:aws:iam::539666729110:policy/eks-edu-pod-identity-workload-policy-9641173 
-
-aws iam delete-role \
-            --role-name eks-edu-pod-identity-workload-role-9641173
+   aws iam detach-role-policy --role-name eks-edu-irsa-workload-role-9641173 --policy-arn arn:aws:iam::539666729110:policy/eks-edu-irsa-workload-policy-9641173 
+   aws iam delete-role --role-name eks-edu-irsa-workload-role-9641173 
+   aws iam detach-role-policy --role-name eks-edu-pod-identity-workload-role-9641173 --policy-arn arn:aws:iam::539666729110:policy/eks-edu-pod-identity-workload-policy-9641173 
+   aws iam delete-role --role-name eks-edu-pod-identity-workload-role-9641173
+   aws s3 rm s3://pod-secrets-bucket-9641173 --recursive 
+   aws s3 rb s3://pod-secrets-bucket-9641173
    ```
 
 2. 실행 화면      
-   ![1743484066002](image/delete.png)
+   ![alt text](image/delete_resource.png)
 
 3. 결과 화면
-
    
+   Role 삭제 확인
+   ![alt text](image/result_delete_role.png)
+
+   Policy 삭제 확인
+   ![alt text](image/result_delete_policy.png)
+   
+   S3 버킷 삭제 확인
+   ![alt text](image/result_delete_bucket.png)
 
 4. EKS 삭제는 03_Default_Environment 에서 삭제 진행
-
+   ```shell
+   cd ../../03_Default_Environment/99_delete
+   sh 99_delete.sh
+   ```
 ## 관련 링크
 - [서비스 계정에 대한 IAM 역할](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/iam-roles-for-service-accounts.html)
 - [EKS Pod Identity가 포드에 AWS 서비스에 대한 액세스 권한을 부여하는 방법 알아보기](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/pod-identities.html)
