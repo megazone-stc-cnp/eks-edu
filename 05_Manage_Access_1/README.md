@@ -574,6 +574,10 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    # eks-edu-user-9641173 연결된 정책 분리
    aws iam detach-user-policy --user-name eks-edu-user-9641173 --policy-arn arn:aws:iam::539666729110:policy/eks-edu-user-policy-9641173 
    # eks-edu-user-9641173 Inline Policy 삭제
+
+   # Policy 삭제
+   aws iam delete-policy --policy-arn arn:aws:iam::539666729110:policy/eks-edu-user-policy-9641173
+
    # eks-edu-user-9641173 USER 삭제
    aws iam delete-user --user-name eks-edu-user-9641173 
    ```
@@ -585,6 +589,8 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 3. 결과 화면
 
    ![1743484066002](image/result_delete_resource.png)
+
+   ![alt text](image/result_delete_policy_resource.png)
 
 4. EKS 삭제는 03_Default_Environment 에서 삭제 진행
 
