@@ -317,44 +317,44 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
     sh 06_create_cluster_role_binding.sh
     ```
 
-   위 `06_create_cluster_role_binding.sh`를 실행하면 tmp/cluster-role-info.yaml를 만들어서 배포를 합니다.(참고용)
+    위 `06_create_cluster_role_binding.sh`를 실행하면 tmp/cluster-role-info.yaml를 만들어서 배포를 합니다.(참고용)
 
-   ```yaml
-   apiVersion: rbac.authorization.k8s.io/v1
-   kind: ClusterRole
-   metadata:
-     name: pod-reader
-   rules:
-     - apiGroups: [""]
-       resources: ["pods"]
-       verbs: ["get", "list"]
-   ---
-   apiVersion: rbac.authorization.k8s.io/v1
-   kind: ClusterRoleBinding
-   metadata:
-     name: pod-reader-binding
-   subjects:
-     - kind: User
-       name: eks-edu-user-9641173  # aws-auth에서 매핑한 User명
-       apiGroup: rbac.authorization.k8s.io
-   roleRef:
-     kind: ClusterRole
-     name: pod-reader
-     apiGroup: rbac.authorization.k8s.io
-   ```
+    ```yaml
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: pod-reader
+    rules:
+      - apiGroups: [""]
+        resources: ["pods"]
+        verbs: ["get", "list"]
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: pod-reader-binding
+    subjects:
+      - kind: User
+        name: eks-edu-user-9641173  # aws-auth에서 매핑한 User명
+        apiGroup: rbac.authorization.k8s.io
+    roleRef:
+      kind: ClusterRole
+      name: pod-reader
+      apiGroup: rbac.authorization.k8s.io
+    ```
 
-   ```shell
-   # 배포
-   kubectl apply -f tmp/cluster-role-info.yaml
-   ```
+    ```shell
+    # 배포
+    kubectl apply -f tmp/cluster-role-info.yaml
+    ```
    
 17. 실행 화면
 
-   ![alt text](image/create_cluster_role_binding.png)
+    ![alt text](image/create_cluster_role_binding.png)
 
 18. 생성 결과 화면
 
-   ![alt text](image/result_create_cluster_role_binding.png)
+    ![alt text](image/result_create_cluster_role_binding.png)
 
 19. `eks-edu-user-<사번>` 의 aws profile eks-edu-profile-<사번> 생성
 
