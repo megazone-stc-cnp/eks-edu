@@ -6,10 +6,10 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
-if [ ! -f "./local_env.sh" ];then
+if [ ! -f "./tmp/local_env.sh" ];then
 	OIDC_ID=$(aws eks describe-cluster --name ${CLUSTER_NAME} --query "cluster.identity.oidc.issuer" --output text ${PROFILE_STRING} | cut -d '/' -f 5)
 else
-  . ./local_env.sh
+  . ./tmp/local_env.sh
 fi
 
 SERVICE_ACCOUNT_NAME=eks-edu-service-account-${IDE_NAME}
