@@ -85,7 +85,7 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
          --user=user1 --user=user2 --group=group1
 
    # ServiceAccount
-   kubectl create clusterrolebinding cluster-admin \
+   kubectl create clusterrolebinding pod-reader-crusterrolebinding \
          --clusterrole=pod-reader-crusterrole \ --serviceaccount=namespace:serviceaccountname
    ```
 
@@ -93,17 +93,20 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 
    User/ServiceAccount 에 모든 Cluster에 대해서 설정한 권한을 위임
    ```shell
-   kubectl -n namespace create role pod-reader-role \
+   kubectl create role pod-reader-role \
          --verb=get --verb=list --verb=watch \
-         --resource=pods
+         --resource=pods \
+         -n namespace
 
    kubectl create rolebinding pod-reader-rolebinding \
          --clusterrole=pod-reader-role --user=user1 --user=user2 \
-         --group=group1
+         --group=group1 \
+         -n namespace
 
-   kubectl create rolebinding NAME \
+   kubectl create rolebinding pod-reader-rolebinding \
          --role=pod-reader-rolebinding \
-         --serviceaccount=namespace:serviceaccountname
+         --serviceaccount=namespace:serviceaccountname \
+         -n namespace
    ```
    
 ## 실습
@@ -125,12 +128,15 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
 
 2. 실행 화면
+
    ![current_context](image/current_context.png)
 
 3. 생성 결과 화면
+
    ![alt text](image/result_current_context.png)
 
 4. `eks-edu-cluster-${IDE_NAME}` 이름으로 context 변경
+
    ```shell
    cd ~/environment/eks-edu/05_Manage_Access_1/01_common
    sh 02_update_kubeconfig.sh
@@ -148,12 +154,15 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
 
 5. 실행 화면
+
    ![alt text](image/update_kubeconfig.png)
 
 6. 생성 결과 화면
+
    ![alt text](image/result_update_kubeconfig.png)
 
 7. aws-auth configmaps 내용 확인
+
    ```shell
    cd ~/environment/eks-edu/05_Manage_Access_1/01_common
    sh 03_get_aws-auth-configmap.sh
@@ -166,12 +175,15 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
 
 5. 실행 화면
+
    ![alt text](image/get_aws_auth_configmap.png)
 
 6. 생성 결과 화면
+
    ![alt text](image/result_get_aws_auth_configmap.png)
 
 ### ConfigMap을 사용하여 사용자 권한 설정
+
 1. `eks-edu-user-<사번>` IAM User 생성
 
    ```shell
@@ -187,8 +199,11 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
    
 2. 실행 화면
+
    ![alt text](image/create_user.png)
+
 3. 생성 결과 화면
+
    ![result_create_user](image/result_create_user.png)
 
 4. User에 Access Key 생성
@@ -205,9 +220,11 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
    
 5. 실행 화면
+
    ![alt text](image/create_access_key.png)
 
 6. 생성 결과 화면
+
    tmp/access_key.json에 key 정보가 보관되어 있습니다.
    ![alt text](image/result_create_access_key.png)
 
@@ -241,9 +258,11 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
    
 8. 실행 화면
+
    ![alt text](image/attach_policy.png)
 
 9. 생성 결과 화면
+
    ![alt text](image/result_attach_policy.png)
 
 10. User에 eks:DescribeCluster 권한을 등록 합니다.
@@ -260,9 +279,11 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
    
 11. 실행 화면
+
    ![alt text](image/get_iamidentitymapping.png)
 
 12. 생성 결과 화면
+
    ![alt text](image/result_get_iamidentitymapping.png)
 
 13. User에 권한 할당
@@ -283,9 +304,11 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    - username은 AWS IAM User
    
 14. 실행 화면
+
    ![alt text](image/create_iamidentitymapping.png)
 
 15. 생성 결과 화면
+
    ![alt text](image/result_create_iamidentitymapping.png)
 
 16. User에 할당할 ClusterRole / ClusterRoleBinding 생성
@@ -326,9 +349,11 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
    
 17. 실행 화면
+
    ![alt text](image/create_cluster_role_binding.png)
 
 18. 생성 결과 화면
+
    ![alt text](image/result_create_cluster_role_binding.png)
 
 19. `eks-edu-user-<사번>` 의 aws profile eks-edu-profile-<사번> 생성
@@ -347,12 +372,15 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
    
 20. 실행 화면
+
    ![alt text](image/create_cli_profile.png)
 
 21. 생성 결과 화면
+
    ```shell
    aws sts get-caller-identity --profile eks-edu-profile-9641173
    ```
+
    ![alt text](image/result_create_cli_profile.png)
 
 22. `eks-edu-user-<사번>` Profile을 이용해서 kubectl config 설정
@@ -369,10 +397,13 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
         --name eks-edu-cluster-9641173 \
         --alias pod-reader --profile eks-edu-profile-9641173
    ```
+
 23. 실행 화면
+
    ![alt text](image/update_kubeconfig_pod_reader.png)
 
 24. 생성 결과 화면
+
    ![alt text](image/result_update_kubeconfig_pod_reader.png)
 
 25. pod get 권한 체크
@@ -388,34 +419,45 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    kubectl get nodes
    ```
 23. 실행 화면
+
    ![alt text](image/get_nodes.png)
 
 24. 생성 결과 화면
+
    ![alt text](image/result_get_nodes.png)
 
 ### Access Entry를 사용하여 사용자 권한 설정
+
 1. Clusters 를 선택
+
    ![alt text](image/click_cluster.png)
    
 2. Addon 메뉴 선택
+
    ![alt text](image/select_add-on.png)
 
 3. Get more add-ons 버튼 클릭
+
    ![alt text](image/click_get_more_add_ons.png)
 
 4. Amazon EKS Pod Identity Agent 메뉴의 checkbox 선택
+
    ![alt text](image/check_amazon_eks_pod_identity_agent.png)
 
 5. Next 버튼 클릭
+
    ![alt text](image/click_next.png)
 
 6. 버전 선택하고 Next 클릭
+
    ![alt text](image/check_version.png)
 
 7. Create 버튼 클릭
+
    ![alt text](image/create_button.png)
 
 8. admin 권한의 access entry 생성
+
    ```shell
    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
    sh 02_create_admin_access_entry.sh
@@ -438,13 +480,17 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
       --access-scope type=cluster \
       --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy 
    ```
+
 9. 실행 화면
+
    ![alt text](image/create_access_entry.png)
 
 10. 생성 결과 화면
+
    ![alt text](image/result_create_access_entry.png)
 
 11. node 조회 권한 체크
+
    ```shell
    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
    sh 03_get_nodes.sh
@@ -457,12 +503,15 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
 
 12. 실행 화면
+
    ![alt text](image/kubectl_get_nodes.png)
 
 13. 생성 결과 화면
+
    ![alt text](image/result_kubectl_get_nodes.png)
 
 14. cluster role 권한으로 변경
+
    ```shell
    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
    sh 04_update_pod_reader_access_entry.sh
@@ -478,12 +527,15 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
 
 15. 실행 화면
+
    ![alt text](image/update_pod_reader_access_entry.png)
 
 16. 생성 결과 화면
+
    ![alt text](image/result_update_pod_reader_access_entry.png)
 
 17. aws get nodes 명령 
+
    ```shell
    sh 03_get_nodes.sh
    ```
@@ -495,9 +547,11 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    ```
 
 15. 실행 화면
+
    ![alt text](image/pod_reader_get_nodes.png)
 
 16. 생성 결과 화면
+
    ![alt text](image/result_pod_reader_get_nodes.png)
 
 ## 정리
@@ -534,4 +588,5 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 4. EKS 삭제는 03_Default_Environment 에서 삭제 진행
 
 ## 관련 링크
+
 - [Full Configuration Format](https://github.com/kubernetes-sigs/aws-iam-authenticator#full-configuration-format)
