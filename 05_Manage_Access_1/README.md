@@ -267,55 +267,55 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 
 10. User에 eks:DescribeCluster 권한을 등록 합니다.
 
-   ```shell
-   sh 04_get_iamidentitymapping.sh
-   ```
+    ```shell
+    sh 04_get_iamidentitymapping.sh
+    ```
 
-   위 `04_get_iamidentitymapping.sh`를 실행하면 아래 eksctl cli 가 실행됩니다.(참고용)
+    위 `04_get_iamidentitymapping.sh`를 실행하면 아래 eksctl cli 가 실행됩니다.(참고용)
 
-   ```shell
-   # configmap에 등록된 정보 조회
-   eksctl get iamidentitymapping --cluster eks-edu-cluster-9641173
-   ```
+    ```shell
+    # configmap에 등록된 정보 조회
+    eksctl get iamidentitymapping --cluster eks-edu-cluster-9641173
+    ```
    
 11. 실행 화면
 
-   ![alt text](image/get_iamidentitymapping.png)
+    ![alt text](image/get_iamidentitymapping.png)
 
 12. 생성 결과 화면
 
-   ![alt text](image/result_get_iamidentitymapping.png)
+    ![alt text](image/result_get_iamidentitymapping.png)
 
 13. User에 권한 할당
 
-   ```shell
-   sh 05_create_iamidentitymapping.sh
-   ```
+    ```shell
+    sh 05_create_iamidentitymapping.sh
+    ```
 
-   위 `05_create_iamidentitymapping.sh`를 실행하면 아래 eksctl cli 가 실행됩니다.(참고용)
+    위 `05_create_iamidentitymapping.sh`를 실행하면 아래 eksctl cli 가 실행됩니다.(참고용)
 
-   ```shell
-   eksctl create iamidentitymapping \
-      --cluster eks-edu-cluster-9641173 \
-      --arn arn:aws:iam::539666729110:user/eks-edu-user-9641173 \
-      --username eks-edu-user-9641173 
-   ```
-   - arn는 user의 arn이며 삭제시에 key로 사용됨
-   - username은 AWS IAM User
+    ```shell
+    eksctl create iamidentitymapping \
+       --cluster eks-edu-cluster-9641173 \
+       --arn arn:aws:iam::539666729110:user/eks-edu-user-9641173 \
+       --username eks-edu-user-9641173 
+    ```
+    - arn는 user의 arn이며 삭제시에 key로 사용됨
+    - username은 AWS IAM User
    
 14. 실행 화면
 
-   ![alt text](image/create_iamidentitymapping.png)
+    ![alt text](image/create_iamidentitymapping.png)
 
 15. 생성 결과 화면
 
-   ![alt text](image/result_create_iamidentitymapping.png)
+    ![alt text](image/result_create_iamidentitymapping.png)
 
 16. User에 할당할 ClusterRole / ClusterRoleBinding 생성
 
-   ```shell
-   sh 06_create_cluster_role_binding.sh
-   ```
+    ```shell
+    sh 06_create_cluster_role_binding.sh
+    ```
 
    위 `06_create_cluster_role_binding.sh`를 실행하면 tmp/cluster-role-info.yaml를 만들어서 배포를 합니다.(참고용)
 
