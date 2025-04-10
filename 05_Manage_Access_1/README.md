@@ -358,73 +358,74 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 
 19. `eks-edu-user-<사번>` 의 aws profile eks-edu-profile-<사번> 생성
 
-   ```shell
-   sh 07_create_cli_profile.sh
-   ```
+    ```shell
+    sh 07_create_cli_profile.sh
+    ```
 
-   위 `07_create_cli_profile.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+    위 `07_create_cli_profile.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
 
-   ```shell
-   aws configure set region ap-northeast-1 --profile eks-edu-profile-9641173
-   aws configure set output yaml --profile eks-edu-profile-9641173
-   aws configure set aws_access_key_id XXXXXXXXXX --profile eks-edu-profile-9641173
-   aws configure set aws_secret_access_key XXXXXXXXXXXXXXXXXXXX --profile eks-edu-profile-9641173
-   ```
+    ```shell
+    aws configure set region ap-northeast-1 --profile eks-edu-profile-9641173
+    aws configure set output yaml --profile eks-edu-profile-9641173
+    aws configure set aws_access_key_id XXXXXXXXXX --profile eks-edu-profile-9641173
+    aws configure set aws_secret_access_key XXXXXXXXXXXXXXXXXXXX --profile eks-edu-profile-9641173
+    ```
    
 20. 실행 화면
 
-   ![alt text](image/create_cli_profile.png)
+    ![alt text](image/create_cli_profile.png)
 
 21. 생성 결과 화면
 
-   ```shell
-   aws sts get-caller-identity --profile eks-edu-profile-9641173
-   ```
+    ```shell
+    aws sts get-caller-identity --profile eks-edu-profile-9641173
+    ```
 
-   ![alt text](image/result_create_cli_profile.png)
+    ![alt text](image/result_create_cli_profile.png)
 
 22. `eks-edu-user-<사번>` Profile을 이용해서 kubectl config 설정
 
-   ```shell
-   cd ~/environment/eks-edu/05_Manage_Access_1/02_user_permission_configmap
-   sh 08_update_kubeconfig-pod-reader.sh
-   ```
+    ```shell
+    cd ~/environment/eks-edu/05_Manage_Access_1/02_user_permission_configmap
+    sh 08_update_kubeconfig-pod-reader.sh
+    ```
 
-   위 `08_update_kubeconfig-pod-reader.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+    위 `08_update_kubeconfig-pod-reader.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
 
-   ```shell
-   aws eks update-kubeconfig \
-        --name eks-edu-cluster-9641173 \
-        --alias pod-reader --profile eks-edu-profile-9641173
-   ```
+    ```shell
+    aws eks update-kubeconfig \
+         --name eks-edu-cluster-9641173 \
+         --alias pod-reader --profile eks-edu-profile-9641173
+    ```
 
 23. 실행 화면
 
-   ![alt text](image/update_kubeconfig_pod_reader.png)
+    ![alt text](image/update_kubeconfig_pod_reader.png)
 
 24. 생성 결과 화면
 
-   ![alt text](image/result_update_kubeconfig_pod_reader.png)
+    ![alt text](image/result_update_kubeconfig_pod_reader.png)
 
 25. pod get 권한 체크
 
-   ```shell
-   cd ~/environment/eks-edu/05_Manage_Access_1/02_user_permission_configmap
-   sh 09_get_nodes.sh
-   ```
+    ```shell
+    cd ~/environment/eks-edu/05_Manage_Access_1/02_user_permission_configmap
+    sh 09_get_nodes.sh
+    ```
 
-   위 `09_get_nodes-pod-reader.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+    위 `09_get_nodes-pod-reader.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
 
-   ```shell
-   kubectl get nodes
-   ```
+    ```shell
+    kubectl get nodes
+    ```
+
 23. 실행 화면
 
-   ![alt text](image/get_nodes.png)
+    ![alt text](image/get_nodes.png)
 
 24. 생성 결과 화면
 
-   ![alt text](image/result_get_nodes.png)
+    ![alt text](image/result_get_nodes.png)
 
 ### Access Entry를 사용하여 사용자 권한 설정
 
@@ -487,72 +488,72 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 
 10. 생성 결과 화면
 
-   ![alt text](image/result_create_access_entry.png)
+    ![alt text](image/result_create_access_entry.png)
 
 11. node 조회 권한 체크
 
-   ```shell
-   cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
-   sh 03_get_nodes.sh
-   ```
+    ```shell
+    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
+    sh 03_get_nodes.sh
+    ```
 
-   위 `03_get_nodes.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
+    위 `03_get_nodes.sh`를 실행하면 아래 kubectl cli 가 실행됩니다.(참고용)
 
-   ```shell
-   kubectl get nodes
-   ```
+    ```shell
+    kubectl get nodes
+    ```
 
 12. 실행 화면
 
-   ![alt text](image/kubectl_get_nodes.png)
+    ![alt text](image/kubectl_get_nodes.png)
 
 13. 생성 결과 화면
 
-   ![alt text](image/result_kubectl_get_nodes.png)
+    ![alt text](image/result_kubectl_get_nodes.png)
 
 14. cluster role 권한으로 변경
 
-   ```shell
-   cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
-   sh 04_update_pod_reader_access_entry.sh
-   ```
+    ```shell
+    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
+    sh 04_update_pod_reader_access_entry.sh
+    ```
 
-   위 `04_update_pod_reader_access_entry.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+    위 `04_update_pod_reader_access_entry.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
 
-   ```shell
-   aws eks update-access-entry \
-      --cluster-name eks-edu-cluster-9641173 \
-      --principal-arn arn:aws:iam::539666729110:user/eks-edu-user-9641173 \
-      --username eks-edu-user-9641173 
-   ```
+    ```shell
+    aws eks update-access-entry \
+       --cluster-name eks-edu-cluster-9641173 \
+       --principal-arn arn:aws:iam::539666729110:user/eks-edu-user-9641173 \
+       --username eks-edu-user-9641173 
+    ```
 
 15. 실행 화면
 
-   ![alt text](image/update_pod_reader_access_entry.png)
+    ![alt text](image/update_pod_reader_access_entry.png)
 
 16. 생성 결과 화면
 
-   ![alt text](image/result_update_pod_reader_access_entry.png)
+    ![alt text](image/result_update_pod_reader_access_entry.png)
 
 17. aws get nodes 명령 
 
-   ```shell
-   sh 03_get_nodes.sh
-   ```
+    ```shell
+    sh 03_get_nodes.sh
+    ```
 
-   위 `04_update_pod_reader_access_entry.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+    위 `04_update_pod_reader_access_entry.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
 
-   ```shell
-   kubectl get nodes
-   ```
+    ```shell
+    kubectl get nodes
+    ```
 
 15. 실행 화면
 
-   ![alt text](image/pod_reader_get_nodes.png)
+    ![alt text](image/pod_reader_get_nodes.png)
 
 16. 생성 결과 화면
 
-   ![alt text](image/result_pod_reader_get_nodes.png)
+    ![alt text](image/result_pod_reader_get_nodes.png)
 
 ## 정리
 
