@@ -24,7 +24,7 @@ AWS EKS에 대해 기초부터 고급주제까지 학습하실 수 있도록 교
 - [2. EKS 기초 실습](02_EKS_Basic/README.md)
 - [3. 기본 환경 생성](03_Default_Environment/README.md)
 - [4. AWS Elasic Container Registry](04_AWS_Elastic_Container_Registry/README.md)
-- [5. 보안 1](05_Manage_Access_1/README.md)
+- [5. Access 관리](05_Manage_Access_1/README.md)
 - [6. 보안 2](06_Workload_Access_2/README.md)
 - [7. EKS Cluster 추가 기능 관리 1(IRSA)](07_EKS_Cluster_Addon_Irsa/README.md)
 - [7. EKS Cluster 추가 기능 관리 2(Pod Identity)](07_EKS_Cluster_Addon_PodIdentity/README.md)

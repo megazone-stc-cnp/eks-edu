@@ -1,1 +1,1 @@
-# README.md 문서 내용에 따라 eks pod identity agent를 설치해 주세요
+# eks pod identity agent를 설치해 있어야 합니다.

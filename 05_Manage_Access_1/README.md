@@ -15,11 +15,11 @@
    ```
 
 ## 학습 목표
-- AWS IAM 사용자가 Kubernetes API에 인증할 수 있도록 하는 방법 숙지 ( IRSA 와 Pod Identity )
+- AWS IAM 사용자가 Kubernetes API에 인증할 수 있도록 하는 방법 숙지 ( ConfigMap 와 Access Entry )
 
 ## 이론
 
-클러스터에는 Kubernetes API 엔드포인트가 있습니다. Kubectl은 이 API를 사용합니다. 다음 두 유형의 ID를 사용하여 이 API에 인증할 수 있습니다.
+클러스터에는 Kubernetes API 엔드포인트가 있습니다. **Kubectl은 이 API를 사용**합니다. 다음 두 유형의 ID를 사용하여 이 **API에 인증**할 수 있습니다.
 - AWS ID 및 액세스 관리(IAM) 보안 주체(역할 또는 사용자)
 - 자체 OpenID Connect(OIDC) 제공자의 사용자
 
@@ -37,7 +37,8 @@
 Amazon EKS 클러스터를 생성할 경우, 클러스터를 생성하는 IAM 보안 주체에게는 Amazon EKS 제어 영역의 클러스터 역할 기반 액세스 제어(RBAC) 구성에 system:masters 권한이 자동으로 부여
 
 ### EKS Access Entry란 ?
-- EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자격 증명에 연결
+
+EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자격 증명에 연결
 
 #### 장점
 이 기능은 사용자 권한을 관리할 때 AWS 및 Kubernetes API 사이를 전환하지 않아도 되므로 **액세스 관리를 간소화**합니다.
@@ -65,9 +66,33 @@ Amazon EKS 클러스터를 생성할 경우, 클러스터를 생성하는 IAM �
 | AmazonEKSClusterInsightsPolicy | Amazon EKS Cluster Insights 기능에 대한 읽기 전용 권한을 부여 |
 
 ### ClusterRole/ClusterRoleBinding 과 Role/RoleBinding
-1. ClusterRole/ClusterRoleBinding 이란
-2. Role/RoleBinding 이란
+1. 구성도
+   ![current_context](image/clusterrole_drawio.png)
 
+1. ClusterRole/ClusterRoleBinding 이란 ?
+   
+   User/ServiceAccount 에 모든 Cluster에 대해서 설정한 권한을 위임
+   ```shell
+   kubectl create clusterrole pod-reader-crusterrole --verb=get,list,watch --resource=pods
+
+   # User
+   kubectl create clusterrolebinding pod-reader-crusterrolebinding --clusterrole=pod-reader-crusterrole --user=user1 --user=user2 --group=group1
+
+   # ServiceAccount
+   kubectl create clusterrolebinding cluster-admin --clusterrole=pod-reader-crusterrole --serviceaccount=namespace:serviceaccountname
+   ```
+
+2. Role/RoleBinding 이란 ?
+
+   User/ServiceAccount 에 모든 Cluster에 대해서 설정한 권한을 위임
+   ```shell
+   kubectl -n namespace create role pod-reader-role --verb=get --verb=list --verb=watch --resource=pods
+
+   kubectl create rolebinding pod-reader-rolebinding --clusterrole=pod-reader-role --user=user1 --user=user2 --group=group1
+
+   kubectl create rolebinding NAME --role=pod-reader-rolebinding --serviceaccount=namespace:serviceaccountname
+   ```
+   
 ## 실습
 
 ### 구성도

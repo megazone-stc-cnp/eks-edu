@@ -81,3 +81,6 @@ vpc_env.sh
 01_Container/03_get_password.sh
 01_Container/99_delete_vscode_server.sh
 06_Workload_Access_2/01_app_irsa/local_env.sh
+05_Manage_Access_1/image/.$clusterrole_drawio.drawio.bkp
+05_Manage_Access_1/image/.$clusterrole_drawio.png.bkp
+05_Manage_Access_1/image/clusterrole_drawio.drawio
