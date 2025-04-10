@@ -136,7 +136,6 @@ EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성
 생성은 CloudFormation을 이용해서 생성합니다.
 
 1. vpc 인프라 생성
-
    ```shell
    cd ~/environment/eks-edu/03_Default_Environment/01_create_vpc
    sh 01_default_vpc.sh
@@ -150,29 +149,15 @@ EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성
        --template-body file://amazon-eks-vpc-private-subnets.yaml \
        --capabilities CAPABILITY_NAMED_IAM
    ```
+
 2. 실행 화면
    ![1743477021002](image/creating_vpc_infra.png)
+
 3. 생성 결과 화면
    ![1743477100419](image/result_vpc_infra.png)
 
-### 생성된 Infra 정보를 env 파일로 저장
-
-1. 생성된 정보를 env 파일로 저장
-
-   ```shell
-   sh 02_get_output.sh
-   ```
-
-   위 `02_get_output.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
-
-   ```shell
-   aws cloudformation describe-stacks \
-       --stack-name eks-workshop-vpc-9641173 --query Stacks[0].Outputs \
-       --output json
-   ```
-2. 실행 화면
-   ![1743477789373](image/get_output.png)
-3. 생성 결과 화면
+4. VPC용 환경파일(`vpc_env.sh`) 확인
+   아래 `vpc_env.sh` 이 자동으로 생성되며, EKS 생성 시 사용됩니다.
    ![1743477850117](image/result_output.png)
 
 ### EKS 생성
