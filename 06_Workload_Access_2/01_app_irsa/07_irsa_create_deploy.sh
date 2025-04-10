@@ -36,7 +36,7 @@ spec:
         image: public.ecr.aws/nginx/nginx:1.27
 EOF
 
-echo "kubectl apply -f irsa-deployment.yaml"
+echo "kubectl apply -f tmp/irsa-deployment.yaml"
 echo ""
 
-kubectl apply -f irsa-deployment.yaml
+kubectl apply -f tmp/irsa-deployment.yaml
