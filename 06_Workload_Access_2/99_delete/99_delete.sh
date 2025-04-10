@@ -35,6 +35,12 @@ if [[ ! "$IRSA_ROLE_EXISTS" == *"ROLE_NOT_FOUND"* ]]; then
 	aws iam delete-role --role-name $IRSA_ROLE_NAME ${PROFILE_STRING}
 fi
 
+IRSA_POLICY_EXISTS=$(aws iam get-policy --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${IRSA_POLICY_NAME} ${PROFILE_STRING} 2>&1 || echo "POLICY_NOT_FOUND")
+if [[ ! "$IRSA_POLICY_EXISTS" == *"POLICY_NOT_FOUND"* ]]; then
+    echo "aws iam delete-policy --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${IRSA_POLICY_NAME} ${PROFILE_STRING}"
+    aws iam delete-policy --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${IRSA_POLICY_NAME} ${PROFILE_STRING}
+fi
+
 POD_IDENTITY_ROLE_EXISTS=$(aws iam get-role --role-name ${POD_IDENTITY_ROLE_NAME} ${PROFILE_STRING} 2>&1 || echo "ROLE_NOT_FOUND")
 if [[ ! "$POD_IDENTITY_ROLE_EXISTS" == *"ROLE_NOT_FOUND"* ]]; then
 
@@ -54,6 +60,12 @@ if [[ ! "$POD_IDENTITY_ROLE_EXISTS" == *"ROLE_NOT_FOUND"* ]]; then
 
 	echo "aws iam delete-role --role-name $POD_IDENTITY_ROLE_NAME ${PROFILE_STRING}"
 	aws iam delete-role --role-name $POD_IDENTITY_ROLE_NAME ${PROFILE_STRING}
+fi
+
+POD_IDENTITY_POLICY_EXISTS=$(aws iam get-policy --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POD_IDENTITY_POLICY_NAME} ${PROFILE_STRING} 2>&1 || echo "POLICY_NOT_FOUND")
+if [[ ! "$POD_IDENTITY_POLICY_EXISTS" == *"POLICY_NOT_FOUND"* ]]; then
+    echo "aws iam delete-policy --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POD_IDENTITY_POLICY_NAME} ${PROFILE_STRING}"
+    aws iam delete-policy --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POD_IDENTITY_POLICY_NAME} ${PROFILE_STRING}
 fi
 
 if aws s3api head-bucket --bucket "${BUCKET_NAME}" 2>/dev/null; then
