@@ -176,14 +176,14 @@
    
     # Role 생성
     aws iam create-role \
-       --role-name eks-edu-workload-role-9641173 \
+       --role-name eks-edu-irsa-workload-role-9641173 \
         --assume-role-policy-document file://tmp/trust-relationship.json \
-        --description eks-edu-workload-role-9641173-description
+        --description eks-edu-irsa-workload-role-9641173-description
 
     # 생성했던 Policy를 연동
     aws iam attach-role-policy \
-       --role-name eks-edu-workload-role-9641173 \
-       --policy-arn=arn:aws:iam::539666729110:policy/eks-edu-workload-policy-9641173    
+       --role-name eks-edu-irsa-workload-role-9641173 \
+       --policy-arn=arn:aws:iam::539666729110:policy/eks-edu-irsa-workload-policy-9641173
     ```
 
 14. 실행 화면
