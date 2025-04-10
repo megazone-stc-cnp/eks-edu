@@ -9,7 +9,7 @@
 
 - ECR의 사용법을 이해하고, Registry 생성
 - pull through cache 에 배우고, 구축 실습
-- aws loadbalancer controller 와 cluster autoscaler 퍼블릭 이미지를 Private ECR에 복사 실습
+- aws loadbalancer controller , cluster autoscaler, nginx 퍼블릭 이미지를 Private ECR에 복사 실습
 
 ## 이론
 
@@ -75,6 +75,31 @@ Amazon ECR은 **AWS IAM을 사용하여 리소스 기반 권한을 가진 프라
    }
    ```
 
+3. Cross Account 권한
+   ```json
+   {   
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Sid": "AllowPushPull",
+         "Effect": "Allow",
+         "Principal": {
+           "AWS": "arn:aws:iam::account-id:root"
+         },
+         "Action": [
+           "ecr:GetDownloadUrlForLayer",
+           "ecr:BatchGetImage",
+           "ecr:BatchCheckLayerAvailability",
+           "ecr:PutImage",
+           "ecr:InitiateLayerUpload",
+           "ecr:UploadLayerPart",
+           "ecr:CompleteLayerUpload"
+         ]
+       }
+     ]
+   }
+   ```
+   - [보조 계정이 내 Amazon ECR 이미지 리포지토리의 이미지를 푸시 또는 풀하도록 허용하려면 어떻게 해야 하나요?](https://repost.aws/ko/knowledge-center/secondary-account-access-ecr)
 ### Pull Through Cache란?
 
 ![1743490206925](image/pull_through_cache_architect.png)
@@ -83,16 +108,16 @@ Amazon ECR은 **AWS IAM을 사용하여 리소스 기반 권한을 가진 프라
 
 Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐시 규칙 생성을 지원합니다.
 
-- Amazon ECR Public, Kubernetes 컨테이너 이미지 레지스트리 및 Quay(인증 필요 없음)
-- Docker Hub, Microsoft Azure 컨테이너 레지스트리, GitHub 컨테이너 레지스트리 및 GitLab 컨테이너 레지스트리(보안 암호로 AWS Secrets Manager 인증 필요)
-- Amazon ECR( AWS IAM 역할을 사용한 인증 필요)
+- Amazon ECR Public, Kubernetes 컨테이너 이미지 레지스트리 및 Quay(**인증 필요 없음**)
+- Docker Hub, Microsoft Azure 컨테이너 레지스트리, GitHub 컨테이너 레지스트리 및 GitLab 컨테이너 레지스트리(**보안 암호로 AWS Secrets Manager 인증 필요**)
+- Amazon ECR( **AWS IAM 역할을 사용한 인증 필요**)
 - GitLab 컨테이너 레지스트리의 경우 Amazon ECR은 GitLab의 서비스형 소프트웨어(SaaS) 오퍼링에서만 풀스루 캐시를 지원합니다
-  ====================================================
 
 ## 실습
 
 ### ECR Repository 생성
 
+#### AWS Load Balancer Controller Repository
 1. AWS Load Balancer Controller Repository 생성
 
    ```shell
@@ -110,29 +135,34 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    ![1743577747455](image/creating_lbc_repository.png)
 3. 생성 결과 화면
    ![1743577874296](image/result_lbc_repository.png)
-4. Cluster AutoScaler Repository 생성
+
+#### Cluster AutoScaler Repository
+1. Cluster AutoScaler Repository 생성
 
    ```shell
    aws ecr create-repository \
         --repository-name registry.k8s.io/autoscaling/cluster-autoscaler
    ```
-5. 실행 화면
+2. 실행 화면
    ![1743578043503.png](image/creating_cluster_autoscaler_repository.png)
-6. 생성 결과 화면
+3. 생성 결과 화면
    ![1743578210172](image/result_cluster_autoscaler_repository.png)
-7. Nginx Repository 생성
+
+#### Nginx   
+1. Nginx Repository 생성
 
    ```shell
    aws ecr create-repository \
         --repository-name public.ecr.aws/nginx/nginx
    ```
-8. 실행 화면
+2. 실행 화면
    ![1743578426316](image/creating_nginx_repository.png)
-9. 생성 결과 화면
+3. 생성 결과 화면
    ![1743578509292](image/result_nginx_repository.png)
 
 ### ECR Repository Image Push
 
+#### AWS Load Balancer Controller
 1. AWS Load Balancer Controller Image 업로드
 
    ```shell
@@ -162,7 +192,9 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    ![1743579337793](image/lbc_image_push.png)
 3. 생성 결과 화면
    ![1743579411398](image/result_lbc_image_push.png)
-4. Cluster AutoScaler Image 업로드
+
+#### Cluster AutoScaler
+1. Cluster AutoScaler Image 업로드
 
    ```shell
    cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/02_image_push
@@ -187,11 +219,13 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    # docker에 존재하는 Image 삭제
    docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0 registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0
    ```
-5. 실행 화면
+2. 실행 화면
    ![1743579830239](image/cluster_autoscaler_image_push.png)
-6. 생성 결과 화면
+3. 생성 결과 화면
    ![1743579895596](image/result_cluster_autoscaler_image_push.png)
-7. Nginx Image 업로드
+
+#### Nginx   
+1. Nginx Image 업로드
 
    ```shell
    cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/02_image_push
@@ -216,9 +250,9 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    # docker에 존재하는 Image 삭제
    docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/nginx/nginx:1.27 public.ecr.aws/nginx/nginx:1.27
    ```
-8. 실행 화면
+2. 실행 화면
    ![1743580289776](image/nginx_image_push.png)
-9. 생성 결과 화면
+3. 생성 결과 화면
    ![1743580353708](image/result_nginx_image_push.png)
 
 ### Pull Through Cache 실습
