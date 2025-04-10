@@ -99,7 +99,7 @@ Amazon ECR은 **AWS IAM을 사용하여 리소스 기반 권한을 가진 프라
      ]
    }
    ```
-   - [보조 계정이 내 Amazon ECR 이미지 리포지토리의 이미지를 푸시 또는 풀하도록 허용하려면 어떻게 해야 하나요?](https://repost.aws/ko/knowledge-center/secondary-account-access-ecr)
+   - 참고 : [보조 계정이 내 Amazon ECR 이미지 리포지토리의 이미지를 푸시 또는 풀하도록 허용하려면 어떻게 해야 하나요?](https://repost.aws/ko/knowledge-center/secondary-account-access-ecr)
 ### Pull Through Cache란?
 
 ![1743490206925](image/pull_through_cache_architect.png)
@@ -140,11 +140,19 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 1. Cluster AutoScaler Repository 생성
 
    ```shell
+   cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/01_create_repository
+   sh 02_create_cluster_autoscaler_ecr_cluster.sh
+   ```
+
+   위 `02_create_cluster_autoscaler_ecr_cluster.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
    aws ecr create-repository \
         --repository-name registry.k8s.io/autoscaling/cluster-autoscaler
    ```
 2. 실행 화면
    ![1743578043503.png](image/creating_cluster_autoscaler_repository.png)
+
 3. 생성 결과 화면
    ![1743578210172](image/result_cluster_autoscaler_repository.png)
 
@@ -152,11 +160,19 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 1. Nginx Repository 생성
 
    ```shell
+   cd ~/environment/eks-edu/04_AWS_Elastic_Container_Registry/01_create_repository
+   sh 03_create_nginx_ecr_repository.sh
+   ```
+
+   위 `03_create_nginx_ecr_repository.sh`를 실행하면 아래 aws cli 가 실행됩니다.(참고용)
+
+   ```shell
    aws ecr create-repository \
         --repository-name public.ecr.aws/nginx/nginx
    ```
 2. 실행 화면
    ![1743578426316](image/creating_nginx_repository.png)
+
 3. 생성 결과 화면
    ![1743578509292](image/result_nginx_repository.png)
 
@@ -322,7 +338,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    # public.ecr.aws/eks/aws-load-balancer-controller repository 삭제
    aws ecr delete-repository --repository-name public.ecr.aws/eks/aws-load-balancer-controller --force
 
-   # registry.k8s.io/autoscaling/cluster-autoscaler, public.ecr.aws/nginx/nginx, public-ecr-9641173/eks/aws-load-balancer-controller 도 위의 항목 삭제 진행
+   # registry.k8s.io/autoscaling/cluster-autoscaler, public.ecr.aws/nginx/nginx, public-ecr-9641173/nginx/nginx 도 위의 항목 삭제 진행
    ```
 
 2. 실행 화면

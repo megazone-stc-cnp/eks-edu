@@ -16,20 +16,27 @@ REPOSITORY_PREFIX=public-ecr-${IDE_NAME}
 # ECR 리포지토리 삭제
 echo "ECR 리포지토리 삭제를 시작합니다..."
 
-# 1. Pull Through Cache Rule 삭제
-echo "Pull Through Cache Rule 삭제 중..."
-echo "aws ecr delete-pull-through-cache-rule \\
-    --ecr-repository-prefix ${REPOSITORY_PREFIX} ${PROFILE_STRING}"
+# ECR 리포지토리 prefix 존재 여부 확인
+if aws ecr describe-pull-through-cache-rules --ecr-repository-prefix ${REPOSITORY_PREFIX} ${PROFILE_STRING} &> /dev/null; then
+    echo "Pull Through Cache Rule 삭제 중..."
+    echo "aws ecr delete-pull-through-cache-rule \\
+        --ecr-repository-prefix ${REPOSITORY_PREFIX} ${PROFILE_STRING}"
 
-aws ecr delete-pull-through-cache-rule \
-    --ecr-repository-prefix ${REPOSITORY_PREFIX} ${PROFILE_STRING}
+    aws ecr delete-pull-through-cache-rule \
+        --ecr-repository-prefix ${REPOSITORY_PREFIX} ${PROFILE_STRING}
+fi
 
-# 2. ECR 리포지토리 목록 조회 및 삭제
 # ECR 리포지토리 삭제 함수
 delete_ecr_repository() {
     local repo=$1
     echo "리포지토리 $repo 삭제 중..."
     
+    # 리포지토리가 존재하는지 확인
+    if ! aws ecr describe-repositories --repository-names $repo ${PROFILE_STRING} &> /dev/null; then
+        echo "리포지토리 $repo가 존재하지 않습니다."
+        return
+    fi
+
     # 이미지 목록 조회
     IMAGE_DIGESTS=$(aws ecr list-images --repository-name $repo --query 'imageIds[*].imageDigest' --output text ${PROFILE_STRING})
     
@@ -51,6 +58,6 @@ delete_ecr_repository() {
 delete_ecr_repository public.ecr.aws/eks/aws-load-balancer-controller
 delete_ecr_repository registry.k8s.io/autoscaling/cluster-autoscaler
 delete_ecr_repository public.ecr.aws/nginx/nginx
-delete_ecr_repository public-ecr-9641173/eks/aws-load-balancer-controller
+delete_ecr_repository public-ecr-9641173/nginx/nginx
 
 echo "ECR 리소스 정리 완료"
