@@ -13,7 +13,6 @@
    sh 01-3_make_eksctl_cluster_nodegroup_pod_identity_template.sh
    sh 02_eksctl_install.sh
    ```
-4. [4. AWS Elasic Container Registry](04_AWS_Elastic_Container_Registry/README.md)에 nginx를 repository가 존재해야 한다.
 
 ## 학습 목표
 

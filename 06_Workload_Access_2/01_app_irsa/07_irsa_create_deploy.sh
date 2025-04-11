@@ -6,7 +6,7 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
-SERVICE_ACCOUNT_NAME=eks-edu-service-account-${IDE_NAME}
+SERVICE_ACCOUNT_NAME=eks-edu-irsa-service-account-${IDE_NAME}
 POLICY_NAME=eks-edu-workload-policy-${IDE_NAME}
 ROLE_NAME=eks-edu-workload-role-${IDE_NAME}
 NAMESPACE_NAME=default
