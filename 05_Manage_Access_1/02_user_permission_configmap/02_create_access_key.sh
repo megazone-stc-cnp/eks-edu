@@ -18,5 +18,3 @@ echo "aws iam create-access-key \\
 
 aws iam create-access-key \
     --user-name ${IAM_USER} ${PROFILE_STRING} --output json | tee tmp/access_key.json
-    
-echo "[TODO] Access Key와 Secret Key는 사용하기 때문에 기록을 해야 한다. (tmp/access_key.json 파일에 저장)"

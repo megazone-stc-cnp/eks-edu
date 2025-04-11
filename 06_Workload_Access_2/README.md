@@ -2,7 +2,18 @@
 
 ## 사전 조건
 
-[5. Access 관리](05_Manage_Access_1/README.md) 의 사전 조건과 동일
+1. [0. 교육 환경 구성하기](00_Setup/)를 이용해 기본 실습 환경 생성이 되어 있어야 합니다.
+2. [0. 교육 환경 구성하기](00_Setup/)를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
+3. [3. 기본 환경 생성](03_Default_Environment/)에 vpc와 eks를 배포해야 합니다.
+   ```shell
+   cd ~/environment/eks-edu/03_Default_Environment/01_create_vpc
+   sh 01_default_vpc.sh
+   sh 02_get_output.sh
+   cd ../02_create_eks
+   sh 01-3_make_eksctl_cluster_nodegroup_pod_identity_template.sh
+   sh 02_eksctl_install.sh
+   ```
+4. [4. AWS Elasic Container Registry](04_AWS_Elastic_Container_Registry/README.md)에 nginx를 repository가 존재해야 한다.
 
 ## 학습 목표
 
