@@ -1,4 +1,4 @@
-# EKS 추가 기능 (Add-on) - 기본
+# 추가 기능 (Add-on) - 기본
 
 ## 0. 사전 조건
 
@@ -242,7 +242,7 @@ sh 00_get_ready.sh
 
 노드 모니터링 에이전트 추가 기능을 `eksctl` 용 Config 파일을 이용해 생성하기 위해 아래 파일을 준비했습니다.
 
-- `eks-edu/07_Addons_1_basic/addon-config-template.yaml`
+- `eks-edu/07_Addons/addon-config-template.yaml`
   ```yaml
   apiVersion: eksctl.io/v1alpha5
   kind: ClusterConfig
@@ -258,7 +258,7 @@ sh 00_get_ready.sh
 위 파일을 이용하여 아래 명령을 실행합니다.
 
 ```shell
-cd ~/environment/eks-edu/07_Addons_1_basic
+cd ~/environment/eks-edu/07_Addons
 source ../env.sh
 envsubst < addon-config-template.yaml | eksctl create addon -f -
 ```
@@ -266,7 +266,7 @@ envsubst < addon-config-template.yaml | eksctl create addon -f -
 생성된 추가 기능 삭제는 `eksctl delete addon` 명령을 이용할 수 있습니다.
 
 ```shell
-cd ~/environment/eks-edu/07_Addons_1_basic
+cd ~/environment/eks-edu/07_Addons
 source ../env.sh
 eksctl delete addon --cluster $CLUSTER_NAME --name eks-node-monitoring-agent
 ```
