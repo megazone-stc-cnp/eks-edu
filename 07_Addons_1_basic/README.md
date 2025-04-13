@@ -231,10 +231,44 @@ AWS Management Console을 통한 EKS 추가 기능을 추가하기는 아래 절
 
 노드 모니터링 에이전트 (`eks-node-monitoring-agent`)를 `eksctl`을 이용해 직접 설치해 보겠습니다.
 
-실습 준비를 위해 준비된 아래 스크립트를 실행해 주세요. (생성된 EKS 클러스터 조회 및 리소스 정리)
+실습 준비를 위해 아래 스크립트를 실행해 주세요. (생성된 EKS 클러스터 확인 및 리소스 정리)
+
 ```bash
-sh 00_ready_for_eks.sh
+cd ~/environment/eks-edu/07-Addon_1_basic
+sh 00_get_ready.sh
 ```
 
-## 정리
+![추가 기능 설치 전 확인](images/addon-check.png)
 
+노드 모니터링 에이전트 추가 기능을 `eksctl` 용 Config 파일을 이용해 생성하기 위해 아래 파일을 준비했습니다.
+
+- `eks-edu/07_Addons_1_basic/addon-config-template.yaml`
+  ```yaml
+  apiVersion: eksctl.io/v1alpha5
+  kind: ClusterConfig
+  metadata:
+    name: $CLUSTER_NAME
+    region: $AWS_REGION
+  
+  addons:
+  - name: eks-node-monitoring-agent
+    version: latest # 설치할 버전을 직접 지정해도 되지만, 항상 최신 버전을 설치한다면 'latest' 라고 지정할 수 있습니다.
+  ```
+
+위 파일을 이용하여 아래 명령을 실행합니다.
+
+```shell
+cd ~/environment/eks-edu/07_Addons_1_basic
+source ../env.sh
+envsubst < addon-config-template.yaml | eksctl create addon -f -
+```
+
+생성된 추가 기능 삭제는 `eksctl delete addon` 명령을 이용할 수 있습니다.
+
+```shell
+cd ~/environment/eks-edu/07_Addons_1_basic
+source ../env.sh
+eksctl delete addon --cluster $CLUSTER_NAME --name eks-node-monitoring-agent
+```
+
+![추가 기능 설치 실습 #1](images/addon-create.png)
