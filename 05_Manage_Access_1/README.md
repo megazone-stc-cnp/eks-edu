@@ -1,4 +1,4 @@
-# Access 관리
+# Access 관리 - 클러스터 액세스
 
 ## 사전 조건
 
@@ -8,6 +8,7 @@
    ```shell
    cd ~/environment/eks-edu/03_Default_Environment/01_create_vpc
    sh 01_default_vpc.sh
+
    cd ../02_create_eks
    sh 01-3_make_eksctl_cluster_nodegroup_pod_identity_template.sh
    sh 02_eksctl_install.sh

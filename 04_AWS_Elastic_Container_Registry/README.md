@@ -1,4 +1,4 @@
-# AWS Elastic Container Registry
+# Amazon Elastic Container Registry
 
 ## 사전 조건
 
