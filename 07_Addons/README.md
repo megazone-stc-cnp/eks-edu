@@ -1,4 +1,4 @@
-# 추가 기능 (Add-on) - 기본
+# 추가 기능 (Add-on) 관리
 
 ## 0. 사전 조건
 
@@ -21,7 +21,7 @@
 ## 2. 개요
 EKS 추가 기능(Add-on)은 EKS 클러스터 생성 후, EKS 관리를 위해 다양한 Application을 손쉽게 설치 및 관리할 수 있도록 해주는 기능입니다.
 
-AWS에서는 EKS 추가 기능을 다음의 3가지 유형으로 구분하여 제공합니다.
+EKS 추가 기능은 다음의 3가지 유형으로 구분하여 제공합니다.
 
 | 유형                      | 설명                                            |
 |---------------------------|-------------------------------------------------|
@@ -240,7 +240,7 @@ sh 00_get_ready.sh
 
 ![추가 기능 설치 전 확인](images/addon-check.png)
 
-노드 모니터링 에이전트 추가 기능을 `eksctl` 용 Config 파일을 이용해 생성하기 위해 아래 파일을 준비했습니다.
+`eksctl`를 이용하여 노드 모니터링 에이전트 추가 기능을 생성하기 위해 아래 파일을 준비했습니다.
 
 - `eks-edu/07_Addons/addon-config-template.yaml`
   ```yaml
@@ -263,6 +263,8 @@ source ../env.sh
 envsubst < addon-config-template.yaml | eksctl create addon -f -
 ```
 
+![추가 기능 설치](images/addon-create.png)
+
 생성된 추가 기능 삭제는 `eksctl delete addon` 명령을 이용할 수 있습니다.
 
 ```shell
@@ -271,4 +273,4 @@ source ../env.sh
 eksctl delete addon --cluster $CLUSTER_NAME --name eks-node-monitoring-agent
 ```
 
-![추가 기능 설치 실습 #1](images/addon-create.png)
+![추가 기능 삭제](images/addon-delete.png)

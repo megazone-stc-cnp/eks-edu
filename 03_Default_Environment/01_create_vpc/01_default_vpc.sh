@@ -38,11 +38,9 @@ echo "기본 VPC 생성완료....."
 
 # Create Env.sh for VPC (vpc_env.sh)
 VPC_ENV_FILE_PATH=../../vpc_env.sh
-set -x
 aws cloudformation describe-stacks \
     --stack-name ${STACK_NAME} --query "Stacks[0].Outputs" ${PROFILE_STRING} --output json | tee result.json
 
-set +x
 if [ -f "${VPC_ENV_FILE_PATH}" ];then
     rm -rf ${VPC_ENV_FILE_PATH}
 fi
