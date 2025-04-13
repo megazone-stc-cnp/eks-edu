@@ -73,8 +73,7 @@ AWS에서는 EKS 추가 기능을 다음의 3가지 유형으로 구분하여 �
 | [Amazon CloudWatch Observability 에이전트](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/workloads-add-ons-available-eks.html#amazon-cloudwatch-observability)  | Observability | CloudWatch 에이전트를 설치하고 CloudWatch Application Signals와 Container Insights 활성화            | EC2, EKS Auto Mode, EKS Hybrid Nodes          |
 | [EKS Pod Identity 에이전트](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/workloads-add-ons-available-eks.html#add-ons-pod-id) <sup>2)</sup>                | Security | 애플리케이션에 대한 자격 증명을 관리 (EC2 인스턴스 프로필 방식과 유사)                               | EC2, EKS Hybrid Nodes                         |
 
-<sup>1\)</sup> `eksctl` 의 Default Addon 설치(`addonsConfig.disableDefaultAddons=false`) 를 활성화하면 설치되는 기본 추가 기능입니다.
-
+<sup>1\)</sup> `eksctl` 의 Default Addon 설치(`addonsConfig.disableDefaultAddons=false`) 를 활성화하면 설치되는 기본 추가 기능입니다.<br/>
 <sup>2\)</sup> AWS Management Console을 통해 EKS 클러스터 생성 시, 기본으로 선택되는 Addon 입니다.
 
 ## 4. 커뮤니티 추가 기능
@@ -89,8 +88,7 @@ AWS에서는 EKS 추가 기능을 다음의 3가지 유형으로 구분하여 �
 | [Cert Manager](https://cert-manager.io/docs/)              | `cert-manager`             | `cert-manager`             | 없음                 | 없음                                                                                                                            | Kubernetes 내부에서 HTTPS 통신을 위한 인증서를 생성하고 자동으로 갱신해주는 역할 |
 | [External DNS](https://github.com/kubernetes-sigs/external-dns) <sup>2\)</sup>             | `external-dns`             | `external-dns`             | `external-dns`       | [AmazonRoute53FullAccess](https://docs.aws.amazon.com/ko_kr/aws-managed-policy/latest/reference/AmazonRoute53FullAccess.html) | Kubernetes 리소스(Service,Ingress 등)를 Kubernetes 외부의 DNS 서버(예: AWS Route53)에 등록 |
 
-<sup>1\)</sup> `eksctl` 의 Default Addon 설치(`addonsConfig.disableDefaultAddons=false`) 를 활성화하면 설치되는 기본 추가 기능입니다.
-
+<sup>1\)</sup> `eksctl` 의 Default Addon 설치(`addonsConfig.disableDefaultAddons=false`) 를 활성화하면 설치되는 기본 추가 기능입니다.<br/>
 <sup>2\)</sup> AWS Management Console을 통해 EKS 클러스터 생성 시, 기본으로 선택되는 Addon 입니다.
 
 커뮤니티 추가 기능은 위 목록이외에도 현재 지속적으로 추가 되고 있기 때문에, EKS 클러스터 구축 또는 관리 시에 신규 추가 기능이 있는지 확인하는 것이 좋습니다.
