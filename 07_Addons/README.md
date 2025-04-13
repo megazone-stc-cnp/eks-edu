@@ -2,9 +2,9 @@
 
 ## 0. 사전 조건
 
-1. [0. 교육 환경 구성하기](00_Setup/)를 이용해 기본 실습 환경 생성이 되어 있어야 합니다.
-2. [0. 교육 환경 구성하기](00_Setup/)를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
-3. [3. 기본 환경 생성](03_Default_Environment/)에 vpc와 eks를 배포해야 합니다.
+1. [0. 교육 환경 구성하기](/00_Setup/)를 이용해 기본 실습 환경 생성이 되어 있어야 합니다.
+2. [0. 교육 환경 구성하기](/00_Setup/)를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
+3. [3. 기본 환경 생성](/03_Default_Environment/)에 vpc와 eks를 배포해야 합니다.
 
    ```shell
    cd ~/environment/eks-edu/03_Default_Environment/01_create_vpc
@@ -176,9 +176,6 @@ AWS Management Console을 통한 EKS 추가 기능을 추가하기는 아래 절
      name: example-cluster
      region: ap-northeast-2
 
-   iam:
-     withOIDC: true
-
    addons:
    - name: vpc-cni
      # all below properties are optional
@@ -276,3 +273,13 @@ eksctl delete addon --cluster $CLUSTER_NAME --name eks-node-monitoring-agent
 ```
 
 ![추가 기능 삭제](images/addon-delete.png)
+
+## 8. 과제
+
+- `Amazon EBS CSI 드라이버` 추가 기능을 직접 설치해 보세요.
+- `Amazon EBS CSI 드라이버` 설치는 `eksctl` 을 이용해 주세요.
+- `Amazon EBS CSI 드라이버` 설치를 위해서는 AWS IAM 권한이 필요합니다. 권한 부여는 IRSA가 아닌 `Pod Identity`를 이용해 주세요.
+  - [6. Access 관리 - 워크로드 액세스](../06_Workload_Access_2/README.md) 의 내용을 참고해주세요.
+  - Pod Identity 에 필요한 관리형 정책은 아래와 같습니다.
+    - [AmazonEBSCSIDriverPolicy](https://docs.aws.amazon.com/ko_kr/aws-managed-policy/latest/reference/AmazonEBSCSIDriverPolicy.html) - `arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy`
+  - IRSA를 이용한 EBS CSI 드라이버 설치는 [Amazon EKS 사용자 가이드](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/index.html)의 [Amazon EBS에 Kubernetes 볼륨 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/ebs-csi.html) 문서를 참고해 주세요.
