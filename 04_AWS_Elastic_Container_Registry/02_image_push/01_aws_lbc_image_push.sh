@@ -11,7 +11,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-REPO_FULLPATH=public.ecr.aws/eks/aws-load-balancer-controller
+REPO_FULLPATH=public.ecr.aws/eks-${IDE_NAME}/aws-load-balancer-controller
 ORIGIN_TAG=v2.9.2
 # ==================================================================
 ORIGIN_IMG=${REPO_FULLPATH}:${ORIGIN_TAG}

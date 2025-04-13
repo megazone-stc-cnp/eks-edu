@@ -12,6 +12,7 @@ if ! command -v docker &> /dev/null; then
 fi
 
 REPO_FULLPATH=public.ecr.aws/nginx/nginx
+TARGET_REPO_FULLPATH=public.ecr.aws/nginx-${IDE_NAME}/nginx
 ORIGIN_TAG=1.27
 # ==================================================================
 ORIGIN_IMG=${REPO_FULLPATH}:${ORIGIN_TAG}

@@ -11,7 +11,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-REPO_FULLPATH=registry.k8s.io/autoscaling/cluster-autoscaler
+REPO_FULLPATH=registry.k8s.io/autoscaling-${IDE_NAME}/cluster-autoscaler
 # ==================================================================
 
 if aws ecr describe-repositories --repository-names ${REPO_FULLPATH} ${PROFILE_STRING} &> /dev/null; then

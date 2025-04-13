@@ -55,9 +55,9 @@ delete_ecr_repository() {
     aws ecr delete-repository --repository-name $repo --force ${PROFILE_STRING}
 }
 
-delete_ecr_repository public.ecr.aws/eks/aws-load-balancer-controller
-delete_ecr_repository registry.k8s.io/autoscaling/cluster-autoscaler
-delete_ecr_repository public.ecr.aws/nginx/nginx
-delete_ecr_repository public-ecr-9641173/nginx/nginx
+delete_ecr_repository public.ecr.aws/eks-${IDE_NAME}/aws-load-balancer-controller
+delete_ecr_repository registry.k8s.io/autoscaling-${IDE_NAME}/cluster-autoscaler
+delete_ecr_repository public.ecr.aws/nginx-${IDE_NAME}/nginx
+delete_ecr_repository public-ecr-${IDE_NAME}/nginx/nginx
 
 echo "ECR 리소스 정리 완료"

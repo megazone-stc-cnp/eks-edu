@@ -11,7 +11,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-REPO_FULLPATH=public.ecr.aws/nginx/nginx
+REPO_FULLPATH=public.ecr.aws/nginx-${IDE_NAME}/nginx
 # ==================================================================
 if aws ecr describe-repositories --repository-names ${REPO_FULLPATH} ${PROFILE_STRING} &> /dev/null; then
     echo "ECR repository ${REPO_FULLPATH} already exists. Skipping creation."
