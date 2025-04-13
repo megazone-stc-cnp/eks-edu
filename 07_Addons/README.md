@@ -277,7 +277,6 @@ eksctl delete addon --cluster $CLUSTER_NAME --name eks-node-monitoring-agent
 ## 8. 과제
 
 - `Amazon EBS CSI 드라이버` 추가 기능을 직접 설치해 보세요.
-- `Amazon EBS CSI 드라이버` 설치는 `eksctl` 을 이용해 주세요.
 - `Amazon EBS CSI 드라이버` 설치를 위해서는 AWS IAM 권한이 필요합니다. 권한 부여는 IRSA가 아닌 `Pod Identity`를 이용해 주세요.
   - [6. Access 관리 - 워크로드 액세스](../06_Workload_Access_2/README.md) 의 내용을 참고해주세요.
   - Pod Identity 에 필요한 관리형 정책은 아래와 같습니다.
