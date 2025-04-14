@@ -354,3 +354,4 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 ## 관련 링크
 - [Amazon ECR의 프라이빗 이미지](https://docs.aws.amazon.com/ko_kr/AmazonECR/latest/userguide/images.html)
 - [Amazon ECR 프라이빗 레지스트리와 업스트림 레지스트리 동기화](https://docs.aws.amazon.com/ko_kr/AmazonECR/latest/userguide/pull-through-cache.html)
+- [ArtifactHub aws-load-balancer-controller](https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller)
