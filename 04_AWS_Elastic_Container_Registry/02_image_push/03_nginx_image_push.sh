@@ -17,7 +17,7 @@ ORIGIN_TAG=1.27
 # ==================================================================
 ORIGIN_IMG=${REPO_FULLPATH}:${ORIGIN_TAG}
 PRIVATE_ECR=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-PRIVATE_ECR_IMG=$PRIVATE_ECR/$REPO_FULLPATH:${ORIGIN_TAG}
+PRIVATE_ECR_IMG=$PRIVATE_ECR/$TARGET_REPO_FULLPATH:${ORIGIN_TAG}
 
 echo "docker pull ${ORIGIN_IMG}"
 echo "aws ecr get-login-password ${PROFILE_STRING} | docker login --username AWS --password-stdin $PRIVATE_ECR"
