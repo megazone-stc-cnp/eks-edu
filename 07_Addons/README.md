@@ -326,6 +326,9 @@ source ../env.sh
 envsubst < addon-config-template-2.yaml | eksctl create addon -f -
 ```
 
+![추가 기능 생성 - 2](images/addon-create-3.png)
+
+
 #### 7-2-3. 실습 - 고급-2
 
 `7-2-2` 실습에서 보여진것 처럼, 추가기능 설치시 필요한 IAM Role중에서 일부는 `eksctl`에서 자동으로 생성해줍니다.
