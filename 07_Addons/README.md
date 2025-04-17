@@ -398,8 +398,7 @@ eksctl delete addon --cluster $CLUSTER_NAME --name aws-ebs-csi-driver
      addons:
      - name: aws-ebs-csi-driver
        version: latest
-       wellKnownPolicies:
-         ebsCSIController: true
+       serviceAccountRoleARN: $ADDON_IAM_ROLE_ARN
        resolveConflicts: preserve
      ```
 
