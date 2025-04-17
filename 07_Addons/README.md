@@ -233,12 +233,12 @@ AWS Management Console을 통한 EKS 추가 기능을 추가하기는 아래 절
 실습 준비를 위해 아래 스크립트를 실행해 주세요. (생성된 EKS 클러스터 확인 및 리소스 정리)
 
 ```bash
-cd ~/environment/eks-edu/07-Addons
+cd ~/environment/eks-edu/07_Addons
 
 sh 00_get_ready.sh
 ```
 
-![추가 기능 설치 전 확인](images/addon-check.png)
+![추가 기능 설치 전 확인](images/addon-ready.png)
 
 `eksctl`를 이용하여 노드 모니터링 에이전트 추가 기능을 생성하기 위해 아래 파일을 준비했습니다.
 
@@ -296,7 +296,8 @@ Amazon EBS CSI 드라이버는 필수 IAM 권한이 필요한데, 다음의 절�
       - [AmazonEBSCSIDriverPolicy](https://docs.aws.amazon.com/ko_kr/aws-managed-policy/latest/reference/AmazonEBSCSIDriverPolicy.html): `arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy`
 3. EKS 추가기능 생성
    1. EKS 추가 기능 생성 시, 2번의 IAM Role을 지정해 줍니다.
-   2. Amazon EBS CSI 드라이버용 Service Account는 추가 기능 생성 시 `ebs-csi-controller-sa`라는 이름으로 자동으로 생성됩니다.
+   2. Amazon EBS CSI 드라이버용 Service Account는 추가 기능 생성 시 `ebs-csi-node-sa`라는 이름으로 자동으로 생성됩니다.
+      (Pod Identity를 사용할 경우에는 `ebs-csi-controller-sa`으로 생성됩니다.)
 
 `eksctl`에서는 위의 과정을 단순화하여 아래와 같은 Config를 설정하면 IAM Role 과 EBS CSI 드라이버 추가 기능을 손쉽게 생성할 수 있습니다.
 
