@@ -289,7 +289,7 @@ Amazon EBS CSI 드라이버는 필수 IAM 권한이 필요한데, 다음의 절�
    - 참고) `eksctl` 을 이용해 생성할 때 `iam.withOIDC: true`로 설정하면 자동으로 생성됩니다.
 2. IAM Role 생성
    1. 추가 기능에서 사용할 IRSA 용 IAM Role 을 지정하기 위해 생성이 필요합니다.
-   2. IAM Role에서 사용할 IAM Policy는 AWS에서 제공하는 관리형 Policy인 `AmazonEBSCSIDriverPolicy'를 사용합니다.
+   2. IAM Role에서 사용할 IAM Policy는 AWS에서 제공하는 관리형 Policy인 `AmazonEBSCSIDriverPolicy`를 사용합니다.
       - [AmazonEBSCSIDriverPolicy](https://docs.aws.amazon.com/ko_kr/aws-managed-policy/latest/reference/AmazonEBSCSIDriverPolicy.html): `arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy`
 3. EKS 추가기능 생성
    1. EKS 추가 기능 생성 시, 2번의 IAM Role을 지정해 줍니다.
