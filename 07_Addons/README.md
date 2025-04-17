@@ -10,7 +10,7 @@
    sh 01_default_vpc.sh
 
    cd ../02_create_eks
-   sh 01-3_make_eksctl_cluster_nodegroup_pod_identity_template.sh
+   sh 01-1_make_eksctl_cluster_only_template.sh
    sh 02_eksctl_install.sh
    ```
 
