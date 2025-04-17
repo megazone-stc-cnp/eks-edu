@@ -115,12 +115,12 @@ Marketplace 추가 기능은 독립 소프트웨어 공급업체가 직접 제�
 | CSI 스냅샷 컨트롤러                      |                |
 | Amazon SageMaker HyperPod 작업 거버넌스  |                |
 | AWS Network Flow Monitor Agent           | ◯              |
-| AWS Distro for OpenTelemetry             | ◯ <sup>*</sup>            |
+| AWS Distro for OpenTelemetry             | ◯ <sup>1)</sup>            |
 | Amazon GuardDuty EKS 런타임 모니터링     |                |
 | Amazon CloudWatch Observability          | ◯              |
 | Amazon EKS Pod Identity 에이전트         | ◯              |
 
-`*`: 고급 구성을 통해 옵트인할 수 있는 사전 구성된 사용자 지정 리소스 중 하나를 사용하는 경우에만 IAM 권한 필요.
+`1)`: 고급 구성을 통해 옵트인할 수 있는 사전 구성된 사용자 지정 리소스 중 하나를 사용하는 경우에만 IAM 권한 필요.
 
 ## 7. 설치 방법
 
