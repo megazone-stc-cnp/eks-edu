@@ -261,7 +261,6 @@ sh 00_get_ready.sh
 ```shell
 cd ~/environment/eks-edu/07_Addons
 source ../env.sh
-echo "EKS Cluster Name 확인: '${CLUSTER_NAME}'"
 
 envsubst < addon-config-template-1.yaml | eksctl create addon -f -
 ```
