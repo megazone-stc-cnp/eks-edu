@@ -58,7 +58,7 @@ EKS 추가 기능은 다음의 3가지 유형으로 구분하여 제공합니다
 다음은 AWS가 직접 관리하는 추가 기능들입니다.
 
 | 추가 기능                                 | 카테고리 | 설치 이름 | 설명                                                                                                 | 호환되는 컴퓨팅 유형                          |
-|-------------------------------------------|------|------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+|-------------------------------------------|----------|-----------|------------------------------------------------------------------------------------------------------|-----------------------------------------------|
 | **[Amazon VPC CNI](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/workloads-add-ons-available-eks.html#add-ons-vpc-cni)** <sup>1),2)</sup>                            | **Networking** | `aws-node` | **클러스터를 위한 네이티브 VPC 네트워킹 제공**                                                           | **EC2**                                           |
 | **[CoreDNS](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/workloads-add-ons-available-eks.html#add-ons-coredns)** <sup>1),2)</sup>                                   | **Networking** | `coredns` | **Kubernetes 클러스터 DNS로 사용할 수 있는 유연하고 확장 가능한 DNS 서버**                               | **EC2, Fargate, EKS Auto Mode, EKS Hybrid Nodes** |
 | **[Kube-proxy](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/workloads-add-ons-available-eks.html#add-ons-kube-proxy)** <sup>1),2)</sup>                                | **Networking** | `kube-proxy` | **각 Amazon EC2 노드에서 네트워크 규칙 유지 관리**                                                       | **EC2, EKS Hybrid Nodes**                         |
