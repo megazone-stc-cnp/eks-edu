@@ -294,7 +294,7 @@ Amazon EBS CSI 드라이버는 필수 IAM 권한이 필요한데, 다음의 절�
 3. EKS 추가기능 생성
    1. EKS 추가 기능 생성 시, 2번의 IAM Role을 지정해 줍니다.
    2. Amazon EBS CSI 드라이버용 Service Account는 추가 기능 생성 시 `ebs-csi-controller-sa`라는 이름으로 자동으로 생성됩니다.
-      [EBS CSI Config](images/addon-ebs-csi-config.png)
+      ![EBS CSI Config](images/addon-ebs-csi-config.png)
 
 `eksctl`에서는 위의 과정을 단순화하여 아래와 같은 Config를 설정하면 IAM Role 과 EBS CSI 드라이버 추가 기능을 손쉽게 생성할 수 있습니다.
 
