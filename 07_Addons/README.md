@@ -431,3 +431,4 @@ eksctl delete addon --cluster $CLUSTER_NAME --name aws-ebs-csi-driver
   - 필요한 관리형 정책은 아래와 같습니다.
     - [AmazonEFSCSIDriverPolicy](https://docs.aws.amazon.com/ko_kr/aws-managed-policy/latest/reference/AmazonEFSCSIDriverPolicy.html) - `arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy`
   - IRSA를 이용한 EFS CSI 드라이버 설치는 [Amazon EKS 사용자 가이드](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/index.html)의 [Amazon EFS를 사용한 탄력적 파일 시스템 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/efs-csi.html) 문서를 참고해 주세요.
+- [Amazon EFS를 사용한 탄력적 파일 시스템 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/efs-csi.html) 의 3, 4단계를 참고하여 샘플 애플리케이션 배포 후 정상 동작하는지도 확인해 보세요.
