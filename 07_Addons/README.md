@@ -390,7 +390,7 @@ eksctl delete addon --cluster $CLUSTER_NAME --name aws-ebs-csi-driver
 
    추가 기능 설치를 위해 사용하는 `eksctl` Config 파일은 다음과 같습니다.
 
-   - `~/environment/eks-edu/07_Addons/addon-config-template-2.yaml`
+   - `~/environment/eks-edu/07_Addons/addon-config-template-3.yaml`
      ```yaml
      apiVersion: eksctl.io/v1alpha5
      kind: ClusterConfig
@@ -413,7 +413,7 @@ eksctl delete addon --cluster $CLUSTER_NAME --name aws-ebs-csi-driver
    export ADDON_IAM_ROLE_ARN=$(aws iam get-role --role-name ${ADDON_IAM_ROLE_NAME} --query "Role.Arn" --no-cli-pager --output text)
 
    # 'eksctl' 실행
-   envsubst < addon-config-template-2.yaml | eksctl create addon -f -
+   envsubst < addon-config-template-3.yaml | eksctl create addon -f -
    ```
 
    ![EBS CSI 드라이버 설치 확인 with IAM Role](images/addon-ebs-csi-installed-with-iamrole.png)
