@@ -327,7 +327,7 @@ eksctl create addon -f addon-config-template-2.yaml
 
 `7-2-2` 실습에서 보여진것 처럼, 추가기능 설치시 필요한 IAM Role중에서 일부는 `eksctl`에서 자동으로 생성해줍니다.
 
-| 관련 IAM Role    | 설명                                                                         |
+| wellKnowPolicy   | 설명                                                                         |
 |------------------|------------------------------------------------------------------------------|
 | ebsCSIController | adds policies for using the ebs-csi-controller. See [aws-ebs-csi-driver docs](https://github.com/kubernetes-sigs/aws-ebs-csi-driver#set-up-driver-permission). |
 | efsCSIController | adds policies for using the efs-csi-controller. See [aws-efs-csi-driver docs](https://aws.amazon.com/blogs/containers/introducing-efs-csi-dynamic-provisioning). |
