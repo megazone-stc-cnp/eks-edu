@@ -1,5 +1,31 @@
 # 추가 기능 (Add-on) 관리
 
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [추가 기능 (Add-on) 관리](#추가-기능-add-on-관리)
+  - [0. 사전 조건](#0-사전-조건)
+  - [1. 학습 목표](#1-학습-목표)
+  - [2. 개요](#2-개요)
+  - [3. AWS 추가 기능](#3-aws-추가-기능)
+  - [4. 커뮤니티 추가 기능](#4-커뮤니티-추가-기능)
+  - [5. AWS MarketPlace 추가 기능](#5-aws-marketplace-추가-기능)
+  - [6. IAM 역할 필요](#6-iam-역할-필요)
+  - [7. 설치 방법](#7-설치-방법)
+    - [7-1. AWS Management Console](#7-1-aws-management-console)
+      - [7-1-1. 실습](#7-1-1-실습)
+    - [7-2. `eksctl`](#7-2-eksctl)
+      - [7-2-1. 실습 - 기본](#7-2-1-실습---기본)
+      - [7-2-2. 실습 - 고급-1](#7-2-2-실습---고급-1)
+      - [7-2-3. 실습 - 고급-2](#7-2-3-실습---고급-2)
+  - [8. 과제](#8-과제)
+
+<!-- /code_chunk_output -->
+
+---
+
 ## 0. 사전 조건
 
 1. [0. 교육 환경 구성하기](/00_Setup/)를 이용해 기본 실습 환경 생성이 되어 있어야 합니다.
@@ -154,6 +180,7 @@ AWS Management Console을 통한 EKS 추가 기능을 추가하기는 아래 절
   1. Addon 스키마 JSON 입력
   2. "Generate" 버튼을 눌러 Fake JSON(Sample) 생성
   3. 생성된 JSON을 확인하여 대략적인 데이터 구조 확인
+  
      ![JSON Schema Facker](images/json-schema-faker.png)
 
 #### 7-1-1. 실습
@@ -352,7 +379,7 @@ envsubst < addon-config-template-2.yaml | eksctl create addon -f -
 
 ![Amazon EBS CSI 드라이버 생성](images/addon-ebs-installed.png)
 
-이러한 문제를 해결하려면 IAM Role을 직접 생성한 후, 추가기능 생성시에 해당 Role을 붙여주는 것이 좋습니다.
+이러한 문제를 해결하려면 IAM Role을 직접 생성한 후, 추가기능 생성시에 해당 Role을 연결하는 것이 좋습니다.
 
 먼저, 이전에 생성한 Amazon EBS CSI 드라이버를 삭제한 후에 진행합니다.
 
@@ -424,7 +451,7 @@ eksctl delete addon --cluster $CLUSTER_NAME --name aws-ebs-csi-driver
 
 ## 8. 과제
 
-<kdb>7-2-3. 실습 - 고급-2</kbd>를 참고하여 `Amazon EFS CSI 드라이버` 추가 기능을 직접 설치해 보세요.
+[7-2-3. 실습 - 고급-2](#7-2-3-실습---고급-2)를 참고하여 `Amazon EFS CSI 드라이버` 추가 기능을 직접 설치해 보세요.
 
 - `Amazon EFS CSI 드라이버`의 Addon name 은 `aws-efs-csi-driver` 입니다.
 - `Amazon EFS CSI 드라이버` 설치를 위해서는 AWS IAM 권한이 필요합니다. 
