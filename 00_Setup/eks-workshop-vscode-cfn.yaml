@@ -359,13 +359,16 @@ Resources:
                   EOF
 
                   mkdir -p ~/environment/.vscode
-                  # tee ~/environment/.vscode/settings.json <<EOF
-                  # {
-                  #   "files.exclude": {
-                  #     "**/.*": true
-                  #   }
-                  # }
-                  # EOF
+                  tee ~/environment/.vscode/settings.json <<EOF
+                  {
+                    # "files.exclude": {
+                    #   "**/.*": true
+                    # },
+                    "files.associations": {
+                      "*.yaml.template": "yaml"
+                    }
+                  }
+                  EOF
 
                   echo '{ "query": { "folder": "/home/ec2-user/environment" } }' > ~/.local/share/code-server/coder.json
 

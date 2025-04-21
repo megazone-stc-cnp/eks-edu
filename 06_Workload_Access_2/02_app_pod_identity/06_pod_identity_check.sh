@@ -8,7 +8,7 @@ echo "kubectl -n ${NAMESPACE_NAME} get pods -l app=${APP_NAME}"
 kubectl -n ${NAMESPACE_NAME} get pods -l app=${APP_NAME}
 echo ""
 
-POD_NAME=$(kubectl -n ${NAMESPACE_NAME} get pods -l app=${APP_NAME} kubectl -n default get pods -l app=pod-identity-app -oname)
+POD_NAME=$(kubectl -n ${NAMESPACE_NAME} get pods -l app=${APP_NAME} -oname)
 echo "POD_NAME: ${POD_NAME}"
 echo ""
 

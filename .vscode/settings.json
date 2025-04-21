@@ -5,5 +5,8 @@
             "*-cfn.yaml",
             "*-cf.yaml"
         ]
-    }
+    },
+    "files.associations": {
+        "*.yaml.template": "yaml"
+    },
 }
