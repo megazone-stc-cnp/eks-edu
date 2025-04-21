@@ -1,4 +1,4 @@
-# 1. 목표
+# 1. 학습 목표
 
 - Amazon EKS 클러스터의 기본 네트워크에 대해 알 수 있습니다.
 - Amazon VPC CNI를 이용한 사용자 지정 네트워킹과 대해 알 수 있습니다.
@@ -97,7 +97,48 @@
 
 참고) AWS 의 전체 IP 주소 범위 - https://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html
 
-## 5. 맞춤형 네트워킹
+## 5. AWS EKS를 위한 네트워킹 관리
+
+이전 추가 기능 부분에서 확인했던것처럼, AWS EKS에서 기본으로 제공되는 추가 기능은 아래 3가지입니다.
+
+| 추가 기능 | 설명 |
+| --------- | ---- |
+| Amazon VPC CNI plugin for Kubernetes | * ENI(Elastic Network Interface)를 생성하여 Amazon EC2 노드에 연결<br/>* IPv4,IPv6 주소를 VPC에서 Pod에 할당 |
+| CoreDNS | Kubernetes 클러스터 DNS로 사용할 수 있는 유연하고 확장 가능한 DNS 서버 |
+| kube-proxy | Amazon EC2 노드의 네트워크 규칙을 유지하고 포드와의 네트워크 통신을 활성화 |
+
+아래는 AWS 환경에서 EKS 에서 생성되는 Pod, Service 들을 EKS 외부에 노출할 때 주로 사용하는 추가 기능입니다.(Helm으로 설치)
+
+| 추가 기능 | 설명 |
+| --------- | ---- |
+| AWS Load Balancer Controller | Kubernetes의 `Service`의 `loadBalancer` type, `Ingress` 등을 이용하여 AWS ELB(Elastic Load Balancer)를 생성하고 관리 |
+
+이 "AWS Load Balancer Controller"는 "11. 네트워킹 2" 챕터에서 자세히 다룰 예정입니다.
+
+## 6. Amazon VPC CNI
+
+Amazon VPC CNI(이하 `vpc-cni`)은 탄력적 네트워크 인터페이스(Elastic Network Interface:ENI)를 생성하여 Amazon EC2 노드에 연결합니다. 또한 이 추가 기능은 프라이빗 IPv4 또는 IPv6 주소를 VPC에서 각 Pod에 할당합니다.
+
+EKS 에서 사용하는 노드 유형에 따라 `vpc-cni` 추가 기능의 설치 방식은 아래와 같이 달라집니다.
+
+| 노드 유형 | 설치 방식 |
+| --------- | --------- |
+| Amazon EC2 | `vpc-cni` 추가 기능 설치 필요 |
+| Fargate | - `vpc-cni` 추가 기능 설치 불필요.<br/>- Fargate 노드 실행 시 자동으로 설치됨.<br/>- `vpc-cni` 버전은 Fargate 노드에서는 자동으로 업데이트되지 않습니다. |
+
+### 6-1. Amazon VPC CNI 사용을 위한 사전 조건
+
+1. AWS IAM OIDC Provider 설정
+2. [AmazonEKS_CNI_Policy](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonEKS_CNI_Policy.html) IAM 정책 (IPv4 사용시 필요)
+3. IPv6 사용을 위한 IAM 정책 ([참고](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/cni-iam-role.html#cni-iam-role-create-ipv6-policy))
+
+### 6-2. Amazon VPC CNI 생성하기
+
+Amazon VPC CNI는 EKS의 추가 기능을 이용해 설치가 가능합니다.
+
+
+
+## 5. 맞춤형 네트워킹 (Custom Networking)
 
 1. 기본적으로 Kubernetes용 Amazon VPC CNI 플러그인이 Amazon EC2 노드에 대한 보조 탄력적 네트워크 인터페이스 (네트워크 인터페이스)를 생성할 때 노드의 기본 네트워크 인터페이스와 동일한 서브넷에 이를 생성합니다
 2. 또한 기본 네트워크 인터페이스에 연결된 동일한 보안 그룹을 보조 네트워크 인터페이스에 연결합니다. 
@@ -106,7 +147,8 @@
     - 보안상의 이유로 포드는 노드의 기본 네트워크 인터페이스와 다른 서브넷 또는 보안 그룹을 사용해야 할 수 있습니다.
     - 노드는 퍼블릭 서브넷에서 구성되며, 포드를 프라이빗 서브넷에 배치할 수 있습니다. 퍼블릭 서브넷과 연결된 라우팅 테이블에는 인터넷 게이트웨이로 가는 경로가 포함됩니다. 프라이빗 서브넷과 연결된 라우팅 테이블에는 인터넷 게이트웨이로 가는 경로가 포함되지 않습니다.
 
-### 2-3. 고려 사항
+### 5-1. 맞춤형 네트워킹 고려 사항
+
 - 사용자 지정 네트워킹을 사용 설정하면 기본 네트워크 인터페이스에 할당된 IP 주소가 포드에 할당되지 않습니다. 보조 네트워크 인터페이스의 IP 주소만 포드에 할당됩니다.
 - 클러스터에서 **IPv6 패밀리를 사용하는 경우 사용자 지정 네트워킹을 사용할 수 없습니다.**
 - 사용자 지정 네트워킹을 사용하여 IPv4 주소 소모를 완화하려는 경우 대신 IPv6 패밀리를 사용하여 클러스터를 생성할 수 있습니다.
