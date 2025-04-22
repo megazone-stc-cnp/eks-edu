@@ -10,11 +10,13 @@
 ### 2-1. VPC 요구사항
 
 - 이미 생성된 VPC의 CIDR 블록보다 많은 IP 주소가 필요한 경우, VPC에 [CIDR 블록을 추가](https://docs.aws.amazon.com/vpc/latest/userguide/working-with-vpcs.html#add-ipv4-cidr)하여 사용 가능.
+
 > [!CAUTION]
-> **<ins>클러스터가 VPC와 연결된 CIDR 블록을 인식하는 데 최대 5시간이 걸릴 수 있습니다.</ins>**
+> **<ins>VPC CIDR 블록을 추가/제거 등의 변화가 생길 경우, EKS 클러스터는 VPC CIDR 블록이 변경된 것을 인식할때까지 최대 5시간이 걸릴 수 있습니다.</ins>**
+
 - 클러스터 생성 전,후에 프라이빗([RFC 1918](https://datatracker.ietf.org/doc/html/rfc1918)) 및 퍼블릭(non-RFC 1918) CIDR 블록을 VPC에 연결 가능
 - Kubernetes가 IPv6 주소를 포드와 서비스에 할당하게 하려는 경우 IPv6 CIDR 블록을 VPC와 연결.
-- VPC는 **DNS 호스트 이름**과 **DNS 확인**을 모두 지원해야 함.
+- VPC는 **DNS 호스트 이름**과 **DNS 확인**을 모두 활성화 되어 있어야 함.
   ![VPC 요구사항 1](images/requirement-vpc-1.png)
 - VPC에는 AWS 프라이빗 링크를 사용하는 VPC 엔드포인트가 필요할 수 있음.
   ![VPC 요구사항 2](images/requirement-vpc-2.png)
@@ -26,7 +28,7 @@
 - *최소 2개 이상*의 서로 다른 가용 영역(Availability Zone)에 있는 서브넷 필요
 - 각 서브넷에는 <ins>최소 6개 이상 IP 주소 필요</ins>. **16개 이상 IP 주소 권고**.
 - 프라이빗 서브넷 또는 퍼블릿 서브넷에 클러스터 생성 가능하지만, 가능하면 프라이빗 서브넷 사용 권고.
-- 아래 가용 영역의 서브넷에는 클러스터 생성 불가
+- 아래 가용 영역에 생성된 서브넷에는 클러스터 생성 불가
 
   | AWS 리전       | 리전 이름                  | 가용 영역 ID |
   | -------------- | -------------------------- | ------------ |
@@ -60,7 +62,7 @@
 
 ### 4-1. 보안 그룹 요구사항
 
-- 클러스터 생성 시, `eks-cluster-sg-my-cluster-uniqueID` 라는 보안 그룹(클러스터 보안 그룹)이 자동 생성됨.
+- 클러스터 생성 시, $\text{eks-cluster-sg-}\color{red}{\textit{(my-cluster)}}\color{black}{\text{-}}\color{red}{\textit{(uniqueID)}}$ 라는 보안 그룹(클러스터 보안 그룹)이 자동 생성됨.
   | 규칙 타입   | 프로토콜  | 포트 | 소스 | 대상                               |
   | ----------- | --------- | ---- | ---- | ---------------------------------- |
   | Inbound     | All       | All  | Self |                                    |
@@ -71,7 +73,7 @@
   | Outbound      | TCP       | 443    |
   | Outbound      | TCP       | 10250  |
   | Outbound(DNS) | TCP / UDP | 53     |
-  
+
 ### 4-2. 보안 그룹 고려사항
 
 - 클러스터 보안 그룹에서 [기본 인바운드 규칙](#4-1-보안-그룹-요구사항)을 제거하면 클러스터가 업데이트될 때마다 해당 규칙을 다시 생성.
@@ -97,13 +99,13 @@
 
 참고) AWS 의 전체 IP 주소 범위 - https://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html
 
-## 5. AWS EKS를 위한 네트워킹 관리
+## 5. Amazon EKS를 위한 네트워킹용 추가 기능
 
-이전 추가 기능 부분에서 확인했던것처럼, AWS EKS에서 기본으로 제공되는 추가 기능은 아래 3가지입니다.
+이전 추가 기능 부분에서 확인했던것처럼, Amazon EKS에서 기본으로 제공되는 추가 기능은 아래 3가지입니다.
 
 | 추가 기능 | 설명 |
 | --------- | ---- |
-| Amazon VPC CNI plugin for Kubernetes | * ENI(Elastic Network Interface)를 생성하여 Amazon EC2 노드에 연결<br/>* IPv4,IPv6 주소를 VPC에서 Pod에 할당 |
+| Amazon VPC CNI for Kubernetes | * ENI(Elastic Network Interface)를 이용하여 Amazon EC2 노드를 EKS 클러스터에 연결<br/>* IPv4,IPv6 주소를 VPC에서 Pod에 할당 |
 | CoreDNS | Kubernetes 클러스터 DNS로 사용할 수 있는 유연하고 확장 가능한 DNS 서버 |
 | kube-proxy | Amazon EC2 노드의 네트워크 규칙을 유지하고 포드와의 네트워크 통신을 활성화 |
 
@@ -113,11 +115,65 @@
 | --------- | ---- |
 | AWS Load Balancer Controller | Kubernetes의 `Service`의 `loadBalancer` type, `Ingress` 등을 이용하여 AWS ELB(Elastic Load Balancer)를 생성하고 관리 |
 
-이 "AWS Load Balancer Controller"는 "11. 네트워킹 2" 챕터에서 자세히 다룰 예정입니다.
+> [!NOTE]
+> "AWS Load Balancer Controller"는 "11. 네트워킹 2" 챕터에서 자세히 다룰 예정입니다.
 
-## 6. Amazon VPC CNI
+## 6. Amazon EC2를 Amazon EKS의 노드로 사용하기 위한 기본 특성
 
-Amazon VPC CNI(이하 `vpc-cni`)은 탄력적 네트워크 인터페이스(Elastic Network Interface:ENI)를 생성하여 Amazon EC2 노드에 연결합니다. 또한 이 추가 기능은 프라이빗 IPv4 또는 IPv6 주소를 VPC에서 각 Pod에 할당합니다.
+Amazon EKS는 EKS 노드로 사용할 수 있는 컴퓨팅 자원으로 Amazon EC2가 있습니다.
+
+Amazon EKS에서 Amazon EC2를 사용하기 위해서는 Amazon EC2에 대한 네트워크 특성에 대해 먼저 파악할 필요가 있습니다.
+
+### 6-1. Amazon EC2의 인스턴스 타입별 ENI 수 및 IPv4 주소 개수가 다름
+
+Amazon EC2에서는 네트워크 관리를 위해 탄력적 네트워크 인터페이스(ENI: Elastic Network Interface)라고 불리는 가상 네트워크 카드를 사용합니다.
+
+기본적으로 EC2 인스턴스를 하나 생성하면 ENI 가 하나 자동으로 할당되며, 이후 필요에 따라서 ENI를 추가할 수 있습니다.
+
+하지만, EC2에 연결할 수 있는 ENI 수는 무한대는 아니며 EC2의 인스턴스 타입에 따라 최대 사용 가능한 ENI 수와 IPv4 주소 개수가 정해져 있습니다.
+
+- 예시 (c7i 타입)
+  ![Max ENI per Instance Type](images/max_eni-per-instances.png)
+- 확인 방법(AWS CLI)
+  ```shell
+  aws ec2 describe-instance-types \
+    --filters "Name=instance-type,Values=c7i.*" \
+    --query "InstanceTypes[].{ \
+        Type: InstanceType, \
+        MaxENI: NetworkInfo.MaximumNetworkInterfaces, \
+        IPv4addr: NetworkInfo.Ipv4AddressesPerInterface}" \
+    --output table --no-cli-pager
+  ```
+  | Instance Type  | Max ENI | Max IPv4 Address Per ENI |
+  | -------------- | ------- | ------------------------ |
+  | c7i.large      | 3       | 10                       |
+  | c7i.xlarge     | 4       | 15                       |
+  | c7i.2xlarge    | 4       | 15                       |
+  | c7i.4xlarge    | 8       | 30                       |
+  | c7i.8xlarge    | 8       | 30                       |
+  | c7i.12xlarge   | 8       | 30                       |
+  | c7i.16xlarge   | 15      | 50                       |
+  | c7i.24xlarge   | 15      | 50                       |
+  | c7i.48xlarge   | 15      | 50                       |
+
+
+### 6-2. IP 주소 부족 해결하는 방법
+
+인스턴스 별로 사용 가능한 IP 주소가 한정되어 있어, EKS 등의 컨테이너 환경처럼 IP 주소를 많이 필요한 환경에서는 사용에 제약이 따르게 됩니다.
+
+이러한 문제를 해결하기 위해 ENI의 [접두사 위임(Prefix Delegation)기능](https://docs.aws.amazon.com/ko_kr/AWSEC2/latest/UserGuide/ec2-prefix-eni.html)을 사용하여, 개별 IP 주소단위 관리가 아닌 IP 주소 블록(IPv4:`/28`(16개),IPv6:`/80`) 단위로 IP 주소를 할당할 수 있습니다.
+
+![ENI Prefix Delegation 1](images/eni-prefix-delegation-1.png)
+
+![ENI Prefix Delegation 2](images/eni-prefix-delegation-2.png)
+
+Amazon EKS 에서는 VPC CNI를 이용하여 접두사 위임 기능을 사용할 수 있습니다. 이에 대해서는 다음 "7. Amazon VPC CNI" 에서 설명하겠습니다.
+
+## 7. Amazon VPC CNI
+
+Amazon EKS는 VPC CNI라고 부르는 Amazon VPC Container Network Interface Plugin을 통해 클러스터 네트워킹을 구현합니다.
+
+Amazon VPC CNI(이하 `vpc-cni`)는 Amazon VPC의 탄력적 네트워크 인터페이스(Elastic Network Interface:ENI)를 생성하여 Amazon EC2 노드에 연결합니다. 또한 이 추가 기능은 프라이빗 IPv4 또는 IPv6 주소를 VPC에서 각 Pod에 할당합니다.
 
 EKS 에서 사용하는 노드 유형에 따라 `vpc-cni` 추가 기능의 설치 방식은 아래와 같이 달라집니다.
 
