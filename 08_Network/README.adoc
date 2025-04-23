@@ -220,9 +220,9 @@ EKS 에서 사용하는 노드 유형에 따라 설치 방식은 아래와 같�
 
 === Amazon VPC CNI 사용을 위한 사전 조건
 
-1. AWS IAM OIDC Provider 설정
-2. https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonEKS_CNI_Policy.html[AmazonEKS_CNI_Policy, window=_blank] IAM 정책 (IPv4 사용시 필요)
-3. IPv6 사용을 위한 IAM 정책 (https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/cni-iam-role.html#cni-iam-role-create-ipv6-policy[참고, window=_blank])
+1. AWS IAM OIDC Provider 설정 (https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/authenticate-oidc-identity-provider.html#associate-oidc-identity-provider[참고^])
+2. https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonEKS_CNI_Policy.html[AmazonEKS_CNI_Policy^] IAM 정책 (IPv4 사용시 필요)
+3. IPv6 사용을 위한 IAM 정책 (IPv6용, https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/cni-iam-role.html#cni-iam-role-create-ipv6-policy[참고^])
 
 === Amazon VPC CNI 생성하기
 
