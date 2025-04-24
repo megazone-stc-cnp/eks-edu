@@ -32,16 +32,6 @@ Parameters:
     Default: 192.168.0.32/27
     Description: CidrBlock for private subnet 02 within the VPC
 
-  # PodSubnet01Block:
-  #   Type: String
-  #   Default: 192.168.2.0/24     # 251 개 = 256-5
-  #   Description: CidrBlock for pod subnet 01 within the VPC
-
-  # PodSubnet02Block:
-  #   Type: String
-  #   Default: 192.168.3.0/24     # 251 개 = 256-5
-  #   Description: CidrBlock for pod subnet 02 within the VPC
-
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
