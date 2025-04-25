@@ -102,9 +102,10 @@ image:images/consideration-subnet-1.png[Consideration Subnet 1]
 +
 .(예시1: 클러스터 보안 그룹의 인바운드 규칙)
 image:images/cluster-sg-1.png[클러스터 보안 그룹 - Inbound]
++
 .(예시2: 클러스터 보안 그룹의 아웃바운드 규칙)
 image:images/cluster-sg-2.png[클러스터 보안 그룹 - Outbound]
-* 클러스터 보안 그룹의 Outbound 규칙은 삭제 가능하지만, 최소한의 Outbound 규칙이 필요됩니다.
+* 클러스터 보안 그룹의 Outbound 규칙은 삭제 가능하지만, 최소한의 Outbound 규칙이 필요합니다.
 +
 [%header%footer%autowidth]
 |===
@@ -163,7 +164,7 @@ image:images/cluster-sg-3.png[클러스터 보안 그룹 - 태그]
 
 [%header%footer%autowidth]
 |===
-|추가 기능 |설명
+|Name |설명
 |AWS Load Balancer Controller |* Kubernetes의 `Service`의 `loadBalancer` type, `Ingress` 등을 이용하여 AWS ELB(Elastic Load Balancer)를 생성하고 관리 +
 * AWS 환경에서 EKS에서 생성되는 Pod, Service 들을 EKS 외부에 노출할 때 주로 사용 (Helm으로 설치)
 |===
@@ -237,7 +238,7 @@ Amazon VPC CNI의 설치는 EKS에서 사용하는 노드 유형에 따라 아�
 [%header%footer%autowidth]
 |===
 |노드 유형 |설치 방식
-|Amazon EC2 |EKS 추가기능으로 https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/workloads-add-ons-available-eks.html#add-ons-vpc-cni[Amazon VPC CNI, window=_blank] 설치 필요
+|EC2 |EKS 추가기능으로 https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/workloads-add-ons-available-eks.html#add-ons-vpc-cni[Amazon VPC CNI, window=_blank] 설치 필요
 |Fargate |* "Amazon VPC CNI" 추가 기능 설치 불필요. +
 * Fargate 노드 실행 시 자동으로 설치됨. +
 * Fargate 노드에서는 버전 업데이트가 자동으로 안되기 때문에, + 
@@ -247,7 +248,7 @@ Amazon VPC CNI의 설치는 EKS에서 사용하는 노드 유형에 따라 아�
 === Amazon VPC CNI 사용을 위한 사전 조건
 
 1. AWS IAM OIDC Provider 설정이 되어 있어야 함 (https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/authenticate-oidc-identity-provider.html#associate-oidc-identity-provider[참고^])
-2. VPC CNI에서 사용할 IAM 정책
+2. VPC CNI에서 사용할 IAM 정책 확인 및 역할 생성
 +
 [%header%footer%autowidth]
 |===
@@ -264,8 +265,12 @@ Amazon VPC CNI 생성 절차는 다음과 같습니다.
 
 . VPC CNI가 사용할 IAM 정책확인 및 역할 생성
 . Amazon VPC CNI 설치
-. 
+. EKS Node Group 생성
 
+위 절차에 맞게 설치를 진행해 보겠습니다.
+(단, IAM 역할 생성시에는 IRSA가 아닌 Pod Identity 방식으로 생성합니다.)
+
+==== VPC CNI용 IAM 역할 생성
 
 
 
