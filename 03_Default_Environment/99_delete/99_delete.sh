@@ -19,15 +19,16 @@ aws cloudformation wait stack-delete-complete \
     --stack-name eksctl-eks-edu-cluster-${IDE_NAME}-cluster ${PROFILE_STRING}
 echo "EKS 삭제 완료....."
 
+VPC_STACK_NAME=eks-workshop-${IDE_NAME}-eks-vpc
 echo "aws cloudformation delete-stack \\
-  --stack-name eks-workshop-vpc-${IDE_NAME} ${PROFILE_STRING}"
+  --stack-name ${VPC_STACK_NAME} ${PROFILE_STRING}"
 
 aws cloudformation delete-stack \
-  --stack-name eks-workshop-vpc-${IDE_NAME} ${PROFILE_STRING}
+  --stack-name ${VPC_STACK_NAME} ${PROFILE_STRING}
 
 echo "VPC 삭제중....."
 aws cloudformation wait stack-delete-complete \
-    --stack-name eks-workshop-vpc-${IDE_NAME} ${PROFILE_STRING}
+    --stack-name ${VPC_STACK_NAME} ${PROFILE_STRING}
 if [ -f "../../vpc_env.sh" ];then
 	rm -rf ../../vpc_env.sh
 fi

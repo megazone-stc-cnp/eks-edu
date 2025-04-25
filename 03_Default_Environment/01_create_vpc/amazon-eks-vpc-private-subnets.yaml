@@ -3,14 +3,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Amazon EKS Sample VPC - Private and Public subnets'
 
 Parameters:
-  VpcBlock:
+  VpcCidrBlock:
     Type: String
     Default: 192.168.0.0/24
     Description: The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range.
-  PodCidrBlock:
+  VpcCidrBlockForPod:
     Type: String
     Default: 100.64.0.0/22
-    Description: The CIDR range for the Pod Subnet. This should be a valid private (RFC 1918) CIDR range.
+    Description: The CIDR range for the EKS Pod Subnet. This should be a valid private (RFC 1918) CIDR range.
 
   PublicSubnet01Block:
     Type: String
@@ -29,28 +29,26 @@ Parameters:
 
   PrivateSubnet02Block:
     Type: String
-    Default: 192.168.0.96/26
+    Default: 192.168.0.128/26
     Description: CidrBlock for private subnet 02 within the VPC
 
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
-      -
-        Label:
+      - Label:
           default: "Worker Network Configuration"
         Parameters:
-          - VpcBlock
+          - VpcCidrBlock
+          - VpcCidrBlockForPod
           - PublicSubnet01Block
           - PublicSubnet02Block
           - PrivateSubnet01Block
           - PrivateSubnet02Block
-          - PodSubnet01Block
-          - PodSubnet02Block
 Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock:  !Ref VpcBlock
+      CidrBlock:  !Ref VpcCidrBlock
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
@@ -62,7 +60,7 @@ Resources:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 100.64.0.0/22
+      CidrBlock: !Ref VpcCidrBlockForPod
 
   InternetGateway:
     Type: "AWS::EC2::InternetGateway"
@@ -113,8 +111,8 @@ Resources:
 
   PrivateRoute01:
     DependsOn:
-    - VPCGatewayAttachment
-    - NatGateway01
+      - VPCGatewayAttachment
+      - NatGateway01
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable01
@@ -123,8 +121,8 @@ Resources:
 
   PodRoute01:
     DependsOn:
-    - VPCGatewayAttachment
-    - NatGateway01
+      - VPCGatewayAttachment
+      - NatGateway01
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PodRouteTable01
@@ -133,9 +131,9 @@ Resources:
 
   NatGateway01:
     DependsOn:
-    - NatGatewayEIP1
-    - PublicSubnet01
-    - VPCGatewayAttachment
+      - NatGatewayEIP1
+      - PublicSubnet01
+      - VPCGatewayAttachment
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt 'NatGatewayEIP1.AllocationId'
@@ -146,7 +144,7 @@ Resources:
 
   NatGatewayEIP1:
     DependsOn:
-    - VPCGatewayAttachment
+      - VPCGatewayAttachment
     Type: 'AWS::EC2::EIP'
     Properties:
       Domain: vpc
@@ -234,6 +232,8 @@ Resources:
         Value: 1
 
   PodSubnet01:
+    DependsOn:
+      - VPCAdditionalCidrBlock
     Type: AWS::EC2::Subnet
     Metadata:
       Comment: Pod Subnet 1
@@ -247,9 +247,9 @@ Resources:
         Fn::Select:
         - 0
         - Fn::Cidr:
-          - !Ref PodCidrBlock
-          - 2
-          - 1
+          - !Ref VpcCidrBlockForPod
+          - 2     # /23 비트 짜리 2개 생성
+          - 9     # /23
       VpcId:
         Ref: VPC
       Tags:
@@ -257,6 +257,8 @@ Resources:
         Value: !Sub "${AWS::StackName}-PodSubnet01"
 
   PodSubnet02:
+    DependsOn:
+      - VPCAdditionalCidrBlock
     Type: AWS::EC2::Subnet
     Metadata:
       Comment: Pod Subnet 2
@@ -270,9 +272,9 @@ Resources:
         Fn::Select:
         - 1
         - Fn::Cidr:
-          - !Ref PodCidrBlock
-          - 2
-          - 1
+          - !Ref VpcCidrBlockForPod
+          - 2     # /23 비트 짜리 2개 생성
+          - 9     # /23
       VpcId:
         Ref: VPC
       Tags:
@@ -333,10 +335,10 @@ Outputs:
     Value: !Ref VPC
   VpcCidr:
     Description: "The CIDR range of the VPC"
-    Value: !Ref VpcBlock
+    Value: !Ref VpcCidrBlock
   PodCidr:
     Description: "The CIDR range of the Pod"
-    Value: !Ref PodCidrBlock
+    Value: !Ref VpcCidrBlockForPod
   PublicSubnet01:
     Description: "Public Subnet1 Id"
     Value: !Ref PublicSubnet01
