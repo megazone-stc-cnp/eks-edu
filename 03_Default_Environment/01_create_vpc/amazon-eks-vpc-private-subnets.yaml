@@ -3,14 +3,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Amazon EKS Sample VPC - Private and Public subnets'
 
 Parameters:
-  VpcBlock:
+  VpcCidrBlock:
     Type: String
     Default: 192.168.0.0/24
     Description: The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range.
-  PodCidrBlock:
+  VpcCidrBlockForPod:
     Type: String
     Default: 100.64.0.0/22
-    Description: The CIDR range for the Pod Subnet. This should be a valid private (RFC 1918) CIDR range.
+    Description: The CIDR range for the EKS Pod Subnet. This should be a valid private (RFC 1918) CIDR range.
 
   PublicSubnet01Block:
     Type: String
@@ -35,22 +35,20 @@ Parameters:
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
-      -
-        Label:
+      - Label:
           default: "Worker Network Configuration"
         Parameters:
-          - VpcBlock
+          - VpcCidrBlock
+          - VpcCidrBlockForPod
           - PublicSubnet01Block
           - PublicSubnet02Block
           - PrivateSubnet01Block
           - PrivateSubnet02Block
-          - PodSubnet01Block
-          - PodSubnet02Block
 Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock:  !Ref VpcBlock
+      CidrBlock:  !Ref VpcCidrBlock
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
@@ -62,7 +60,7 @@ Resources:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 100.64.0.0/22
+      CidrBlock: !Ref VpcCidrBlockForPod
 
   InternetGateway:
     Type: "AWS::EC2::InternetGateway"
@@ -247,9 +245,9 @@ Resources:
         Fn::Select:
         - 0
         - Fn::Cidr:
-          - !Ref PodCidrBlock
+          - !Ref VpcCidrBlockForPod
           - 2
-          - 1
+          - 9    # /23
       VpcId:
         Ref: VPC
       Tags:
@@ -270,9 +268,9 @@ Resources:
         Fn::Select:
         - 1
         - Fn::Cidr:
-          - !Ref PodCidrBlock
+          - !Ref VpcCidrBlockForPod
           - 2
-          - 1
+          - 9   # /23
       VpcId:
         Ref: VPC
       Tags:
@@ -333,10 +331,10 @@ Outputs:
     Value: !Ref VPC
   VpcCidr:
     Description: "The CIDR range of the VPC"
-    Value: !Ref VpcBlock
+    Value: !Ref VpcCidrBlock
   PodCidr:
     Description: "The CIDR range of the Pod"
-    Value: !Ref PodCidrBlock
+    Value: !Ref VpcCidrBlockForPod
   PublicSubnet01:
     Description: "Public Subnet1 Id"
     Value: !Ref PublicSubnet01
