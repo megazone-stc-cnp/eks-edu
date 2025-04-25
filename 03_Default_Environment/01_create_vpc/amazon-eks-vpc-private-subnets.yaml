@@ -111,8 +111,8 @@ Resources:
 
   PrivateRoute01:
     DependsOn:
-    - VPCGatewayAttachment
-    - NatGateway01
+      - VPCGatewayAttachment
+      - NatGateway01
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable01
@@ -121,8 +121,8 @@ Resources:
 
   PodRoute01:
     DependsOn:
-    - VPCGatewayAttachment
-    - NatGateway01
+      - VPCGatewayAttachment
+      - NatGateway01
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PodRouteTable01
@@ -131,9 +131,9 @@ Resources:
 
   NatGateway01:
     DependsOn:
-    - NatGatewayEIP1
-    - PublicSubnet01
-    - VPCGatewayAttachment
+      - NatGatewayEIP1
+      - PublicSubnet01
+      - VPCGatewayAttachment
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt 'NatGatewayEIP1.AllocationId'
@@ -144,7 +144,7 @@ Resources:
 
   NatGatewayEIP1:
     DependsOn:
-    - VPCGatewayAttachment
+      - VPCGatewayAttachment
     Type: 'AWS::EC2::EIP'
     Properties:
       Domain: vpc
@@ -232,6 +232,8 @@ Resources:
         Value: 1
 
   PodSubnet01:
+    DependsOn:
+      - VPCAdditionalCidrBlock
     Type: AWS::EC2::Subnet
     Metadata:
       Comment: Pod Subnet 1
@@ -255,6 +257,8 @@ Resources:
         Value: !Sub "${AWS::StackName}-PodSubnet01"
 
   PodSubnet02:
+    DependsOn:
+      - VPCAdditionalCidrBlock
     Type: AWS::EC2::Subnet
     Metadata:
       Comment: Pod Subnet 2
