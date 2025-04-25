@@ -29,7 +29,7 @@ Parameters:
 
   PrivateSubnet02Block:
     Type: String
-    Default: 192.168.0.96/26
+    Default: 192.168.0.128/26
     Description: CidrBlock for private subnet 02 within the VPC
 
 Metadata:
@@ -248,8 +248,8 @@ Resources:
         - 0
         - Fn::Cidr:
           - !Ref VpcCidrBlockForPod
-          - 2
-          - 9    # /23
+          - 2     # /23 비트 짜리 2개 생성
+          - 9     # /23
       VpcId:
         Ref: VPC
       Tags:
@@ -273,8 +273,8 @@ Resources:
         - 1
         - Fn::Cidr:
           - !Ref VpcCidrBlockForPod
-          - 2
-          - 9   # /23
+          - 2     # /23 비트 짜리 2개 생성
+          - 9     # /23
       VpcId:
         Ref: VPC
       Tags:
