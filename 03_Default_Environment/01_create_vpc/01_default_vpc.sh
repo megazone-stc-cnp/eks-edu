@@ -6,7 +6,7 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
-STACK_NAME=eks-workshop-vpc-${IDE_NAME}
+STACK_NAME=eks-workshop-${IDE_NAME}-eks-vpc
 # ==================================================================
 # Check if the stack already exists
 echo "${STACK_NAME} 스택 존재 여부 확인 중....."
