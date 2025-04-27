@@ -33,10 +33,10 @@ mkdir -p $LOCAL_BASH_COMPLETION_DIR
 # bashrc
 cat << EOT > ~/.bashrc.d/kubectl.bash
 # source <(kubectl completion bash)
-alias kubectl=kubecolor
+# alias kubectl=kubecolor
 alias k=kubectl
 # Make "kubecolor" borrow the same completion logic as "kubectl"
-complete -o default -F __start_kubectl kubecolor
+# complete -o default -F __start_kubectl kubecolor
 # Make "k" borrow the same completion logic as "kubectl"
 complete -o default -F __start_kubectl k
 EOT

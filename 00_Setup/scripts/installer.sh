@@ -102,9 +102,9 @@ chmod +x ./kubectl
 mv ./kubectl /usr/local/bin
 
 # kubecolor
-dnf install 'dnf-command(config-manager)'
-dnf config-manager --add-repo https://kubecolor.github.io/packages/rpm/kubecolor.repo
-dnf install kubecolor
+# sudo dnf install 'dnf-command(config-manager)'
+# sudo dnf config-manager --add-repo https://kubecolor.github.io/packages/rpm/kubecolor.repo
+# sudo dnf install kubecolor
 
 # helm
 download "https://get.helm.sh/helm-v$helm_version-linux-${arch_name}.tar.gz" "helm.tar.gz"
