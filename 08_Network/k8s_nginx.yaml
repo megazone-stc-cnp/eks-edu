@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      volumes:
+        - name: html
+          emptyDir: {}
+      initContainers:
+        - name: init-nginx
+          image: busybox:latest
+          command: ['sh', '-c', "echo $POD_NAME > /usr/share/nginx/html/index.html"]
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-debug
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-debug
+  template:
+    metadata:
+      labels:
+        app: nginx-debug
+    spec:
+      containers:
+        - name: netshoot
+          image: nicolaka/netshoot
+          command: ["/bin/bash"]
+          args: ["-c", "while true; do ping localhost; sleep 10;done"]

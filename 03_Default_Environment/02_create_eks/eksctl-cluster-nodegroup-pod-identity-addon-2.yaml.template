@@ -1,0 +1,40 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eks-edu-cluster-${IDE_NAME}
+  region: ${AWS_REGION}
+  version: "${EKS_VERSION}"
+  tags:
+    karpenter.sh/discovery: eks-edu-cluster-${IDE_NAME}
+    created-by: eks-workshop-v2
+    env: eks-edu-cluster-${IDE_NAME}
+iam:
+  withOIDC: true
+vpc:
+  id: "${VPC_ID}"  # (optional, must match VPC ID used for each subnet below)
+  controlPlaneSecurityGroupIDs: ["${EKS_ADDITIONAL_SG}"]  
+  subnets:
+    # must provide 'private' and/or 'public' subnets by availability zone as shown
+    private:
+      ${AWS_AZ1}:
+        id: "${AWS_PRIVATE_SUBNET1}"
+      ${AWS_AZ2}:
+        id: "${AWS_PRIVATE_SUBNET2}"
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: true
+managedNodeGroups:
+  - name: app-nodegroup
+    instanceType: t3.medium
+    desiredCapacity: 2
+    privateNetworking: true # if only 'Private' subnets are given, this must be enabled
+addons:
+  - name: vpc-cni
+    # podIdentityAssociations:
+    #   - serviceAccountName: aws-node
+    #     permissionPolicyARNs: ["arn:aws:iam::aws::policy/AmazonEKS_CNI_Policy"]
+  - name: eks-pod-identity-agent # required for `iam.podIdentityAssociations`
+    tags:
+      team: eks
+addonsConfig:
+  autoApplyPodIdentityAssociations: true    # default: false
