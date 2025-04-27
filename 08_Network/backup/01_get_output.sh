@@ -5,7 +5,7 @@ if [ ! -f "../env.sh" ];then
 fi
 . ../env.sh
 
-STACK_NAME=eks-workshop-vpc-${IDE_NAME}
+STACK_NAME=eks-workshop-${IDE_NAME}-eks-vpc
 # ==================================================================
 
 
