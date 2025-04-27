@@ -1,0 +1,24 @@
+{
+  "env": {
+    "AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG": "true",
+    "ENI_CONFIG_LABEL_DEF": "topology.kubernetes.io/zone",
+    "ENABLE_PREFIX_DELEGATION": "true",
+    "WARM_PREFIX_TARGET": "1",
+    "WARM_ENI_TARGET": "1",
+    "WARM_IP_TARGET": "2"
+  },
+  "eniConfig": {
+    "create": true,
+    "region": "<EKS Cluster가 생성된 리전(ex:ap-northeast-2)>",
+    "subnets": {
+      "<'eks-workshop-*-PodSubnet01' Subnet이 속한 AZ Name(ex: ap-northeast-2a)>": {
+        "id": "<'eks-workshop-*-PodSubnet01'의 Subnet ID>",
+        "securityGroups": ["<EKS 클러스터 보안 그룹 ID>","<EKS 클러스터 추가 보안 그룹 ID>"]
+      },
+      "<'eks-workshop-*-PodSubnet01' Subnet이 속한 AZ Name(ex: ap-northeast-2b)>": {
+        "id": "<'eks-workshop-*-PodSubnet02'의 Subnet ID>",
+        "securityGroups": ["<EKS 클러스터 보안 그룹 ID>","<EKS 클러스터 추가 보안 그룹 ID>"]
+      }
+    }
+  }
+}

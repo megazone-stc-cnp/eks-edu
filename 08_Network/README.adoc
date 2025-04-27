@@ -231,7 +231,7 @@ Amazon EKS 에서는 VPC CNI를 이용하여 접두사 위임 기능을 사용�
 
 EKS 에서 사용하는 Subnet에 할당된 IP 주소가 절대적으로 부족할 경우에는 Amazon VPC CNI에서 제공하는 *사용자 지정 네트워킹* 기능을 사용하여 Pod가 사용할 Subnet을 지정하여 IP를 할당할 수 있습니다.
 
-이에 대해서는 아래에서 설명합니다.
+이에 대해서는 아래 "사용자 지정 네트워킹 (Custom Networking)" 챕터에서 설명합니다.
 
 == Amazon VPC CNI
 
@@ -262,6 +262,9 @@ Amazon VPC CNI의 설치는 EKS에서 사용하는 노드 유형에 따라 아�
 * Pod 에 IP 주소 할당
 |===
 
+.- AWS VPC CNI의 L-IPAMD가 IP Address를 관리하는 프로세스
+image:https://docs.aws.amazon.com/ko_kr/eks/latest/best-practices/images/networking/cni_image.png[AWS VPC CNI의 L-IPAMD가 IP Address를 관리하는 프로세스]
+
 
 === Amazon VPC CNI 사용을 위한 사전 조건
 
@@ -285,7 +288,7 @@ Amazon VPC CNI 생성 절차는 다음과 같습니다.
 . Amazon VPC CNI 설치
 . EKS Node Group 생성
 
-<<1-사전-조건>> 에서 안내한대로 EKS 클러스터를 생성하였다면, Amazon VPC CNI가 자동으로 설치되면 아래 화면과 같습니다.
+<<1-사전-조건>> 에서 안내한대로 EKS 클러스터를 생성하였다면, 아래 화면처럼 Amazon VPC CNI가 자동으로 설치됩니다.
 
 image:images/vpc-cni-1.png[Amazon VPC CNI 설치 정보]
 
@@ -324,30 +327,176 @@ addonsConfig:
   autoApplyPodIdentityAssociations: true    # default: false
 ----
 
+== 사용자 지정 네트워킹 (Custom Networking)
 
-== 맞춤형 네트워킹 (Custom Networking)
+. Kubernetes용 Amazon VPC CNI 플러그인이 Amazon EC2 노드에 보조(Secondary) 탄력적 네트워크 인터페이스(ENI:Elastic Network Interface)를 생성할 때 노드의 기본 네트워크 인터페이스와 동일한 서브넷에 이를 생성합니다
+. 또한 기본(Primary) 네트워크 인터페이스에 연결된 동일한 보안 그룹을 보조(Secondary) 네트워크 인터페이스에 연결합니다.
+. 다음 중 하나 이상의 이유로 플러그인이 다른 서브넷에서 보조(Secondary) 네트워크 인터페이스를 생성하거나 다른 보안 그룹을 보조(Secondary) 네트워크 인터페이스에 연결하거나, 둘 다 하려고 할 수 있습니다.
+  - 기본(Primary) 네트워크 인터페이스가 있는 서브넷에서 사용할 수 있는 IPv4 주소의 수는 제한되어 있습니다. 이렇게 하면 서브넷에서 생성할 수 있는 포드 수가 제한될 수 있습니다. 보조(Secondary) 네트워크 인터페이스에 다른 서브넷을 사용하면 포드에 사용 가능한 IPv4 주소 수를 늘릴 수 있습니다.
+  - 보안상의 이유로 포드는 노드의 기본(Primary) 네트워크 인터페이스와 다른 서브넷 또는 보안 그룹을 사용해야 할 수 있습니다.
+  - 노드는 퍼블릭 서브넷에서 구성되며, 포드를 프라이빗 서브넷에 배치할 수 있습니다. 퍼블릭 서브넷과 연결된 라우팅 테이블에는 인터넷 게이트웨이로 가는 경로가 포함됩니다. 프라이빗 서브넷과 연결된 라우팅 테이블에는 인터넷 게이트웨이로 가는 경로가 포함되지 않습니다.
 
-1. 기본적으로 Kubernetes용 Amazon VPC CNI 플러그인이 Amazon EC2 노드에 대한 보조 탄력적 네트워크 인터페이스 (네트워크 인터페이스)를 생성할 때 노드의 기본 네트워크 인터페이스와 동일한 서브넷에 이를 생성합니다
-2. 또한 기본 네트워크 인터페이스에 연결된 동일한 보안 그룹을 보조 네트워크 인터페이스에 연결합니다. 
-3. 다음 중 하나 이상의 이유로 플러그 인이 다른 서브넷에서 보조 네트워크 인터페이스를 생성하거나 다른 보안 그룹을 보조 네트워크 인터페이스에 연결하거나, 둘 다 하려고 할 수 있습니다.
-    - 기본 네트워크 인터페이스가 있는 서브넷에서 사용할 수 있는 IPv4 주소의 수는 제한되어 있습니다. 이렇게 하면 서브넷에서 생성할 수 있는 포드 수가 제한될 수 있습니다. 보조 네트워크 인터페이스에 다른 서브넷을 사용하면 포드에 사용 가능한 IPv4 주소 수를 늘릴 수 있습니다.
-    - 보안상의 이유로 포드는 노드의 기본 네트워크 인터페이스와 다른 서브넷 또는 보안 그룹을 사용해야 할 수 있습니다.
-    - 노드는 퍼블릭 서브넷에서 구성되며, 포드를 프라이빗 서브넷에 배치할 수 있습니다. 퍼블릭 서브넷과 연결된 라우팅 테이블에는 인터넷 게이트웨이로 가는 경로가 포함됩니다. 프라이빗 서브넷과 연결된 라우팅 테이블에는 인터넷 게이트웨이로 가는 경로가 포함되지 않습니다.
+image:https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/images/cn-image.png[Custom Networking Architecture]
 
-=== 맞춤형 네트워킹 고려 사항
+=== 사용자 지정 네트워킹 고려 사항
 
-* 사용자 지정 네트워킹을 사용 설정하면 기본 네트워크 인터페이스에 할당된 IP 주소가 포드에 할당되지 않습니다. 보조 네트워크 인터페이스의 IP 주소만 포드에 할당됩니다.
+* 사용자 지정 네트워킹을 사용 설정하면 기본(Primary) 네트워크 인터페이스에 할당된 IP 주소는 포드에 할당되지 않습니다. 보조(Secondary) 네트워크 인터페이스의 IP 주소만 포드에 할당됩니다.
 * 클러스터에서 **IPv6 패밀리를 사용하는 경우 사용자 지정 네트워킹을 사용할 수 없습니다.**
 * 사용자 지정 네트워킹을 사용하여 IPv4 주소 소모를 완화하려는 경우 대신 IPv6 패밀리를 사용하여 클러스터를 생성할 수 있습니다.
-* 보조 네트워크 인터페이스에 지정된 서브넷에 배포된 포드는 노드의 기본 네트워크 인터페이스와 다른 서브넷 및 보안 그룹을 사용할 수 있다고 해도 **서브넷과 보안 그룹은 노드와 동일한 VPC에 있어야 합니다.**
+* 보조(Secondary) 네트워크 인터페이스에 지정된 서브넷에 배포된 포드는 노드의 기본(Primary) 네트워크 인터페이스와 다른 서브넷 및 보안 그룹을 사용할 수 있다고 해도 **서브넷과 보안 그룹은 노드와 동일한 VPC에 있어야 합니다.**
 
-== IP 주소 늘리기
+=== 사용자 지정 네트워킹을 사용하기 위한 Amazon VPC CNI 환경 변수
 
-== 사전 조건
+[%header%footer%autowidth]
+|===
+| Configuration Variable | Type | Default | Description
+| https://github.com/aws/amazon-vpc-cni-k8s?tab=readme-ov-file#aws_vpc_k8s_cni_custom_network_cfg[`AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG`] | Boolean as a String | `'false'` | 사용자 지정 네트워킹 활성화 여부
+| https://github.com/aws/amazon-vpc-cni-k8s?tab=readme-ov-file#eni_config_annotation_def[`ENI_CONFIG_ANNOTATION_DEF`] | String | `'k8s.amazonaws.com/eniConfig'` | 노드 annotation key 이름. `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true` 일 경우, 반드시 지정해야 함.
+| https://github.com/aws/amazon-vpc-cni-k8s?tab=readme-ov-file#eni_config_label_def[`ENI_CONFIG_LABEL_DEF`] | String | `'k8s.amazonaws.com/eniConfig'` | 노드 Label key 이름. `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true` 일 경우, 반드시 지정해야 함. +
+EC2가 속한 Subnet의 가용 영역(Available Zone)을 기반으로 `ENIConfig` name 을 선택하려면 `topology.kubernetes.io/zone` 을 사용해야 함
+| https://github.com/aws/amazon-vpc-cni-k8s?tab=readme-ov-file#enable_prefix_delegation-v190[`ENABLE_PREFIX_DELEGATION`] | Boolean as a String | `'false'` | 접두사 위임 기능을 사용.
+| https://github.com/aws/amazon-vpc-cni-k8s?tab=readme-ov-file#warm_prefix_target-v190[`WARM_PREFIX_TARGET`] | Integer | None | `ipamd` 데몬이 유지해야 할 IPv4 접두사(/28) 수.
+| https://github.com/aws/amazon-vpc-cni-k8s?tab=readme-ov-file#warm_eni_target[`WARM_ENI_TARGET`] | Integer as a String | `'1'` | `ipamd` 데몬이 유지해야할 ENI 수. +
+| https://github.com/aws/amazon-vpc-cni-k8s?tab=readme-ov-file#warm_ip_target[`WARM_IP_TARGET`] | Integer | None | `ipamd` 데몬이 유지해야할 IP 주소 수. +
+* `ENABLE_PREFIX_DELEGATION=true` 일때 `ipamd` 데몬이 기존 접두사(/28)가 WARM_IP_TARGET을 유지하기에 충분한지 확인하고 충분하지 않으면 접두사를 더 추가함. +
+* `WARM_IP_TARGET` 이 설정되면, `WARM_ENI_TARGET` 설정은 무시되고, `WARM_IP_TARGET` 설정을 사용함.
+|===
 
-== 실습
-=== VPC에 Secondary Cidr에 추가하기
-```
-sh 01_get_output.sh
-```
-== 5. 정리
+
+위 설정을 Amazon VPC CNI의 환경 설정 값으로 적용하면 다음과 같습니다.
+
+[source,json]
+----
+{
+  "env": {
+    "AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG": "true",
+    "ENI_CONFIG_LABEL_DEF": "topology.kubernetes.io/zone",
+    "ENABLE_PREFIX_DELEGATION": "true",
+    "WARM_PREFIX_TARGET": "1",
+    "WARM_ENI_TARGET": "1",
+    "WARM_IP_TARGET": "2"
+  },
+  "eniConfig": {
+    "create": true,
+    "region": "<EKS Cluster가 생성된 리전(ex:ap-northeast-2)>",
+    "subnets": {
+      "<'eks-workshop-*-PodSubnet01' Subnet이 속한 AZ Name(ex: ap-northeast-2a)>": {
+        "id": "<'eks-workshop-*-PodSubnet01'의 Subnet ID>",
+        "securityGroups": ["<EKS 클러스터 보안 그룹 ID>","<EKS 클러스터 추가 보안 그룹 ID>"]
+      },
+      "<'eks-workshop-*-PodSubnet01' Subnet이 속한 AZ Name(ex: ap-northeast-2b)>": {
+        "id": "<'eks-workshop-*-PodSubnet02'의 Subnet ID>",
+        "securityGroups": ["<EKS 클러스터 보안 그룹 ID>","<EKS 클러스터 추가 보안 그룹 ID>"]
+      }
+    }
+  }
+}
+----
+
+////
+위에서 설정한 값을 적용하기 전에 먼저, `ENIConfig` Custom Resource(CRD)를 생성해 주어야 합니다.
+[source,yaml]
+----
+apiVersion: crd.k8s.amazonaws.com/v1alpha1
+kind: ENIConfig
+metadata:
+  name: <'eks-workshop-*-PodSubnet01' Subnet이 속한 AZ Name(ex: ap-northeast-2a)>
+spec:
+  securityGroups:
+    - $CLUSTER_NAME
+  subnet: <'eks-workshop-*-PodSubnet01'의 Subnet ID>
+---
+apiVersion: crd.k8s.amazonaws.com/v1alpha1
+kind: ENIConfig
+metadata:
+  name: <'eks-workshop-*-PodSubnet01' Subnet이 속한 AZ Name(ex: ap-northeast-2b)>
+spec:
+  securityGroups:
+    - $CLUSTER_NAME
+  subnet: <'eks-workshop-*-PodSubnet02'의 Subnet ID>
+----
+
+`02_ENIConfig.yaml` 파일을 열어, 생성된 VPC의 Subnet 에 맞게 내용을 변경하고, 
+
+아래 명령을 실행합니다.
+
+[source,shell]
+----
+cd ~/environment/eks-edu/08_Network
+source ../env.sh
+envsubst < 01_ENIConfig.yaml | kubectl apply -f -
+eniconfig.crd.k8s.amazonaws.com/ap-northeast-2a created
+eniconfig.crd.k8s.amazonaws.com/ap-northeast-2b created
+----
+////
+
+위의 내용을 Amazon VPC CNI에 적용하기 위해 이번에는 AWS Management Console에 직접 적용해 보겠습니다.
+
+. 노드 그룹 삭제
++
+EKS Cluster에 이미 노드 그룹이 생성되어 있고, 여러 Pod들이 실행중이라면, VPC CNI 업데이트는 실패하게 됩니다.
++
+이를 방지하기 위해 먼저 노드 그룹을 삭제 또는 목표 수량을 `0` 으로 변경해야 합니다.
++
+여기서는 `eksctl` 을 이용해 이미 생성된 노드그룹의 노드 수량을 `0` 으로 변경하겠습니다.
++
+[source,shell]
+----
+cd ~/environment/eks-edu/08_Network
+source ../env.sh
+eksctl scale nodegroup --cluster=$CLUSTER_NAME --name=app-nodegroup --nodes=0 --nodes-max=1 --nodes-min=0 --region=$AWS_REGION
+----
++
+CAUTION: 모든 노드가 종료될때까지 최대 15분이 소요될 수 있습니다.
++
+////
+https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/managed-node-groups.html#managed-node-group-capacity-types
+- AZRebalance로 노드를 종료하거나 원하는 노드 수를 줄이는 경우 포드 중단 예산은 반영되지 않습니다. 
+- 이러한 작업은 노드에서 포드 제거를 시도합니다. 
+- 그러나 15분 넘게 걸리면 노드의 모든 포드가 종료되었는지 여부에 관계없이 노드가 종료됩니다. 
+- 노드가 종료될 때까지 기간을 연장하려면 Auto Scaling 그룹에 수명 주기 후크를 추가하세요. 
+- 자세한 내용을 알아보려면 Amazon EC2 Auto Scaling 사용 설명서의 수명 주기 후크 추가를 참조하세요.
+////
+. "추가 기능" -> "Amazon VPC CNI" 선택 -> "편집" 버튼 클릭
++
+image:images/vpc-cni-3.png[Amazon VPC CNI 선택 후 편집 버튼 클릭]
+. "선택적 구성 설정" -> "구성 값"에 내용 입력
++
+.- 예시 (내용은 자신의 Subnet 및 보안 그룹 ID로 변경하여 적용)
+image:images/vpc-cni-4.png[구성 값]
+. 저장 버튼 클릭 후에는 업데이트되기까지 약간의 시간이 소요됩니다. 진행 상황에 대해서는 Amazon VPC CNI 상세 화면의 "업데이트 기록" 부분에서 확인할 수 있습니다.
++
+image:images/vpc-cni-5.png[업데이트 기록]
+. 업데이트가 완료되었다면, `ENIConfig` 사용자 지정 리소스(CRD:Custom Resource Definition)가 잘 생성되었는지 확인합니다.
++
+[source,shell]
+----
+kubectl get eniconfig
+----
++
+image:images/eniconfig-check.png[ENConfig 확인]
+. 노드 그룹 수량을 다시 늘려줍니다.
++
+문제가 없다면, 대략 3분 이내에 노드 2개가 정상적으로 생성됩니다.
++
+[source,shell]
+---
+cd ~/environment/eks-edu/08_Network
+source ../env.sh
+eksctl scale nodegroup --cluster=$CLUSTER_NAME --name=app-nodegroup --nodes=2 --nodes-max=2 --nodes-min=2 --region=$AWS_REGION
+---
+. "컴퓨팅" 탭으로 이동하여 새로운 노드가 올바르게 생성되어 "Ready(준비완료)" 상태인지 확인합니다.
++
+image:images/cluster-computing-1.png[컴퓨팅 상태 확인]
+. 새로 실행된 Pod들 중 `daemonset` Type이 아닌 Pod들의 IP가 바뀌었는지 확인합니다.
++
+`kubectl` 명령을 이용해 새로 실행된 Pod 들 중 `coredns`, `metrics-server` Pod 들의 IP가 바뀌었으면 사용자 지정 네트워크 구성이 올바르게 적용된 것입니다.
++
+NOTE: vpc-cni, kube-proxy Pod들의 IP가 여전히 기존 IP로 적용된 이유는 `DaemonSet` 객체로 생성된 것들이기 때문입니다.
+
+== 참고
+
+- https://github.com/aws/amazon-vpc-cni-k8s[Amazon VPC CNI]
+- https://repost.aws/ko/knowledge-center/eks-configure-cni-plugin-use-ip-address[Amazon EKS에서 VPC 서브넷의 IP 주소를 사용하도록 Amazon VPC CNI 플러그인을 구성하려면 어떻게 해야 하나요?]
+- https://docs.aws.amazon.com/ko_kr/eks/latest/best-practices/vpc-cni.html[Amazon EKS Best Practice - Amazon VPC CNI]
+- https://nangman14.tistory.com/100[AWS EKS의 IP 주소 관리: 쿠버네티스 클러스터의 네트워킹 고려사항]

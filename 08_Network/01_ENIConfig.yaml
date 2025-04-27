@@ -1,0 +1,17 @@
+apiVersion: crd.k8s.amazonaws.com/v1alpha1
+kind: ENIConfig
+metadata:
+  name: <'eks-workshop-*-PodSubnet01' Subnet이 속한 AZ Name(ex: ap-northeast-2a)>
+spec:
+  securityGroups:
+    - <EKS Cluster 보안 그룹 ID>
+  subnet: <'eks-workshop-*-PodSubnet01'의 Subnet ID>
+---
+apiVersion: crd.k8s.amazonaws.com/v1alpha1
+kind: ENIConfig
+metadata:
+  name: <'eks-workshop-*-PodSubnet01' Subnet이 속한 AZ Name(ex: ap-northeast-2b)>
+spec:
+  securityGroups:
+    - $CLUSTER_NAME
+  subnet: <'eks-workshop-*-PodSubnet02'의 Subnet ID>
