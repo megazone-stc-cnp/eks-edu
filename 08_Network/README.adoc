@@ -492,6 +492,8 @@ image:images/cluster-computing-1.png[컴퓨팅 상태 확인]
 +
 `kubectl` 명령을 이용해 새로 실행된 Pod 들 중 `coredns`, `metrics-server` Pod 들의 IP가 바뀌었으면 사용자 지정 네트워크 구성이 올바르게 적용된 것입니다.
 +
+image:images/kubectl-pod-1.png[바뀐 IP 확인]
++
 NOTE: vpc-cni, kube-proxy Pod들의 IP가 여전히 기존 IP로 적용된 이유는 `DaemonSet` 객체로 생성된 것들이기 때문입니다.
 
 == 참고
