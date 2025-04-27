@@ -101,11 +101,6 @@ download "https://dl.k8s.io/release/v${kubectl_version}/bin/linux/${arch_name}/k
 chmod +x ./kubectl
 mv ./kubectl /usr/local/bin
 
-# kubecolor
-# sudo dnf install 'dnf-command(config-manager)'
-# sudo dnf config-manager --add-repo https://kubecolor.github.io/packages/rpm/kubecolor.repo
-# sudo dnf install kubecolor
-
 # helm
 download "https://get.helm.sh/helm-v$helm_version-linux-${arch_name}.tar.gz" "helm.tar.gz"
 tar zxf helm.tar.gz
@@ -162,6 +157,5 @@ mv ./argocd /usr/local/bin/argocd
 download "https://github.com/junegunn/fzf/releases/download/v${fzf_version}/fzf-${fzf_version}-linux_${arch_name}.tar.gz" "fzf-${fzf_version}-linux_${arch_name}.tar.gz"
 tar xfz fzf-${fzf_version}-linux_${arch_name}.tar.gz
 chmod +x fzf
-chown root:root fzf
 mv ./fzf /usr/local/bin
 rm -rf fzf-${fzf_version}-linux_${arch_name}.tar.gz

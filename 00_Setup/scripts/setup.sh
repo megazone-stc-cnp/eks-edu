@@ -19,7 +19,6 @@ export AWS_REGION="${AWS_REGION}"
 export AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID}"
 EOT
 
-# Bash completions
 LOCAL_BASH_COMPLETION_DIR=~/.local/share/bash-completion/completions
 mkdir -p $LOCAL_BASH_COMPLETION_DIR
 /usr/local/bin/kubectl completion bash > $LOCAL_BASH_COMPLETION_DIR/kubectl
@@ -30,16 +29,9 @@ mkdir -p $LOCAL_BASH_COMPLETION_DIR
 /usr/local/bin/argocd completion bash > $LOCAL_BASH_COMPLETION_DIR/argocd
 /usr/bin/docker completion bash > $LOCAL_BASH_COMPLETION_DIR/docker
 
-# bashrc
-cat << EOT > ~/.bashrc.d/kubectl.bash
-# source <(kubectl completion bash)
-# alias kubectl=kubecolor
-alias k=kubectl
-# Make "kubecolor" borrow the same completion logic as "kubectl"
-# complete -o default -F __start_kubectl kubecolor
-# Make "k" borrow the same completion logic as "kubectl"
-complete -o default -F __start_kubectl k
-EOT
+echo "alias k=kubectl" > ~/.bashrc.d/kubectl.bash
+echo "source <(kubectl completion bash)" >> ~/.bashrc.d/kubectl.bash
+echo "complete -o default -F __start_kubectl k" >> ~/.bashrc.d/kubectl.bash
 
 echo "eval \"\$(fzf --bash)\"" > ~/.bashrc.d/fzf.bash
 
@@ -52,7 +44,6 @@ then
 fi
 export PATH
 EOT
-
 
 # Aliases for 'ls'
 cat << EOT > ~/.bashrc.d/aliases.bash
