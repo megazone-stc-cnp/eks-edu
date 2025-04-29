@@ -26,6 +26,7 @@ vpc:
 managedNodeGroups:
   - name: app-nodegroup
     instanceType: t3.medium
+    spot: false
     desiredCapacity: 2
     privateNetworking: true # if only 'Private' subnets are given, this must be enabled
 addons:

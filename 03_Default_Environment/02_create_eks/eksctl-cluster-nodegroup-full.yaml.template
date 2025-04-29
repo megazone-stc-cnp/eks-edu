@@ -26,6 +26,7 @@ vpc:
 managedNodeGroups:
   - name: ops-nodegroup
     instanceType: t3.medium
+    spot: false
     desiredCapacity: 1
     privateNetworking: true # if only 'Private' subnets are given, this must be enabled
     labels: {role: ops}
