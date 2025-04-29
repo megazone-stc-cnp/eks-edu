@@ -29,10 +29,10 @@ mkdir -p $LOCAL_BASH_COMPLETION_DIR
 /usr/local/bin/yq completion bash > $LOCAL_BASH_COMPLETION_DIR/yq
 /usr/local/bin/argocd completion bash > $LOCAL_BASH_COMPLETION_DIR/argocd
 /usr/bin/docker completion bash > $LOCAL_BASH_COMPLETION_DIR/docker
+/usr/local/bin/bat --completion bash > $LOCAL_BASH_COMPLETION_DIR/bat
 
-# bashrc
+# kubectl & kubecolor
 cat << EOT > ~/.bashrc.d/kubectl.bash
-# source <(kubectl completion bash)
 alias kubectl=kubecolor
 alias k=kubectl
 # Make "kubecolor" borrow the same completion logic as "kubectl"
@@ -41,10 +41,13 @@ complete -o default -F __start_kubectl kubecolor
 complete -o default -F __start_kubectl k
 EOT
 
+# fzf
 echo "eval \"\$(fzf --bash)\"" > ~/.bashrc.d/fzf.bash
 
+# terraform
 echo "complete -C /usr/local/bin/terraform terraform" > ~/.bashrc.d/terraform.bash
 
+# Krew
 cat << EOT > ~/.bashrc.d/krew.bash
 if ! [[ "\$PATH" =~ "\$HOME/.krew/bin:" ]]
 then
@@ -52,7 +55,6 @@ then
 fi
 export PATH
 EOT
-
 
 # Aliases for 'ls'
 cat << EOT > ~/.bashrc.d/aliases.bash

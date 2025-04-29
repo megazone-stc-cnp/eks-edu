@@ -35,6 +35,9 @@ terraform_version='1.11.2'                      # 2025-03-12
 # fzf
 fzf_version='0.60.3'                            # 2025-03-03
 
+# bat
+bat_version='0.25.0'                           # 2025-01-08
+
 download () {
   url=$1
   out_file=$2
@@ -104,7 +107,7 @@ mv ./kubectl /usr/local/bin
 # kubecolor
 dnf install 'dnf-command(config-manager)'
 dnf config-manager --add-repo https://kubecolor.github.io/packages/rpm/kubecolor.repo
-dnf install kubecolor
+dnf install kubecolor -y
 
 # helm
 download "https://get.helm.sh/helm-v$helm_version-linux-${arch_name}.tar.gz" "helm.tar.gz"
@@ -159,9 +162,18 @@ chmod +x ./argocd
 mv ./argocd /usr/local/bin/argocd
 
 # fzf
-download "https://github.com/junegunn/fzf/releases/download/v${fzf_version}/fzf-${fzf_version}-linux_${arch_name}.tar.gz" "fzf-${fzf_version}-linux_${arch_name}.tar.gz"
-tar xfz fzf-${fzf_version}-linux_${arch_name}.tar.gz
+download "https://github.com/junegunn/fzf/releases/download/v${fzf_version}/fzf-${fzf_version}-linux_${arch_name}.tar.gz" "fzf.tar.gz"
+tar xfz fzf.tar.gz
 chmod +x fzf
 chown root:root fzf
 mv ./fzf /usr/local/bin
-rm -rf fzf-${fzf_version}-linux_${arch_name}.tar.gz
+rm -rf fzf.tar.gz
+
+# bat
+download "https://github.com/sharkdp/bat/releases/download/v${bat_version}/bat-v${bat_version}-${arch_name}-unknown-linux-gnu.tar.gz" "bat.tar.gz"
+tar xfz bat.tar.gz
+chmod +x bat-v${bat_version}-${arch_name}-unknown-linux-gnu/bat
+chown root:root bat-v${bat_version}-${arch_name}-unknown-linux-gnu/bat
+mv ./bat-v${bat_version}-${arch_name}-unknown-linux-gnu/bat /usr/local/bin
+rm -rf bat-v${bat_version}-${arch_name}-unknown-linux-gnu
+rm -rf bat.tar.gz
