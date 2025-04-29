@@ -365,9 +365,13 @@ Resources:
                   mkdir -p ~/environment/.vscode
                   tee ~/environment/.vscode/settings.json <<EOF
                   {
-                    # "files.exclude": {
-                    #   "**/.*": true
-                    # },
+                    "yaml.schemas": {
+                      "https://s3.amazonaws.com/cfn-resource-specifications-us-east-1-prod/schemas/2.15.0/all-spec.json": [
+                        "*-cfn-template.yaml",
+                        "*-cfn.yaml",
+                        "*-cf.yaml"
+                      ]
+                    },
                     "files.associations": {
                       "*.yaml.template": "yaml"
                     }
