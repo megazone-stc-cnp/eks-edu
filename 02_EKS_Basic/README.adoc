@@ -35,7 +35,7 @@ EKS의 주요 장점:
 * *클러스터 IAM 역할*: EKS 클러스터가 다른 AWS 서비스와 상호 작용하기 위한 권한
 * *노드 IAM 역할*: 워커 노드가 AWS 리소스에 접근하기 위한 권한
 
-image::https://d1.awsstatic.com/product-marketing/EKS/product-page-diagram-AmazonEKS-v2.c47baa74024dca47634acd6c0c59e61f9c08661a.png[EKS 아키텍처, 600]
+image::https://d1.awsstatic.com/product-page-diagram_Amazon-EKS@2x.ddc48a43756bff3baead68406d3cac88b4151a7e.ddc48a43756bff3baead68406d3cac88b4151a7e.png[EKS 아키텍처, 600]
 
 == 2. EKS 클러스터 생성하기
 
