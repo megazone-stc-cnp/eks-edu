@@ -3,8 +3,7 @@
 cat << EOT > /home/ec2-user/.bashrc.d/banner.bash
 if [ "\$TERM_PROGRAM" = "vscode" ]; then
     if [ ! -f ~/.banner ]; then
-        touch ~/.banner
-        cat << EOF
+        tee ~/.banner << EOF
 
                                           Welcome to
 
