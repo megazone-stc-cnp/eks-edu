@@ -285,12 +285,13 @@ Resources:
                 - !Sub |
                   set -e
 
-                  # Install required packages
+                  echo ">>> Install required packages"
                   yum update -y
                   yum install -y git tar gzip vim nodejs npm make gcc g++ argon2
 
                   # source <(curl -fsSL https://raw.githubusercontent.com/${RepositoryOwner}/${RepositoryName}/${RepositoryRef}/hack/lib/common-env.sh)
 
+                  echo ">>> Install Caddy Web Server"
                   dnf copr enable -y @caddy/caddy epel-9-x86_64
                   dnf install -y caddy
                   systemctl enable --now caddy
@@ -303,6 +304,7 @@ Resources:
 
                   systemctl restart caddy
 
+                  echo ">>> Add a Custom Prompt profile"
                   tee /etc/profile.d/custom_prompt.sh <<EOF
                   #!/bin/sh
 
@@ -314,10 +316,12 @@ Resources:
                   export REPOSITORY_NAME="${RepositoryName}"
                   export REPOSITORY_REF="${RepositoryRef}"
                   export RESOURCES_PRECREATED="${ResourcesPrecreated}"
-                  export RAW_REPOSITORY_URL="https://raw.githubusercontent.com/$REPOSITORY_OWNER/$REPOSITORY_NAME/$REPOSITORY_REF"
 
+                  echo ">>> Execute the 'eks-edu' installer"
+                  export RAW_REPOSITORY_URL="https://raw.githubusercontent.com/$REPOSITORY_OWNER/$REPOSITORY_NAME/$REPOSITORY_REF"
                   curl -fsSL $RAW_REPOSITORY_URL/00_Setup/scripts/installer.sh | bash
 
+                  echo ">>> Install code-server"
                   cat <<"EOT" | sudo -E -H -u ec2-user bash
                   set -e
 

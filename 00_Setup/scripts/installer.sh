@@ -137,12 +137,11 @@ mv ./kubeseal /usr/local/bin
 rm -rf kubeseal.tar.gz
 
 # krew
-KREW_INSTALL_ROOT=/tmp/krew-install
 download "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_${arch_name}.tar.gz" "krew.tar.gz"
-mkdir -p /tmp/krew-install
-mv krew.tar.gz $KREW_INSTALL_ROOT && cd $KREW_INSTALL_ROOT
-tar zxvf "krew.tar.gz"
-sudo -u ec2-user $KREW_INSTALL_ROOT/krew-linux_${arch_name} install krew
+mv krew.tar.gz /tmp
+tar xfz /tmp/krew.tar.gz -C /tmp
+chown ec2-user:ec2-user /tmp/krew-linux_${arch_name}
+sudo -i -u ec2-user /tmp/krew-linux_${arch_name} install krew
 
 # yq
 download "https://github.com/mikefarah/yq/releases/download/v${yq_version}/yq_linux_${arch_name}" "yq"
@@ -170,10 +169,12 @@ mv ./fzf /usr/local/bin
 rm -rf fzf.tar.gz
 
 # bat
-download "https://github.com/sharkdp/bat/releases/download/v${bat_version}/bat-v${bat_version}-${arch_name}-unknown-linux-gnu.tar.gz" "bat.tar.gz"
+download "https://github.com/sharkdp/bat/releases/download/v${bat_version}/bat-v${bat_version}-${arch}-unknown-linux-gnu.tar.gz" "bat.tar.gz"
+download "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_64-unknown-linux-gnu.tar.gz" "bat.tar.gz"
+download "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_64-unknown-linux-gnu.tar.gz" "bat.tar.gz"
 tar xfz bat.tar.gz
-chmod +x bat-v${bat_version}-${arch_name}-unknown-linux-gnu/bat
-chown root:root bat-v${bat_version}-${arch_name}-unknown-linux-gnu/bat
-mv ./bat-v${bat_version}-${arch_name}-unknown-linux-gnu/bat /usr/local/bin
-rm -rf bat-v${bat_version}-${arch_name}-unknown-linux-gnu
+chmod +x bat-v${bat_version}-${arch}-unknown-linux-gnu/bat
+chown root:root bat-v${bat_version}-${arch}-unknown-linux-gnu/bat
+mv ./bat-v${bat_version}-${arch}-unknown-linux-gnu/bat /usr/local/bin
+rm -rf bat-v${bat_version}-${arch}-unknown-linux-gnu
 rm -rf bat.tar.gz
