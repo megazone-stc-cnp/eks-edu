@@ -1,0 +1,302 @@
+= EKS 기초 실습
+:icons: font
+:toc: left
+:toclevels: 4
+:sectnums:
+
+== 목표
+* Amazon EKS(Elastic Kubernetes Service)의 기본 개념 이해
+* AWS Management Console을 통해 EKS 클러스터 생성
+* 기본 Kubernetes 리소스 배포 및 확인
+
+== 사전 조건
+* AWS 계정 및 콘솔 접근 권한
+* 기본적인 Kubernetes 개념 이해
+* AWS IAM 권한 (EKS 클러스터 생성 권한 필요)
+
+== 1. EKS 개요
+
+=== Amazon EKS란?
+Amazon EKS(Elastic Kubernetes Service)는 AWS에서 제공하는 관리형 Kubernetes 서비스입니다. EKS를 사용하면 Kubernetes 컨트롤 플레인을 직접 설치, 운영 및 유지 관리할 필요 없이 AWS에서 Kubernetes를 쉽게 실행할 수 있습니다.
+
+[TIP]
+====
+EKS의 주요 장점:
+
+* 관리형 컨트롤 플레인 (마스터 노드)
+* AWS 서비스와의 원활한 통합
+* 고가용성 설계
+* 자동 업데이트 및 패치 관리
+====
+
+=== EKS의 주요 구성 요소
+* *컨트롤 플레인*: AWS에서 관리하는 Kubernetes 마스터 노드
+* *데이터 플레인*: 사용자가 관리하는 워커 노드 (EC2 인스턴스)
+* *클러스터 IAM 역할*: EKS 클러스터가 다른 AWS 서비스와 상호 작용하기 위한 권한
+* *노드 IAM 역할*: 워커 노드가 AWS 리소스에 접근하기 위한 권한
+
+image::https://d1.awsstatic.com/product-marketing/EKS/product-page-diagram-AmazonEKS-v2.c47baa74024dca47634acd6c0c59e61f9c08661a.png[EKS 아키텍처, 600]
+
+== 2. EKS 클러스터 생성하기
+
+=== 2.1 EKS 클러스터 IAM 역할 생성
+
+[NOTE]
+====
+이 단계는 EKS 클러스터가 AWS 리소스에 접근하기 위한 권한을 설정하는 과정입니다.
+====
+
+. AWS Management Console에 로그인합니다.
+. IAM 콘솔로 이동합니다.
+. 왼쪽 메뉴에서 "역할"을 선택한 다음 "역할 생성"을 클릭합니다.
++
+image::images/iam-create-role.png[IAM 역할 생성, 400]
+
+. "AWS 서비스"를 선택하고, 사용 사례에서 "EKS"를 선택합니다.
+. "EKS - Cluster"를 선택하고 "다음"을 클릭합니다.
+. 권한 정책 페이지에서 `AmazonEKSClusterPolicy`가 선택되어 있는지 확인하고 "다음"을 클릭합니다.
+. 역할 이름을 `eksClusterRole`로 입력하고 "역할 생성"을 클릭합니다.
+
+=== 2.2 EKS 클러스터 생성
+
+. AWS Management Console에서 EKS 서비스로 이동합니다.
+. "클러스터" 메뉴를 선택하고 "클러스터 생성"을 클릭합니다.
++
+image::images/eks-create-cluster.png[EKS 클러스터 생성, 400]
+
+. 클러스터 구성 페이지에서:
+** 클러스터 이름: `my-first-eks-cluster`
+** Kubernetes 버전: 최신 안정 버전 선택 (예: 1.28)
+** 클러스터 서비스 역할: 앞서 생성한 `eksClusterRole` 선택
+** "다음"을 클릭합니다.
++
+image::images/eks-cluster-config.png[EKS 클러스터 구성, 400]
+
+. 네트워킹 구성 페이지에서:
+** VPC: 기존 VPC 선택 또는 새로운 VPC 생성
+** 서브넷: 최소 2개 이상의 서브넷 선택 (가용 영역이 다른 서브넷)
+** 보안 그룹: 기본값 사용 또는 새로운 보안 그룹 생성
+** 클러스터 엔드포인트 액세스: "퍼블릭"으로 설정 (실습 환경)
+** "다음"을 클릭합니다.
++
+image::images/eks-networking.png[EKS 네트워킹 구성, 400]
+
+. 로깅 구성 페이지에서:
+** 기본 설정 유지 (필요에 따라 로그 유형 선택)
+** "다음"을 클릭합니다.
+
+. 검토 및 생성 페이지에서:
+** 모든 설정을 검토하고 "생성"을 클릭합니다.
++
+image::images/eks-review-create.png[EKS 검토 및 생성, 400]
+
+. 클러스터 생성이 완료될 때까지 기다립니다 (약 15-20분 소요).
++
+[IMPORTANT]
+====
+클러스터 생성은 약 15-20분 정도 소요됩니다. 이 시간 동안 AWS는 여러 리소스를 프로비저닝하고 구성합니다.
+====
+
+=== 2.3 노드 그룹 생성
+
+. 클러스터가 생성되면, 클러스터 세부 정보 페이지에서 "컴퓨팅" 탭을 선택합니다.
+. "노드 그룹 추가"를 클릭합니다.
++
+image::images/eks-add-nodegroup.png[노드 그룹 추가, 400]
+
+. 노드 그룹 구성 페이지에서:
+** 이름: `my-nodegroup`
+** 노드 IAM 역할: 새 역할 생성 또는 기존 역할 선택
+*** 새 역할 생성 시 필요한 정책: `AmazonEKSWorkerNodePolicy`, `AmazonEKS_CNI_Policy`, `AmazonEC2ContainerRegistryReadOnly`
+** "다음"을 클릭합니다.
+
+. 컴퓨팅 및 크기 조정 구성 페이지에서:
+** AMI 유형: Amazon Linux 2 (x86)
+** 인스턴스 유형: t3.medium (실습용)
+** 디스크 크기: 20 GiB
+** 노드 그룹 크기 조정 구성:
+*** 최소 크기: 2
+*** 최대 크기: 4
+*** 원하는 크기: 2
+** "다음"을 클릭합니다.
++
+image::images/eks-nodegroup-compute.png[노드 그룹 컴퓨팅 구성, 400]
+
+. 네트워킹 구성 페이지에서:
+** 서브넷: 클러스터와 동일한 서브넷 선택
+** "다음"을 클릭합니다.
+
+. 검토 및 생성 페이지에서:
+** 모든 설정을 검토하고 "생성"을 클릭합니다.
+
+. 노드 그룹 생성이 완료될 때까지 기다립니다 (약 5분 소요).
+
+== 3. kubectl 구성 및 클러스터 연결
+
+=== 3.1 kubectl 설치 (이미 설치되어 있다면 생략)
+
+[tabs]
+====
+macOS::
++
+[source,bash]
+----
+brew install kubectl
+----
+
+Windows::
++
+[source,bash]
+----
+choco install kubernetes-cli
+----
+
+Linux::
++
+[source,bash]
+----
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+----
+====
+
+=== 3.2 kubeconfig 구성
+
+AWS CLI를 사용하여 EKS 클러스터에 대한 kubeconfig를 생성합니다:
+
+[source,bash]
+----
+aws eks update-kubeconfig --region <리전> --name my-first-eks-cluster
+----
+
+[TIP]
+====
+리전은 클러스터를 생성한 AWS 리전 코드를 입력합니다 (예: ap-northeast-2, us-west-2 등).
+====
+
+=== 3.3 클러스터 연결 확인
+
+[source,bash]
+----
+kubectl get nodes
+----
+
+정상적으로 연결되면 노드 목록이 표시됩니다:
+[source]
+----
+NAME                                           STATUS   ROLES    AGE   VERSION
+ip-192-168-12-34.ap-northeast-2.compute.internal   Ready    <none>   5m    v1.28.x
+ip-192-168-56-78.ap-northeast-2.compute.internal   Ready    <none>   5m    v1.28.x
+----
+
+== 4. 기본 애플리케이션 배포
+
+=== 4.1 간단한 Nginx 애플리케이션 배포
+
+다음 명령을 실행하여 Nginx 웹 서버를 배포합니다:
+
+[source,bash]
+----
+kubectl create deployment nginx --image=nginx
+kubectl expose deployment nginx --port=80 --type=LoadBalancer
+----
+
+=== 4.2 배포 확인
+
+[source,bash]
+----
+kubectl get pods
+----
+
+[source]
+----
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-6799fc88d8-nbkrx   1/1     Running   0          30s
+----
+
+[source,bash]
+----
+kubectl get services
+----
+
+[source]
+----
+NAME         TYPE           CLUSTER-IP      EXTERNAL-IP                                                               PORT(S)        AGE
+kubernetes   ClusterIP      10.100.0.1      <none>                                                                    443/TCP        45m
+nginx        LoadBalancer   10.100.123.45   a1b2c3d4e5f6g7.us-west-2.elb.amazonaws.com                               80:32572/TCP   30s
+----
+
+LoadBalancer 타입의 서비스가 생성되면 EXTERNAL-IP가 할당됩니다. 이 IP를 웹 브라우저에 입력하여 Nginx 웹 페이지에 접속할 수 있습니다.
+
+image::images/nginx-welcome.png[Nginx 웰컴 페이지, 400]
+
+== 5. EKS 콘솔 둘러보기
+
+AWS Management Console의 EKS 서비스에서 다음 항목들을 확인해 봅니다:
+
+. *클러스터 개요*: 클러스터 상태, 버전, 엔드포인트 정보
++
+image::images/eks-cluster-overview.png[클러스터 개요, 400]
+
+. *컴퓨팅 탭*: 노드 그룹 및 Fargate 프로필 관리
++
+image::images/eks-compute-tab.png[컴퓨팅 탭, 400]
+
+. *네트워킹 탭*: VPC, 서브넷, 보안 그룹 정보
+. *추가 기능 탭*: CoreDNS, kube-proxy, VPC CNI 등의 추가 기능 관리
+. *로깅 탭*: 클러스터 로그 구성
+
+== 6. 리소스 정리
+
+실습이 끝나면 비용 발생을 방지하기 위해 리소스를 정리합니다:
+
+[IMPORTANT]
+====
+리소스를 정리하지 않으면 계속해서 비용이 발생할 수 있습니다.
+====
+
+. 배포한 서비스 및 애플리케이션 삭제:
++
+[source,bash]
+----
+kubectl delete service nginx
+kubectl delete deployment nginx
+----
+
+. EKS 콘솔에서 노드 그룹 삭제:
+.. 클러스터 세부 정보 페이지에서 "컴퓨팅" 탭 선택
+.. 노드 그룹 선택 후 "삭제" 클릭
+.. 노드 그룹 이름을 입력하고 확인
++
+image::images/eks-delete-nodegroup.png[노드 그룹 삭제, 400]
+
+. EKS 콘솔에서 클러스터 삭제:
+.. 클러스터 목록에서 클러스터 선택
+.. "삭제" 클릭
+.. 클러스터 이름을 입력하고 확인
++
+image::images/eks-delete-cluster.png[클러스터 삭제, 400]
+
+== 정리
+
+이 실습을 통해 다음 내용을 학습했습니다:
+
+* Amazon EKS 클러스터의 기본 개념
+* AWS Management Console을 통한 EKS 클러스터 생성
+* 노드 그룹 생성 및 관리
+* kubectl을 사용한 클러스터 연결
+* 기본 애플리케이션 배포 및 확인
+
+EKS는 AWS에서 Kubernetes를 쉽게 운영할 수 있게 해주는 관리형 서비스로, 컨트롤 플레인 관리의 부담을 줄이고 AWS의 다양한 서비스와 통합하여 사용할 수 있는 장점이 있습니다.
+
+[TIP]
+====
+다음 단계로 학습할 내용:
+
+* EKS 클러스터 업그레이드
+* 오토스케일링 구성
+* 영구 스토리지 설정
+* 인그레스 컨트롤러 배포
+* 모니터링 및 로깅 설정
+====
