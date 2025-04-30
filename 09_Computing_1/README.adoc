@@ -1,0 +1,91 @@
+ifdef::env-github[]
+:tip-caption: :bulb: Tip
+:note-caption: :information_source: Note
+:important-caption: :heavy_exclamation_mark: Important
+:caution-caption: :fire: Caution
+:warning-caption: :warning: Warning
+endif::[]
+:icons: font
+:toc: left
+:toclevels: 4
+:sectnums:
+= 9. 컴퓨팅 관리 1
+
+== 학습 목표
+* EKS 노드 그룹의 개념과 유형을 이해합니다.
+* 관리형과 비관리형 노드 그룹의 차이점을 설명할 수 있습니다.
+* 노드 관리를 위한 모범 사례를 파악합니다.
+
+== 사전 조건
+
+1. link:../00_Setup/[0. 교육 환경 구성하기]를 이용해 기본 실습 환경 생성이 되어 있어야 합니다.
+2. link:../00_Setup/[0. 교육 환경 구성하기]를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
+3. link:../03_Default_Environment[3. 기본 환경 생성]을 참고하여 아래와 같이 vpc와 eks를 배포해야 합니다.
++
+[source,shell]
+----
+cd ~/environment/eks-edu/03_Default_Environment/01_create_vpc
+sh 01_default_vpc.sh
+
+cd ../02_create_eks
+sh 01-1_make_eksctl_cluster_only_template.sh <1>
+sh 02_eksctl_install.sh
+----
+<1> `01-1_make_eksctl_cluster_only_template.sh` 사용 필수!!
+
+== Kubernetes 노드 구성 요소
+// [%header%footer%autowidth]
+[cols="1,3"]
+|===
+|구성 요소 |설명
+
+|kubelet
+a|
+* 각 노드에서 실행되는 *노드 에이전트*
+* 컨테이너가 제공된 Pod 스펙(PodSpec)에 따라 정상 실행되도록 관리
+
+|kube-proxy
+a|
+* 각 노드에서 실행되는 네트워크 프록시
+* 노드의 네트워크 규칙을 관리
+* 내/외부 네트워크 세션에 대한 포워딩을 처리
+
+|Container Runtime
+a|
+* 컨테이너 실행을 담당하는 소프트웨어
+* *containerd*, CRI-O, Docker 등이 대표적!footnote:[`Docker`는 Kubernetes 1.24 부터 지원안함]
+* 컨테이너 이미지를 다운로드하고 실행하는 역할 수행
+|===
+
+
+== AWS EKS 노드 관리
+
+=== 노드 그룹 개요
+* EKS의 노드 그룹은 Amazon EC2 인스턴스의 논리적 그룹
+* 관리형과 비관리형 노드 그룹으로 구분
+* 노드 그룹을 통해 워크로드에 맞는 컴퓨팅 리소스 구성 가능
+
+=== 관리형 노드 그룹
+* AWS가 노드의 프로비저닝과 수명 주기를 관리
+* 자동 크기 조정 그룹(ASG) 기반으로 동작
+* 노드 업데이트 및 패치 자동화 지원
+* 손쉬운 버전 업그레이드
+
+=== 비관리형 노드 그룹
+* 사용자가 직접 노드를 관리
+* 더 많은 사용자 정의 옵션 제공
+* 특별한 요구사항이 있는 워크로드에 적합
+
+=== 노드 관리 모범 사례
+* 적절한 인스턴스 유형 선택
+* 가용성 영역 분산 배치
+* 리소스 모니터링 설정
+* 정기적인 업데이트 계획 수립
+
+[NOTE]
+====
+노드 그룹 선택 시 워크로드 특성, 관리 부담, 비용을 종합적으로 고려해야 합니다.
+====
+ifdef::env
+ifdef::env-
+ifdef::env-github
