@@ -161,7 +161,7 @@ Amazon EKS 클러스터는 다음 5가지 유형으로 노드를 관리할 수 �
 * 워크로드 요구사항에 따라 자동으로 노드 수를 조정
 
 .EKS Auto Mode 주요 특징
-[%autowidth,cols="1s,a"]
+[cols="1s,4a"]
 |===
 |특징 |설명
 
@@ -175,7 +175,8 @@ Amazon EKS 클러스터는 다음 5가지 유형으로 노드를 관리할 수 �
 * 애플리케이션의 요구에 따라 노드를 동적으로 추가하거나 제거 가능
 * Manual 용량 계획의 필요성을 최소화하고 애플리케이션 가용성 보장
 
-| 관리형 컴포넌트 (핵심 Addon 불필요)
+| 관리형 컴포넌트 +
+(핵심 Addon 불필요)
 |
 * Kubernetes 및 AWS 클라우드 기능 사용을 위한 추가 기능(Addon) 관리 자동화 (VPC,CoreDNS,EBS, ELB)
 
@@ -185,7 +186,8 @@ Amazon EKS 클러스터는 다음 5가지 유형으로 노드를 관리할 수 �
 * 미사용 인스턴스를 종료하고 워크로드를 다른 노드로 통합하여 비용 효율성 개선
 
 | 자동 업그레이드
-| * 포드 중단 예산(PDB:Pod Disruption Budget) 및 NodePool 중단 예산(NodePool Disruption Budget)을 준수하면서 최신 패치를 사용하여 최신 상태로 유지
+| * 포드 중단 예산(PDB:Pod Disruption Budget) 및 +
+NodePool 중단 예산(NodePool Disruption Budget)을 준수하면서 최신 패치를 사용하여 최신 상태로 유지
 
 | 보안
 | * 노드에 대해 변경 불가능한 AMI를 사용.
