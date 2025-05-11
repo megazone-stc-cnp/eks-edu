@@ -28,7 +28,7 @@ AWS EKS에 대해 기초부터 고급주제까지 학습하실 수 있도록 교
 - [6. Access 관리 - 워크로드 액세스](06_Workload_Access_2/README.md)
 - [7. 추가 기능 관리](07_Addons/README.md)
 - [8. 네트워크 관리-1](08_Network/README.adoc)
-- [9. 컴퓨팅 관리](09_Computing_1/backups/README.adoc)
+- [9. 컴퓨팅 관리](09_Computing_1/README.adoc)
 - [10. 네트워크 관리-2](11_Network_2/README.md)
 - [11. Storage 관리](12_Storage_Management/README.md)
 - [12. Application 배포 - 기본](13_Application/README.md)
