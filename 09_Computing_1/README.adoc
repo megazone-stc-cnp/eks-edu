@@ -381,9 +381,9 @@ cd ~/environment/eks-edu/09_Computing_1
 source ../env.sh
 source ../vpc_env.sh
 
-export EKS_CLUSTER_SG=$(eksctl get cluster -n $CLUSTER_NAME -o json | jq -r '.[0].ResourcesVpcConfig.ClusterSecurityGroupId') <1>
+export EKS_CLUSTER_SG=$(eksctl get cluster -n $CLUSTER_NAME -o json | jq -r '.[0].ResourcesVpcConfig.ClusterSecurityGroupId')
 
-envsubst < cluster-addons.yaml | eksctl create addon -f - <2>
+envsubst < cluster-addons.yaml | eksctl create addon -f -
 ----
 <1> 클러스터 보안 그룹 ID 조회 (VPC CNI 설치 시 사용자 지정 네트워킹 구성에 사용)
 <2> 클러스터 Addon 설치 (VPC CNI 설치 시 Custom Networking 활성화)
