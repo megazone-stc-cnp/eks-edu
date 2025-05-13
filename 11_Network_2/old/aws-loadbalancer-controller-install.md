@@ -1,4 +1,4 @@
-# aws loadbalancer controller 설치
+# aws loadbalancer controller Helm Chart 업그레이드
 
 ## 1. IRSA 연동 Role 확인
 ```shell
