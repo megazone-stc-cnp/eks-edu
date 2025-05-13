@@ -381,9 +381,9 @@ cd ~/environment/eks-edu/09_Computing_1
 source ../env.sh
 source ../vpc_env.sh
 
-export EKS_CLUSTER_SG=$(eksctl get cluster -n $CLUSTER_NAME -o json | jq -r '.[0].ResourcesVpcConfig.ClusterSecurityGroupId')
+export EKS_CLUSTER_SG=$(eksctl get cluster -n $CLUSTER_NAME -o json | jq -r '.[0].ResourcesVpcConfig.ClusterSecurityGroupId') # <1>
 
-envsubst < cluster-addons.yaml | eksctl create addon -f -
+envsubst < cluster-addons.yaml | eksctl create addon -f - # <2>
 ----
 <1> 클러스터 보안 그룹 ID 조회 (VPC CNI 설치 시 사용자 지정 네트워킹 구성에 사용)
 <2> 클러스터 Addon 설치 (VPC CNI 설치 시 Custom Networking 활성화)
@@ -404,14 +404,14 @@ metadata:
   region: $AWS_REGION
 
 managedNodeGroups:
-  - name: managed-ng-1 <1>
-    instanceType: t3.large <2>
-    spot: true <3>
-    desiredCapacity: 2 <4>
-    minSize: 2 <5>
-    maxSize: 2 <6>
-    volumeSize: 30 <7>
-    privateNetworking: true <8>
+  - name: managed-ng-1  # <1>
+    instanceType: t3.large # <2>
+    spot: true # <3>
+    desiredCapacity: 2 # <4>
+    minSize: 2 # <5>
+    maxSize: 2 # <6>
+    volumeSize: 30 # <7>
+    privateNetworking: true # <8>
 ----
 <1> 생성할 Managed Node Group 이름
 <2> Managed Node group을 통해 생성되는 Node 인스턴스 유형
