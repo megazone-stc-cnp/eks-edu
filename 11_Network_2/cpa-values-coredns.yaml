@@ -1,0 +1,11 @@
+options:
+  target: deployment/coredns    # CPA Target: CoreDNS
+  namespace: kube-system
+
+config:
+  linear:                       # CPA Method
+    nodePerReplica: 2
+    min: 2
+    max: 6
+    preventSinglePOintFailure: true
+    includeUnshedulableNodes: true
