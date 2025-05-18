@@ -1,0 +1,33 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: $CLUSTER_NAME
+  region: $AWS_REGION
+
+addons:
+  - name: vpc-cni
+    version: latest # auto discovers the latest available
+    configurationValues: |-
+      env:
+        AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG: "true"
+        ENI_CONFIG_LABEL_DEF: "topology.kubernetes.io/zone"
+        ENABLE_PREFIX_DELEGATION: "true"
+        WARM_PREFIX_TARGET: "1"
+        WARM_ENI_TARGET: "1"
+        WARM_IP_TARGET: "2"
+      eniConfig:
+        create: true
+        region: $AWS_REGION
+        subnets:
+          $AWS_AZ1:
+            id: $AWS_POD_SUBNET1
+            securityGroups:
+              - $EKS_CLUSTER_SG
+              - $EKS_ADDITIONAL_SG
+          $AWS_AZ2:
+            id: $AWS_POD_SUBNET2
+            securityGroups:
+              - $EKS_CLUSTER_SG
+              - $EKS_ADDITIONAL_SG
+    resolveConflicts: overwrite
