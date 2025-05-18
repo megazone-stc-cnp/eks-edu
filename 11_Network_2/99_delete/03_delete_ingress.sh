@@ -8,6 +8,6 @@ fi
 NAMESPACE_NAME=kube-system
 # =============================================================================
 
-kubectl -n ${NAMESPACE_NAME} delete ingress alb-ingress-manager
-
 kubectl -n default delete ingress nginx-ingress
+
+kubectl -n ${NAMESPACE_NAME} delete ingress alb-ingress-manager
