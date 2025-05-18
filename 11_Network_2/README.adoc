@@ -37,7 +37,7 @@ Kubernetes 1.12 버전 이전에는 `kube-dns` 가 Kubernetes 기본 DNS 서버�
 
 이러한 특성때문에 CoreDNS를 Kubernetes에 배포하면 CoreDNS용 Service 이름은 여전히 `kube-dns` 로 표시됩니다.
 
-image:images/coredns-service-name.png[CoreDNS Service name]
+image::images/coredns-service-name.png[CoreDNS Service name]
 
 === DNS 기반 서비스 디스커버리
 
@@ -101,7 +101,7 @@ search <namespace>.svc.cluster.local svc.cluster.local cluster.local <region>.co
 options ndots:5
 ----
 
-image:images/eks-pod-resolve-conf.png[/etc/resolve.conf on Amazon EKS]
+image::images/eks-pod-resolve-conf.png[/etc/resolve.conf on Amazon EKS]
 
 :search_order: {counter:search_order}
 .Search Order
@@ -204,7 +204,7 @@ CoreDNS는 EC2 node 및 Fargate 모두에 설치 가능합니다.
 
 하나 이상의 노드가 있는 Amazon EKS 클러스터를 시작하면 클러스터에 배포된 **노드 수에 관계없이 CoreDNS 이미지의 복제본 2개가 기본적으로 배포**됩니다.
 
-image:images/coredns-deployment-count.png[CoreDNS default pods count]
+image::images/coredns-deployment-count.png[CoreDNS default pods count]
 
 ==== CoreDNS 설정 파일 확인
 
@@ -255,7 +255,7 @@ metadata:
   resourceVersion: "27114"
   uid: 10e09535-85d5-4be5-a936-f09d0406fdd5
 ----
-image:images/coredns-configmap.png[CoreDNS ConfigMap]
+image::images/coredns-configmap.png[CoreDNS ConfigMap]
 ====
 
 ==== host 추가
@@ -328,9 +328,23 @@ TIP: https://coredns.io/plugins/rewrite/#cname-field-rewrites[CoreDNS - #rewrite
 다른 요인으로 DNS 응답 캐시 크기, CoreDNS 인스턴스당 수신된 쿼리 속도(QPS:Query per seconds) 등이 있습니다.
 
 [TIP]
-*필요한 MB(기본 설정) = (Pod 수 + 서비스 수) / 1000 + 54*
+.*CoreDNS 1개 Pod 당 필요한 메모리 크기*
+====
+메모리 크기(MB) = (Pod 수 + 서비스 수) / 1000 + 54
+====
 
-image:https://camo.githubusercontent.com/c114381719421bb31e38690aa22d2968e01c5926f318167803d8f372ed77cab8/68747470733a2f2f646f63732e676f6f676c652e636f6d2f7370726561647368656574732f642f652f32504143582d3176533764324d6c674e31674d72724f485861375a6e3653335671756a5354354c2d34504858376a723449556856635469306775585652436774495972744c6d3371785a57466c4d48542d5874396e332f70756263686172743f6f69643d31393137373533383926666f726d61743d696d616765[CoreDNS in Kubernetes Memory Use]
+.예시-1
+image::https://camo.githubusercontent.com/c114381719421bb31e38690aa22d2968e01c5926f318167803d8f372ed77cab8/68747470733a2f2f646f63732e676f6f676c652e636f6d2f7370726561647368656574732f642f652f32504143582d3176533764324d6c674e31674d72724f485861375a6e3653335671756a5354354c2d34504858376a723449556856635469306775585652436774495972744c6d3371785a57466c4d48542d5874396e332f70756263686172743f6f69643d31393137373533383926666f726d61743d696d616765[CoreDNS in Kubernetes Memory Use]
+
+.예시-2
+[%header,%autowidth,cols="1,a"]
+|===
+|Item |Description
+
+|Pod 수 |59 개
+|Service 수 |37 개
+|필요한 메모리 Size | 54.096 MB ( =(59 + 37) / 1000 + 54 )
+|===
 
 자세한 내용은 아래 문서에서 확인하시기 바랍니다.
 
@@ -513,7 +527,7 @@ Amazon EKS의 추가기능(Addon)을 통해 CoreDNS를 설치하면 Auto Scaling
 
 CoreDNS의 선택적 구성 설정에서 값을 위와 같이 적용한 후, btn:[변경 사항 저장(Save changes)] 버튼을 눌러 적용해 줍니다.
 
-image:images/coredns-config-update.png[CoreDNS Configu update]
+image::images/coredns-config-update.png[CoreDNS Configu update]
 
 추가 기능 상에서 값이 적용되었어도 이미 실행중인 CoreDNS Pod는 재시작이 필요합니다.
 
@@ -522,7 +536,7 @@ image:images/coredns-config-update.png[CoreDNS Configu update]
 kubectl rollout deployment/coredns -n kube-system
 ----
 
-image:images/coredns-rollout-restart.png[CoreDNS Rollout restart]]
+image::images/coredns-rollout-restart.png[CoreDNS Rollout restart]]
 ////
 
 === 실습
@@ -590,110 +604,141 @@ Address: 10.43.0.1
 https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/managing-coredns.html[Amazon EKS 클러스터에서 DNS에 대한 CoreDNS 관리]
 
 == AWS Load Balancer Controller
-=== AWS Load Balancer Controller이란?
 
-AWS 로드 밸런서 컨트롤러는 Kubernetes 클러스터의 AWS Elastic Load Balancer를 관리합니다.
+=== AWS Load Balancer Controller 란?
 
-컨트롤러를 사용하여 클러스터 앱을 인터넷에 노출할 수 있습니다. 컨트롤러는 클러스터 Service 또는 Ingress 리소스를 가리키는 AWS 로드 밸런서를 프로비저닝합니다.
+AWS Load Balancer Controller(이하 LBC)는 Amazon EKS 클러스터에서 AWS ELB(Elastic Load Balancer)를 관리합니다.
 
-다시 말해 컨트롤러는 클러스터의 여러 포드를 가리키는 단일 IP 주소 또는 DNS 이름을 생성합니다.
+AWS LBC를 사용하여 Amazon EKS Cluster에 배포된 App을 인터넷에 노출할 수 있습니다. AWS LBC는 클러스터 `Service` 또는 `Ingress` 리소스를 가리키는 AWS ELB를 프로비저닝합니다.
 
-![img.png](lbc-overview.png)
+다시 말해 AWS LBC는 클러스터의 여러 Pod를 가리키는 단일 IP 주소 또는 DNS 이름을 생성합니다.
 
-=== https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/guide/ingress/annotations/[Ingress에 적용할 수 있는 주석]
+.AWS LBC Overview
+image::https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/images/lbc-overview.png[AWS LBC Overview,700]
 
-=== https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/guide/service/annotations/[Service에 적용할 수 잇는 주석]
+=== AWS LBC Design
+
+아래 이미지는 AWS LBC가 `Ingress` 에 대해 어떻게 동작하는지 보여줍니다.
+
+.AWS LBC Design
+image::https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/assets/images/controller-design.png[AWS LBC Design]
+
+. API Server에서 https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-controllers[`ingress 이벤트`] 를 감시합니다.
++
+-> 요구 사항을 충족하는 Ingress 리소스를 감지한 경우, AWS ELB 또는 관련 리소스 생성을 시작합니다.
+. 새로운 Ingress 리소스를 위해 https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html[ALB]가 만들어집니다.
++
+-> ALB는 인터넷 또는 `인터넷 경계(Internet-facing)` 또는 `내부(Internal)` 중에 선택할 수 있습니다.
+. Ingress 리소스에 설정된 각 고유한 Kubernetes Service에 대해 AWS에 http://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html[대상 그룹(Target group)]이 생성됩니다.
+. Ingress 리소스의 Annotation에 명시된 모든 포트에 대해 http://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html[Listener]가 생성됩니다.
++
+-> 포트를 지정하지 않으면, 기본값(80 또는 443)이 사용됩니다.
+. Ingress 리소스에 지정된 각 경로(Path)에 맞는 http://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-update-rules.html[Listener 규칙]이 생성됩니다.
+
+=== https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/guide/ingress/annotations/[Ingress에 적용할 수 있는 Annotation]
+
+=== https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/guide/service/annotations/[Service에 적용할 수 잇는 Annotation]
+
+=== AWS LBC 설치
+
+==== AWS LBC용 IRSA용 생성
+
+AWS LBC는 AWS ELB 및 그와 관련된 AWS 리소스를 관리해야 하기 때문에 적절한 IAM Policy 및 Role이 생성되어야 합니다.
+
+AWS LBC에서는 미리 사용 가능한 IAM Policy용 JSON 파일을 제공하고 있어, 이 파일을 이용하여 IAM Policy 및 IAM Role을 생성할 수 있습니다.
+
+- AWS LBC용 IAM Policy: https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.13.2/docs/install/iam_policy.json
+
+.AWS LBC 용 Service Account 생성 (`create-aws-lbc-irsa.sh`)
+[,shell]
+----
+cd ~/environment/eks-edu/11_Network_2
+source ../env.sh
+
+# AWS CLI 실행을 위한 환경변수 설정
+export ADDON_NAME="aws-lbc"
+export ADDON_VERSION="v2.13.2"
+export OIDC_ID=$(aws eks describe-cluster --name ${CLUSTER_NAME} --query "cluster.identity.oidc.issuer" --output text ${PROFILE_STRING} --no-cli-pager | cut -d '/' -f 5)
+export ADDON_IAM_POLICY_NAME=${CLUSTER_NAME}-addon-${ADDON_NAME}-iam-pol
+export ADDON_IAM_ROLE_NAME=${CLUSTER_NAME}-addon-${ADDON_NAME}-iam-rol
+export IRSA_NAME=aws-lbc-sa
+
+# AWS LBC 용 IAM Policy 다운로드
+curl -o aws-lbc-iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/${ADDON_VERSION}/docs/install/iam_policy.json
+
+# IAM Policy 생성
+export ADDON_IAM_POLICY_ARN=$(aws iam create-policy --policy-name ${ADDON_IAM_POLICY_NAME} --policy-document file://aws-lbc-iam-policy.json --output text --no-cli-pager --query "Policy.Arn")
+
+# IAM Role 생성 (eksctl 사용)
+eksctl create iamserviceaccount \
+    --cluster=${CLUSTER_NAME} \
+    --namespace=kube-system \
+    --name=${IRSA_NAME} \
+    --role-name=${ADDON_IAM_ROLE_NAME} \
+    --attach-policy-arn=${ADDON_IAM_POLICY_ARN} \
+    --override-existing-serviceaccounts \
+    --region $AWS_REGION \
+    --approve
+----
+
+위 명령들을 일괄 실행할 수 있도록 제공된 스크립트 파일을 아래와 같이 실행할 수 있습니다.
+
+[,shell]
+----
+sh create-aws-lbc-irsa.sh
+----
+
+==== AWS LBC 설치
+
+. AWS LBC가 포함되어 있는 `eks-charts` Helm 리포지토리를 추가합니다.
++
+[,shell]
+----
+helm repo add eks https://aws.github.io/eks-charts
+----
+. 추가된 리포지토리를 업데이트합니다.
++
+[,shell]
+----
+helm repo update eks
+----
+. HELM을 이용하여 AWS LBC를 설치합니다.
++
+[,shell]
+----
+cd ~/environment/eks-edu/11_Network_2
+source ../env.sh
+
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+  -n kube-system \
+  --set clusterName=$CLUSTER_NAME \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-lbc-sa \
+  --version 1.13.2
+----
++
+Fargate 또는 EKS Hybrid Node에 배포할 경우에는 다음 파라메터 지정을 반드시 해주어야 합니다.
++
+- `--set region=#region-code#`
+- `--set vpcId=#vpc-xxxxxxxx#`
++
+image::images/aws-lbc-helm-install.png[AWS LBC 설치 결과]
+
+=== 실습
+
+==== Ingress 배포
+
+<구두 설명>
+
+==== Target Group Binding 배포
+
+<구두 설명>
 
 === 관련 링크
 - https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/aws-load-balancer-controller.html[AWS 로드 밸런서 컨트롤러를 통해 인터넷 트래픽 라우팅]
+- https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/[AWS Load Balancer Controller Documentation]
 - https://github.com/kubernetes-sigs/aws-load-balancer-controller[AWS Load Balancer Controller GitHub]
-
-== 실습
-=== 사전 설치
-```shell
-cd 00_pre_setup
-sh 01_install.sh
-```
-
-=== hosts 추가
-1. coredns configmap 백업
-```shell
-cd 01_coredns
-sh 01_coredns_configmap_backup.sh
-```
-
-2. coredns 내용을 수정하기
-```shell
-sh 02_coredns_edit_configmap.sh
-=============================================
-apiVersion: v1
-data:
-  Corefile: |
-    .:53 {
-        ....
-        reload
-        loadbalance
-
-        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        hosts {                        
-            10.43.0.1 myapp.local
-            fallthrough
-        }
-        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    }
-    ....
-kind: ConfigMap
-=============================================
-```
-3. coredns deployment 재시작
-```shell
-sh 03_coredns_restart_deployment.sh
-```
-4. Pod에서 nslookup 실행
-```shell
-sh 04_pod_exec.sh
-kubectl run test-pod --image=busybox --restart=Never --rm -it -- /bin/sh 
-terminal에서 아래와 같이 조회하세요
-# nslookup myapp.local
-
-If you don't see a command prompt, try pressing enter.
-/ # nslookup myapp.local
-Server:		10.100.0.10
-Address:	10.100.0.10:53
-
-Name:	myapp.local
-Address: 10.43.0.1
-```
-
-=== C Name 등록 ( 설명 )
-1. CoreDNS에 특정 도메인을 Internal ALB에 매핑 작업
-```shell
-sh 02_coredns_edit_configmap.sh
-=============================================
-apiVersion: v1
-data:
-  Corefile: |
-    .:53 {
-        ....
-        ready
-        rewrite stop {
-            name exact working.dot.com internal-alb.ap-northeast-2.elb.amazonaws.com
-            answer name internal-alb.ap-northeast-2.elb.amazonaws.com working.dot.com
-        }
-        kubernetes cluster.local in-addr.arpa ip6.arpa {
-          pods insecure
-          fallthrough in-addr.arpa ip6.arpa
-        }
-    }
-    ....
-kind: ConfigMap
-=============================================
-```
-
-=== https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/lbc-helm.html[AWS LoadBalancer Controller 설치]
-
-=== Ingress 배포
-=== Target Group Binding 배포
+- https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller[ArtifactHUB: aws-load-balancer-controller]
 
 == 정리
 ```shell
