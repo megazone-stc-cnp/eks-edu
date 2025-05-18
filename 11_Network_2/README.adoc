@@ -26,7 +26,7 @@ endif::[]
 // - https://zenika.github.io/adoc-presentation-model/reveal-my-asciidoc.html
 
 == 목표
-- Kubernetes DNS 서비스, CoreDNS, kube-proxy에 대해서 배우고 실습
+- Kubernetes DNS 서비스, CoreDNS에 대해서 배우고 실습
 - AWS Load Balancer Controller에 대해서 배우고 실습
 
 == Kubernetes DNS
