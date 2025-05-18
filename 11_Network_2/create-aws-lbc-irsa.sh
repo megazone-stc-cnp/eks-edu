@@ -6,7 +6,6 @@ source ../env.sh
 # AWS CLI 실행을 위한 환경변수 설정
 export ADDON_NAME="aws-lbc"
 export ADDON_VERSION="v2.13.2"
-export OIDC_ID=$(aws eks describe-cluster --name ${CLUSTER_NAME} --query "cluster.identity.oidc.issuer" --output text ${PROFILE_STRING} --no-cli-pager | cut -d '/' -f 5)
 export ADDON_IAM_POLICY_NAME=${CLUSTER_NAME}-addon-${ADDON_NAME}-iam-pol
 export ADDON_IAM_ROLE_NAME=${CLUSTER_NAME}-addon-${ADDON_NAME}-iam-rol
 export IRSA_NAME=aws-lbc-sa

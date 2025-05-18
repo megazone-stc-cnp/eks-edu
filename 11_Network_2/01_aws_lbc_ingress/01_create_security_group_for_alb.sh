@@ -41,6 +41,6 @@ aws ec2 authorize-security-group-ingress \
     --cidr 0.0.0.0/0 ${PROFILE_STRING}
 
 echo "Security Group 설정이 완료되었습니다."
-echo "[TODO] EKS Cluster Security Group의 Inbound에 이 Security Group을 등록해야 한다 ( Port: 80 ). 
-echo "export ALB_SECURITY_GROUP_ID=${SG_ID}" >> ./local_env.sh
+echo "[TODO] EKS Cluster Security Group의 Inbound에 이 Security Group을 등록해야 한다 ( Port: 80 )."
+echo "export ALB_SECURITY_GROUP_ID=${SG_ID}" > ./local_env.sh
 echo "" >> ./local_env.sh
