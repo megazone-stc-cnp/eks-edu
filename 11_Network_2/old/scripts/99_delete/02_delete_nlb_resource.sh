@@ -5,17 +5,11 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
-if [ ! -f "../../vpc_env.sh" ];then
-	echo "vpc_env.sh 파일 세팅을 해주세요."
+if [ ! -f "../04_target_group_binding/local_env.sh" ];then
+	echo "../04_target_group_binding/local_env.sh 파일 세팅을 해주세요."
 	exit 1
 fi
-. ../../vpc_env.sh
-
-if [ ! -f "../02_aws_lbc_target_group_binding/local_env.sh" ];then
-	echo "../02_aws_lbc_target_group_binding/local_env.sh 파일 세팅을 해주세요."
-	exit 1
-fi
-. ../02_aws_lbc_target_group_binding/local_env.sh
+. ../04_target_group_binding/local_env.sh
 # export NLB_SECURITY_GROUP_ID=
 # export TARGET_GROUP_ARN=
 # export LISTENER_ARN=

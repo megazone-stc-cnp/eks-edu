@@ -1,9 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-ns
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
+  namespace: app-ns
 spec:
-  replicas: 4
+  replicas: 2
   selector:
     matchLabels:
       app: nginx
@@ -40,6 +46,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx-service
+  namespace: app-ns
 spec:
   type: ClusterIP
   selector:
@@ -52,6 +59,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-debug
+  namespace: app-ns
 spec:
   replicas: 1
   selector:

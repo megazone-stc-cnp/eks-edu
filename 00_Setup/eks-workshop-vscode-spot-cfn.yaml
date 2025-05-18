@@ -448,7 +448,6 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              
               - ec2:CreateLaunchTemplate
               - ec2:DeleteLaunchTemplate
               - sts:GetCallerIdentity
@@ -539,27 +538,49 @@ Resources:
       Path: "/"
       Roles:
         - Ref: EksWorkshopIdeRole
+  EksWorkshopIdeLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub ${AWS::StackName}-ide-lt
+      LaunchTemplateData:
+        InstanceType: !Ref CodeServerInstanceType
+        ImageId: !Ref AmiParameterStoreName
+        IamInstanceProfile:
+          Name: !Ref EksWorkshopIdeInstanceProfile
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              VolumeSize: !Ref InstanceVolumeSize
+              VolumeType: gp3
+              DeleteOnTermination: true
+              Encrypted: true
+        InstanceMarketOptions:
+          MarketType: spot
+          SpotOptions:
+            SpotInstanceType: one-time
+            InstanceInterruptionBehavior: terminate
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: !Sub ${AWS::StackName}-ide
+              - Key: type
+                Value: eksworkshop-ide
+          - ResourceType: volume
+            Tags:
+              - Key: Name
+                Value: !Sub ${AWS::StackName}-ide
+              - Key: type
+                Value: eksworkshop-ide
   EksWorkshopIdeInstance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref AmiParameterStoreName
-      InstanceType: !Ref CodeServerInstanceType
-      BlockDeviceMappings:
-        - Ebs:
-            VolumeSize: !Ref InstanceVolumeSize
-            VolumeType: gp3
-            DeleteOnTermination: true
-            Encrypted: true
-          DeviceName: /dev/xvda
+      LaunchTemplate:
+        LaunchTemplateId: !Ref EksWorkshopIdeLaunchTemplate
+        Version: !GetAtt EksWorkshopIdeLaunchTemplate.LatestVersionNumber
       SubnetId: !Ref PublicSubnet
-      SecurityGroupIds:
-        - !Ref SecurityGroup
-      IamInstanceProfile: !Ref EksWorkshopIdeInstanceProfile
-      Tags:
-        - Key: Name
-          Value: !Sub ${AWS::StackName}-ide
-        - Key: type
-          Value: eksworkshop-ide
   EksWorkshopIdePassword:
     Type: AWS::SecretsManager::Secret
     Properties:

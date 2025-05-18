@@ -11,3 +11,9 @@ fi
 echo "eksctl create cluster -f template/eksctl.yaml ${PROFILE_STRING}" 
 
 eksctl create cluster -f template/eksctl.yaml ${PROFILE_STRING}
+
+# EKS Cluster SG 추가
+VPC_ENV_FILE_PATH=../../vpc_env.sh
+cat >> ${VPC_ENV_FILE_PATH} << EOF
+export EKS_CLUSTER_SG=$(aws eks describe-cluster --name $CLUSTER_NAME --no-cli-pager --query 'cluster.resourcesVpcConfig.clusterSecurityGroupId' --output text)
+EOF

@@ -1,0 +1,30 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: $CLUSTER_NAME
+  region: $AWS_REGION
+
+addons:
+  - name: coredns
+    version: latest # auto discovers the latest available
+    configurationValues: |-
+      resources:
+        requests:
+          cpu: "250m"
+        limits:
+          cpu: "500m"
+      tolerations:
+        - operator: "Exists"
+      autoScaling:
+        enabled: true
+        minReplicas: 3
+        maxReplicas: 10
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              eks.amazonaws.com/component: coredns
+    resolveConflicts: overwrite

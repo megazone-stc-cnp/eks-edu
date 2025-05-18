@@ -55,7 +55,7 @@ export AWS_PRIVATE_SUBNET1=$(cat result.json | jq -r '.[] | select(.OutputKey=="
 export AWS_PRIVATE_SUBNET2=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet02") | .OutputValue')
 export AWS_POD_SUBNET1=$(cat result.json | jq -r '.[] | select(.OutputKey=="PodSubnet01") | .OutputValue')
 export AWS_POD_SUBNET2=$(cat result.json | jq -r '.[] | select(.OutputKey=="PodSubnet02") | .OutputValue')
-export EKS_ADDITIONAL_SG=$(cat result.json | jq -r '.[] | select(.OutputKey=="SecurityGroups") | .OutputValue')
 export AWS_AZ1=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet01AZ") | .OutputValue')
 export AWS_AZ2=$(cat result.json | jq -r '.[] | select(.OutputKey=="PrivateSubnet02AZ") | .OutputValue')
+export EKS_ADDITIONAL_SG=$(cat result.json | jq -r '.[] | select(.OutputKey=="SecurityGroups") | .OutputValue')
 EOF

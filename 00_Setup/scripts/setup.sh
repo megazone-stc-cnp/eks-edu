@@ -10,6 +10,10 @@ if [[ ! -d "~/.bashrc.d" ]]; then
   echo 'for file in ~/.bashrc.d/*.bash; do source "$file"; done' >> ~/.bashrc
 fi
 
+# VIMRC 설정
+cat << EOT > ~/.vimrc
+set number
+EOT
 
 # AWS CLI 환경변수 설정
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
