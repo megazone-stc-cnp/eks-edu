@@ -50,9 +50,70 @@ sh 02_eksctl_install.sh
 
 == Backstage 란?
 
+=== Backstage가 필요로한 이유
+
+image::image/why_needs_backstage.png[Backstage가 필요로한 이유]
+
+Backstage의 혜택
+
+. 엔지니어링 매니저에게는, 조직 전체에서 표준과 모범 사례를 유지할 수 있게 해주며, 마이그레이션부터 테스트 인증에 이르기까지 **전체 기술 생태계를 관리하는 데 도움**이 됩니다.
+. 최종 사용자(개발자)에게는, 소프트웨어 구성 요소를 표준화된 방식으로 빠르고 간편하게 구축할 수 있도록 해주며, 모든 프로젝트와 문서를 중앙에서 관리할 수 있는 공간을 제공합니다.
+. 플랫폼 엔지니어에게는, 새로운 도구와 서비스를 플러그인 형태로 쉽게 통합하거나 기존 기능을 확장할 수 있어 확장성과 유연성을 제공합니다.
+. 모든 사용자에게는, 인프라 도구, 리소스, 표준, 소유자, 기여자, 관리자 등을 하나의 장소에서 통합하는 일관된 사용자 경험을 제공합니다.
+
+=== Backstage의 주요 요소
+. 모든 소프트웨어(마이크로서비스, 라이브러리, 데이터 파이프라인, 웹사이트, ML 모델 등)를 관리하기 위한 *Backstage 소프트웨어 카탈로그*
+. 조직의 모범 사례에 맞춰 새로운 프로젝트를 빠르게 시작하고 툴을 표준화하기 위한 Backstage *소프트웨어 템플릿*
+. "코드와 같은 문서" 접근 방식을 사용하여 기술 문서를 쉽게 만들고, 유지 관리하고, 찾고, 사용할 수 있도록 해주는 *Backstage TechDocs*
+. Backstage의 사용자 정의 가능성과 기능을 더욱 확장하는 https://backstage.io/docs/overview/what-is-backstage[오픈 소스 플러그인] 의 성장하는 생태계
+
 == Backstage 설치
 
+Backstage Standalone 앱 설치
+[source,shell]
+----
+npx @backstage/create-app@latest
+----
+
+image::image/Backstage_install.png[백스테이지 설치]
+
+=== 개발 환경 사전 요건
+
+. Linux, macOS 또는 Windows Subsystem for Linux 와 같은 Unix 기반 운영 체제에 대한 액세스
+. curl 또는 wget 설치됨
+. Node 20 설치 ( nvm 이용 )
+. yarn 설치
+. docker 설치
+. git 설치
+
+=== 관련 링크
+. Creating your Backstage App : https://backstage.io/docs/getting-started/
+
 == Backstage 인증
+
+=== 지원 인증 공급자
+. https://backstage.io/docs/auth/auth0/provider/[AuthO]
+. https://backstage.io/docs/auth/atlassian/provider/[Atlassian]
+. https://backstage.io/docs/auth/microsoft/provider/[Azure]
+. https://backstage.io/docs/auth/microsoft/easy-auth/[Azure Easy Auth]
+. https://backstage.io/docs/auth/bitbucket/provider/[Bitbucket]
+. https://backstage.io/docs/auth/bitbucketServer/provider/[Bitbucket Server]
+. https://backstage.io/docs/auth/cloudflare/provider/[Cloudflare Access]
+. https://backstage.io/docs/auth/github/provider/[GitHub]
+. https://backstage.io/docs/auth/gitlab/provider/[GitLab]
+. https://backstage.io/docs/auth/google/provider/[Google]
+. https://backstage.io/docs/auth/google/gcp-iap-auth/[Google IAP]
+. https://backstage.io/docs/auth/okta/provider/[Okta]
+. https://backstage.io/docs/auth/oauth2-proxy/provider/[OAuth 2 Custom Proxy]
+. https://backstage.io/docs/auth/onelogin/provider/[OneLogin]
+. https://backstage.io/docs/auth/vmware-cloud/provider/[VMWare Cloud]
+
+=== GitHub 연동
+
+=== 관련 링크
+
+. Authentication : https://backstage.io/docs/getting-started/config/authentication/
+. Authentication in Backstage : https://backstage.io/docs/auth/
 
 == Backstage Software Catalog
 
