@@ -29,7 +29,7 @@ aws cloudformation delete-stack \
 echo "VPC 삭제중....."
 aws cloudformation wait stack-delete-complete \
     --stack-name ${VPC_STACK_NAME} ${PROFILE_STRING}
-if [ -f "../../vpc_env.sh" ];then
-	rm -rf ../../vpc_env.sh
-fi
+#if [ -f "../../vpc_env.sh" ];then
+#	rm -rf ../../vpc_env.sh
+#fi
 echo "VPC 삭제 완료....."

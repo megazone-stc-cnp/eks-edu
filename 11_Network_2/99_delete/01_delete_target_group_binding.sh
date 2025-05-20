@@ -13,4 +13,4 @@ fi
 
 TARGET_GROUP_BINDING_NAME=eks-edu-target-group-binding-${IDE_NAME}
 # =========================================================================================
-kubectl delete -f ../04_target_group_binding/tmp/${TARGET_GROUP_BINDING_NAME}.yaml
+kubectl delete -f ../02_aws_lbc_target_group_binding/tmp/${TARGET_GROUP_BINDING_NAME}.yaml
