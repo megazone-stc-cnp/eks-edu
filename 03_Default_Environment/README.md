@@ -98,7 +98,7 @@ EKS 생성시에 아래의 기본 보안 그룹이 EKS Cluster에 연결됩니�
 
 ### eksctl이란
 
-eksclt은 관리형 Kubernetes 서비스인 EKS에서 클러스터를 만들고 관리하기 위해 Weaveworks 에서 만든 CLI Tool
+eksctl은 관리형 Kubernetes 서비스인 EKS에서 클러스터를 만들고 관리하기 위해 Weaveworks 에서 만든 CLI Tool
 
 Weaveworks가 상업중 운영을 중단한다고 하여, 현재는 AWS에서 인수한 상태
 
