@@ -2,9 +2,9 @@
 
 set -e
 
-if [[ ! -d "~/.bashrc.d" ]]; then
+if [[ ! -d ~/.bashrc.d ]]; then
   mkdir -p ~/.bashrc.d
-  
+
   touch ~/.bashrc.d/dummy.bash
 
   echo 'for file in ~/.bashrc.d/*.bash; do source "$file"; done' >> ~/.bashrc

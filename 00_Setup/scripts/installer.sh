@@ -170,8 +170,6 @@ rm -rf fzf.tar.gz
 
 # bat
 download "https://github.com/sharkdp/bat/releases/download/v${bat_version}/bat-v${bat_version}-${arch}-unknown-linux-gnu.tar.gz" "bat.tar.gz"
-download "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_64-unknown-linux-gnu.tar.gz" "bat.tar.gz"
-download "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_64-unknown-linux-gnu.tar.gz" "bat.tar.gz"
 tar xfz bat.tar.gz
 chmod +x bat-v${bat_version}-${arch}-unknown-linux-gnu/bat
 chown root:root bat-v${bat_version}-${arch}-unknown-linux-gnu/bat
