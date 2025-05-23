@@ -730,7 +730,31 @@ image::images/aws-lbc-helm-install.png[AWS LBC 설치 결과]
 
 ==== Ingress 배포
 
-<구두 설명>
+AWS LBC가 설치된 후 아래 스크립트를 순서대로 실행하여 간단한 Ingress 환경을 구축합니다.
+
+. ALB용 보안 그룹 생성
+[
+,shell]
+----
+bash 01_aws_lbc_ingress/01_create_security_group_for_alb.sh
+----
+
+. 기본 Ingress 리소스 배포 (ALB 생성 확인)
+[
+,shell]
+----
+bash 01_aws_lbc_ingress/02_create_default_ingress.sh
+----
+
+. 샘플 서비스와 Ingress 배포
+[
+,shell]
+----
+bash 01_aws_lbc_ingress/03_create_service.sh
+bash 01_aws_lbc_ingress/04_create_nginx_ingress.sh
+----
+
+실행 후 생성된 ALB의 DNS 주소로 접속하여 Nginx 페이지가 보이는지 확인합니다.
 
 ==== Target Group Binding 배포
 
