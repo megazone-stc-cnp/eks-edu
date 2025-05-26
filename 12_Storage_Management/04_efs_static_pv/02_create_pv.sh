@@ -1,10 +1,4 @@
 #!/bin/bash
-if [ -z "$1" ]; then
-    echo "사용법: $0 <EFS_ID>"
-    exit 1
-fi
-EFS_ID=$1
-
 if [ ! -f "../../env.sh" ];then
 	echo "env.sh 파일 세팅을 해주세요."
 	exit 1
@@ -16,6 +10,12 @@ if [ ! -f "../../vpc_env.sh" ];then
 	exit 1
 fi
 . ../../vpc_env.sh
+
+if [ ! -f "../03_efs_dynamic_pv/local_env.sh" ];then
+	echo "local_env 를 진행해 주세요."
+	exit 1
+fi
+. ../03_efs_dynamic_pv/local_env.sh
 
 STORAGECLASS_NAME=efs-static-sc
 PV_NAME=efs-static-pv

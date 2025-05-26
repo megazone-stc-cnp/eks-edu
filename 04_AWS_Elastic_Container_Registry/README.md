@@ -132,8 +132,10 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
         --repository-name public.ecr.aws/eks/aws-load-balancer-controller 
    ```
 2. 실행 화면
+
    ![1743577747455](image/creating_lbc_repository.png)
 3. 생성 결과 화면
+
    ![1743577874296](image/result_lbc_repository.png)
 
 #### Cluster AutoScaler Repository
@@ -151,9 +153,11 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
         --repository-name registry.k8s.io/autoscaling/cluster-autoscaler
    ```
 2. 실행 화면
+
    ![1743578043503.png](image/creating_cluster_autoscaler_repository.png)
 
 3. 생성 결과 화면
+
    ![1743578210172](image/result_cluster_autoscaler_repository.png)
 
 #### Nginx   
@@ -170,10 +174,13 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    aws ecr create-repository \
         --repository-name public.ecr.aws/nginx/nginx
    ```
+
 2. 실행 화면
+
    ![1743578426316](image/creating_nginx_repository.png)
 
 3. 생성 결과 화면
+
    ![1743578509292](image/result_nginx_repository.png)
 
 ### ECR Repository Image Push
@@ -205,8 +212,11 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2 public.ecr.aws/eks/aws-load-balancer-controller:v2.9.2
    ```
 2. 실행 화면
+
    ![1743579337793](image/lbc_image_push.png)
+
 3. 생성 결과 화면
+ 
    ![1743579411398](image/result_lbc_image_push.png)
 
 #### Cluster AutoScaler
@@ -235,12 +245,17 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    # docker에 존재하는 Image 삭제
    docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0 registry.k8s.io/autoscaling/cluster-autoscaler:v1.32.0
    ```
+
 2. 실행 화면
+
    ![1743579830239](image/cluster_autoscaler_image_push.png)
+
 3. 생성 결과 화면
+
    ![1743579895596](image/result_cluster_autoscaler_image_push.png)
 
-#### Nginx   
+#### Nginx
+
 1. Nginx Image 업로드
 
    ```shell
@@ -266,9 +281,13 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    # docker에 존재하는 Image 삭제
    docker rmi 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/public.ecr.aws/nginx/nginx:1.27 public.ecr.aws/nginx/nginx:1.27
    ```
+
 2. 실행 화면
+
    ![1743580289776](image/nginx_image_push.png)
+
 3. 생성 결과 화면
+
    ![1743580353708](image/result_nginx_image_push.png)
 
 ### Pull Through Cache 실습
@@ -289,9 +308,13 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
        --ecr-repository-prefix public-ecr-9641173
    ```
 2. 실행 화면
+
    ![1743582805949](image/creating_pull_through_cache_rule.png)
+
 3. 생성 결과 화면
+
    ![1743582919218](image/result_pull_through_cache_rule.png)
+
 4. nginx image pull
 
    docker pull 시에 Private ECR 및 Image가 업로드 됩니다.
@@ -312,6 +335,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 5. 실행 화면
 
    ![1743584365543](image/pull_through_cache_nginx_pull.png)
+
 6. 생성 결과 화면
 
    ![1743585511177](image/result_pull_through_cache_nginx_pull.png)
@@ -342,9 +366,11 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
    ```
 
 2. 실행 화면
+
    ![1743642810030](image/delete_resource.png)
 
 3. 결과 화면
+
    private repository 목록
    ![1743642923754](image/result_private_repository.png)
 

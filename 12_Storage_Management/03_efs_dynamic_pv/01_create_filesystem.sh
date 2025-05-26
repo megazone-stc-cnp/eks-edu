@@ -27,24 +27,24 @@ echo "aws ec2 create-security-group \\
     --query \"GroupId\" \\
     --output text ${PROFILE_STRING}"
 
-EFS_SG_ID=$(aws ec2 create-security-group \
+EFS_SECURITY_GROUP=$(aws ec2 create-security-group \
     --group-name ${EFS_SG_NAME} \
     --description "Security group for EFS in EKS" \
     --vpc-id ${VPC_ID} \
     --query "GroupId" \
     --output text ${PROFILE_STRING})
 
-echo "Created security group: ${EFS_SG_ID}"
+echo "Created security group: ${EFS_SECURITY_GROUP}"
 
 # Add inbound rule to allow NFS traffic from the VPC CIDR
 echo "aws ec2 authorize-security-group-ingress \\
-    --group-id ${EFS_SG_ID} \\
+    --group-id ${EFS_SECURITY_GROUP} \\
     --protocol tcp \\
     --port 2049 \\
     --cidr ${VPC_CIDR} ${PROFILE_STRING}"
 
 aws ec2 authorize-security-group-ingress \
-    --group-id ${EFS_SG_ID} \
+    --group-id ${EFS_SECURITY_GROUP} \
     --protocol tcp \
     --port 2049 \
     --cidr ${VPC_CIDR} ${PROFILE_STRING}
@@ -77,21 +77,28 @@ sleep 10
 echo "aws efs create-mount-target \\
     --file-system-id ${EFS_ID} \\
     --subnet-id ${AWS_PRIVATE_SUBNET1} \\
-    --security-groups ${EFS_SG_ID} ${PROFILE_STRING}"
+    --security-groups ${EFS_SECURITY_GROUP} ${PROFILE_STRING}"
 
 aws efs create-mount-target \
     --file-system-id ${EFS_ID} \
     --subnet-id ${AWS_PRIVATE_SUBNET1} \
-    --security-groups ${EFS_SG_ID} ${PROFILE_STRING}
+    --security-groups ${EFS_SECURITY_GROUP} ${PROFILE_STRING}
 
 echo "aws efs create-mount-target \\
     --file-system-id ${EFS_ID} \\
     --subnet-id ${AWS_PRIVATE_SUBNET2} \\
-    --security-groups ${EFS_SG_ID} ${PROFILE_STRING}"
+    --security-groups ${EFS_SECURITY_GROUP} ${PROFILE_STRING}"
 
 aws efs create-mount-target \
     --file-system-id ${EFS_ID} \
     --subnet-id ${AWS_PRIVATE_SUBNET2} \
-    --security-groups ${EFS_SG_ID} ${PROFILE_STRING}
+    --security-groups ${EFS_SECURITY_GROUP} ${PROFILE_STRING}
 
-echo "EFS ID 값을 기록하세요: ${EFS_ID}"
+if [ -f "./local_env.sh" ];then
+    rm -rf local_env.sh
+fi
+echo "#!/bin/bash" >> local_env.sh
+echo "export EFS_ID=${EFS_ID}" >> local_env.sh
+echo "export EFS_SECURITY_GROUP=${EFS_SECURITY_GROUP}" >> local_env.sh
+
+

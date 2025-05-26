@@ -17,6 +17,12 @@ if [ ! -f "../../vpc_env.sh" ];then
 fi
 . ../../vpc_env.sh
 
+if [ ! -f "./local_env.sh" ];then
+	echo "01_create_volume 를 진행해 주세요."
+	exit 1
+fi
+. ./local_env.sh
+
 PV_NAME=ebs-static-pv
 VOLUME_SIZE="1"
 # ====================================================================

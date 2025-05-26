@@ -42,6 +42,13 @@ if [ $? -eq 0 ]; then
     echo "Waiting for volume to become available..."
     aws ec2 wait volume-available --volume-ids ${VOLUME_ID} ${PROFILE_STRING}
     echo "Volume is now available and ready to use."
+
+    if [ -f "./local_env.sh" ];then
+        rm -rf local_env.sh
+    fi
+    echo "#!/bin/bash" >> local_env.sh
+    echo "export VOLUME_ID=${VOLUME_ID}" >> local_env.sh
+
 else
     echo "Failed to create EBS volume."
     exit 1

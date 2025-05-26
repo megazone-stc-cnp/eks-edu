@@ -57,13 +57,83 @@ image::image/result_ebs_efs_addon.png[EBS EFS Addon 설치 결과]
 
 ==== 종류
 - emptyDir : Pod 시작 시 비어 있음, 저장소는 kubelet 기본 디렉토리(일반적으로 루트 디스크) 또는 RAM에서 로컬로 제공됨
++
+[,yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: counter
+spec:
+  containers:
+  - name: count
+    image: busybox:1.28
+    args:
+    - /bin/sh
+    - -c
+    - >
+      i=0;
+      while true;
+      do
+        echo "$i: $(date)" >> /var/log/1.log;
+        echo "$(date) INFO $i" >> /var/log/2.log;
+        i=$((i+1));
+        sleep 1;
+      done
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+  - name: count-log-1
+    image: busybox:1.28
+    args: [/bin/sh, -c, 'tail -n+1 -F /var/log/1.log']
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+  - name: count-log-2
+    image: busybox:1.28
+    args: [/bin/sh, -c, 'tail -n+1 -F /var/log/2.log']
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+  volumes:
+  - name: varlog
+    emptyDir: {}
+----
 - configMap, secret : 다양한 종류의 Kubernetes 데이터를 Pod에 주입합니다.
++
+[,yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: mypod
+    image: redis
+    volumeMounts:
+    - name: foo
+      mountPath: "/etc/foo"
+      readOnly: true
+  volumes:
+  - name: foo
+    configMap:
+      name: myconfigmap
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myconfigmap
+data:
+  username: k8s-admin
+  access_level: "1"
+----
 
 == EBS CSI Driver
 
-Amazon Elastic Block Store(Amazon EBS) CSI(Container Storage Interface) 드라이버에서는 Amazon EBS 볼륨의 수명 주기를 사용자가 생성하는 Kubernetes 볼륨의 스토리지로 관리합니다.
+Amazon Elastic Block Store(Amazon EBS) CSI(Container Storage Interface) 드라이버에서는 **Amazon EBS 볼륨의 수명 주기를 사용자가 생성하는 Kubernetes 볼륨의 스토리지로 관리**합니다.
 
-Amazon EBS CSI 드라이버는 Amazon EBS 볼륨을 Kubernetes 볼륨 유형인 일반 임시 볼륨 및 영구 볼륨에 사용할 수 있도록 만듭니다.
+Amazon EBS CSI 드라이버는 Amazon EBS 볼륨을 Kubernetes 볼륨 유형인 일반 임시 볼륨 및 **영구 볼륨**에 사용할 수 있도록 만듭니다.
 
 === 고려 사항
 
@@ -89,18 +159,27 @@ Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 �
 * 버전 2.0.0부터 이 드라이버는 TLS 연결에 stunnel를 사용하던 것을 efs-proxy로 전환했습니다. efs-proxy를 사용하면 실행 중인 노드의 코어 수에 1을 더한 것과 같은 수의 스레드가 열립니다.
 * Amazon EFS CSI 드라이버는 *Amazon EKS Hybrid Nodes와 호환되지 않습*니다.
 
-## 실습
+== Dynamic Provisioning
 
-## EBS Dynamic Provisioning
-1. EBS StorageClass 생성
+image::image/Dynamic_Provisioning_draw.png[Dynamic Provisioning]
+
+== Static Provisioning
+
+image::image/Static_Provisioning_draw.png[Static Provisioning]
+
+== 실습
+
+=== EBS Dynamic Provisioning
+. EBS StorageClass 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/01_ebs_dynamic_pv
 sh 01_create_storageclass.sh
 ----
 
-위 `01_create_storageclass.sh`를 실행하면 tmp/ebs_dynamic_storageclass.yaml를 만들어서 배포를 합니다.(참고용)
-
+. 위 ``01_create_storageclass.sh```를 실행하면 ``tmp/ebs_dynamic_storageclass.yaml```를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: storage.k8s.io/v1
@@ -111,33 +190,31 @@ provisioner: ebs.csi.aws.com
 reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/ebs_dynamic_storageclass.yaml
 ----
-
-2. 실행 화면
-
++
+.실행 화면
 image::image/creating_ebs_dynamic_storageclass.png[1743738878537]
-
-3. 생성 결과 화면
-
++
 `kubectl get storageclass` 실행 시
-
++
+.생성 결과 화면
 image::image/result_ebs_dynamic_storageclass.png[1743739043124]
 
-4. EBS PVC 생성
-
+. EBS PVC 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/01_ebs_dynamic_pv
 sh 02_create_pvc.sh
 ----
-
-위 `02_create_pvc.sh`를 실행하면 tmp/ebs_dynamic_pvc.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``02_create_pvc.sh``를 실행하면 ``tmp/ebs_dynamic_pvc.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -152,27 +229,24 @@ spec:
    requests:
      storage: 1Gi
 ----
-
-5. 실행 화면
-
++
+.실행 화면
 image::image/creating_ebs_dynamic_pvc.png[1743739340663]
-
-6. 생성 결과 화면
-
-`kubectl get pvc` 실행 시
-
++
+``kubectl get pvc`` 실행 시
+.생성 결과 화면
 image::image/result_ebs_dynamic_pvc.png[1743739496367]
 
-7. Pod 생성
-
+. Pod 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/01_ebs_dynamic_pv
 sh 03_create_pod.sh
 ----
-
-위 `03_create_pod.sh`를 실행하면 tmp/ebs_dynamic_pod.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``03_create_pod.sh``를 실행하면 ``tmp/ebs_dynamic_pod.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -193,52 +267,49 @@ spec:
    persistentVolumeClaim:
      claimName: ebs-dynamic-claim
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/ebs_dynamic_pod.yaml
 ----
-
-8. 실행 화면
-
++
+.실행 화면
 image::image/ebs_dynamic_pv_creating_pod.png[1743740263503]
-
-9. 생성 결과 화면
-
-`kubectl get pods` 실행 시
-
++
+``kubectl get pods`` 실행 시
++
+.생성 결과 화면
 image::image/ebs_dynamic_pv_result_creating_pod.png[1743740479731]
-
-`kubectl get pv` 실행 시
-
++
+``kubectl get pv`` 실행 시
++
 image::image/ebs_dynamic_pv_result_creating_pv.png[1743740621150]
 - NAME : 자동으로 생성된 Volume이름으로 매핑
 - STATUS : Pod가 생성시 Attach되어 Bound 상태
 - CLAIM : 네임스페이스/PVC 이름
 - STORAGECLASS : 1번단계에서 만들어진 Storageclass 이름
 
-8. Volume 체크
-
+. Volume 체크
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/01_ebs_dynamic_pv
 sh 04_check.sh
 ----
-
++
 위 `04_check.sh`를 실행하면 아래 kubectl 명령을 실행합니다..(참고용)
-
++
 [,shell]
 ----
 kubectl exec ebs-dynamic-app -- cat /data/out.txt
 ----
-
-9. 실행 결과 화면
-
++
+.실행 결과 화면
 image::image/ebs_dynamic_pv_result_exec.png[1743740797263]
 
-10. 미션
-
+. Pod가 삭제되어도 유지가 되는지 확인
++
 [,shell]
 ----
 kubectl delete pod app
@@ -251,17 +322,18 @@ sh 03_create_pod.sh
 sh 04_check.sh
 ----
 
-## EBS Static Provisioning
-1. EBS Volume 생성
+=== EBS Static Provisioning
 
+. EBS Volume 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
 sh 01_create_volume.sh
 ----
-
-위 `01_create_volume.sh`를 실행하면 아래 aws cli 명령을 수행하여 EBS Volume을 생성 합니다.(참고용)
-
++
+위 ``01_create_volume.sh``를 실행하면 아래 aws cli 명령을 수행하여 EBS Volume을 생성 합니다.(참고용)
++
 [,shell]
 ----
 aws ec2 create-volume \
@@ -272,23 +344,23 @@ aws ec2 create-volume \
    --query "VolumeId" \
    --output text
 ----
-
-2. 실행 화면
++
+.실행 화면
 image::image/ebs_static_pv_creating_volume.png[1743741491394]
-
-3. 생성 결과 화면
++
+.생성 결과 화면
 image::image/result_ebs_static_pv_creating_volume.png[1743741558026]
 
-4. EBS Static PV 생성
-
+. EBS Static PV 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
 sh 02_create_pv.sh
 ----
-
-위 `02_create_pv.sh`를 실행하면 tmp/ebs_static_pv.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``02_create_pv.sh``를 실행하면 ``tmp/ebs_static_pv.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -313,31 +385,31 @@ spec:
              values:
                - ap-northeast-1a
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/ebs_static_pv.yaml
 ----
-
-5. 실행 화면
-
++
+.실행 화면
 image::image/ebs_static_pv_creating_pv.png[1743743081863]
-
-6. 생성 결과 화면
-
-`kubectl get pv` 실행 시
++
+``kubectl get pv`` 실행 시
++
+.생성 결과 화면
 image::image/result_ebs_static_pv_creating_pv.png[1743743312824]
 
-7. EBS Static PVC 생성
+. EBS Static PVC 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
 sh 03_create_pvc.sh
 ----
-
-위 `03_create_pvc.sh`를 실행하면 tmp/ebs_static_pvc.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``03_create_pvc.sh``를 실행하면 ``tmp/ebs_static_pvc.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -353,32 +425,31 @@ spec:
    requests:
      storage: 1Gi
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/ebs_static_pvc.yaml
 ----
-
-8. 실행 화면
-
++
+.실행 화면
 image::image/ebs_static_pv_creating_pvc.png[1743743633856]
-
-8. 생성 결과 화면
++
 `kubectl get pvc` 실행 시
-
++
+.생성 결과 화면
 image::image/result_ebs_static_pv_creating_pvc.png[1743743750740]
 
-10. Pod 생성
-
+. Pod 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
 sh 04_create_pod.sh
 ----
-
-위 `04_create_pod.sh`를 실행하면 tmp/ebs_dynamic_pod.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``04_create_pod.sh``를 실행하면 ``tmp/ebs_dynamic_pod.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -399,37 +470,33 @@ spec:
     persistentVolumeClaim:
       claimName: ebs-static-claim
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/ebs_static_pod.yaml
 ----
-
-2. 실행 화면
-
++
+.실행 화면
 image::image/ebs_static_pv_creating_pod.png[1743744172083]
-
-3. 생성 결과 화면
++
 `kubectl get pods` 실행 시
-
++
+.생성 결과 화면
 image::image/result_ebs_static_pv_creating_pod.png[1743744268949]
 
-11. 실행 화면
+=== EFS Dynamic PV Provisioning
 
-12 생성 결과 화면
-
-## EFS Dynamic PV Provisioning
-1. EFS Volume 생성
-
+. EFS Volume 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
 sh 01_create_filesystem.sh
 ----
-
-위 `01_create_filesystem.sh`를 실행하면 아래 aws cli 명령을 수행하여 EFS FileSystem을 생성 합니다.(참고용)
-
++
+위 ``01_create_filesystem.sh``를 실행하면 아래 aws cli 명령을 수행하여 EFS FileSystem을 생성 합니다.(참고용)
++
 [,shell]
 ----
 # EFS Filesystem에서 사용할 Security Group 값을 생성
@@ -468,34 +535,29 @@ aws efs create-mount-target \
   --subnet-id subnet-0838f6d3cec5cb929 \
   --security-groups sg-0bea82704736e1ff2
 
-# 생성된 EFS ID값을 기록
-EFS ID 값을 기록하세요: fs-002c6492a5482f394
 ----
-
-2. 실행 화면
-
++
+.실행 화면
 image::image/creating_efs_filesystem.png[1743748628768]
-
-3. 생성 결과 화면
-
++
 Security Group 생성
-
++
+.생성 결과 화면
 image::image/result_security_group.png[1743748773963]
-
-EFS FileSystem Id 생성
-
++
+.EFS FileSystem Id 생성
 image::image/result_efs_filesystem.png[1743748932455]
 
-4. EFS Dynamic PV용 Storageclass 생성
-
+. EFS Dynamic PV용 Storageclass 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
 sh 02_create_storageclass.sh
 ----
-
-위 `02_create_storageclass.sh`를 실행하면 tmp/efs_dynamic_storageclass.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``02_create_storageclass.sh``를 실행하면 ``tmp/efs_dynamic_storageclass.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: storage.k8s.io/v1
@@ -514,32 +576,31 @@ parameters:
  ensureUniqueDirectory: "true" # optional
  reuseAccessPoint: "false" # optional
 ----
-
++
 [,shell]
 ----
 # 배포
-kubectl apply -f tmp/efs_dynamic_storageclass.yaml <EFS Filesystem Id>
+kubectl apply -f tmp/efs_dynamic_storageclass.yaml
 ----
-
-5. 실행 화면
-
++
+.실행 화면
 image::image/ebs_static_pv_creating_storageclass.png[1743750771429]
-
-6. 생성 결과 화면
-`kubectl get storageclass` 실행 시
-
++
+``kubectl get storageclass`` 실행 시
++
+.생성 결과 화면
 image::image/result_ebs_static_pv_creating_storageclass.png[1743750907226]
 
-7. EFS Dynamic PV용 PVC 생성
-
+. EFS Dynamic PV용 PVC 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
 sh 03_create_pvc.sh
 ----
-
-위 `03_create_pvc.sh`를 실행하면 tmp/efs_dynamic_pvc.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``03_create_pvc.sh``를 실행하면 ``tmp/efs_dynamic_pvc.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -554,32 +615,31 @@ spec:
    requests:
      storage: 1Gi
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/efs_dynamic_pvc.yaml
 ----
-
-8. 실행 화면
-
++
+.실행 화면
 image::image/efs_dynamic_creating_pvc.png[1743751588167]
-
-9. 생성 결과 화면
-`kubectl get pvc` 실행 시
-
++
+``kubectl get pvc`` 실행 시
++
+.생성 결과 화면
 image::image/result_efs_dynamic_creating_pvc.png[1743751699610]
 
-10. EFS Dynamic PV용 Pod 생성
-
+. EFS Dynamic PV용 Pod 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
 sh 04_create_pod.sh
 ----
-
-위 `04_create_pod.sh`를 실행하면 tmp/efs_dynamic_pod.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``04_create_pod.sh``를 실행하면 ``tmp/efs_dynamic_pod.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -600,34 +660,33 @@ spec:
       persistentVolumeClaim:
         claimName: efs-dynamic-claim
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/efs_dynamic_pod.yaml
 ----
-
-11. 실행 화면
-
++
+.실행 화면
 image::image/efs_dynamic_creating_pod.png[1743752217132]
-
-12. 생성 결과 화면
-`kubectl get pod` 실행 시
-
++
+``kubectl get pod`` 실행 시
++
+.생성 결과 화면
 image::image/result_efs_dynamic_creating_pod.png[1743751699610]
 
-## EFS Static PV Provisioning
+=== EFS Static PV Provisioning
 
-1. EFS Static PV용 StorageClass 생성
-
+. EFS Static PV용 StorageClass 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
 sh 01_create_storageclass.sh
 ----
-
-위 `01_create_storageclass.sh`를 실행하면 tmp/efs_static_storageclass.yaml를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``01_create_storageclass.sh``를 실행하면 ``tmp/efs_static_storageclass.yaml``를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: storage.k8s.io/v1
@@ -636,32 +695,31 @@ metadata:
  name: efs-static-sc
 provisioner: efs.csi.aws.com
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/efs_static_storageclass.yaml
 ----
-
-11. 실행 화면
-
++
+.실행 화면
 image::image/efs_static_creating_storage_class.png[1743753616166]
-
-12. 생성 결과 화면
-`kubectl get storageclass` 실행 시
-
++
+``kubectl get storageclass`` 실행 시
++
+.생성 결과 화면
 image::image/result_efs_static_creating_storage_class.png[1743753704451]
 
-13. EFS Static PV용 PersistentVolume 생성
-
+. EFS Static PV용 PersistentVolume 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
-sh 02_create_pv.sh <filesystem_id>
+sh 02_create_pv.sh
 ----
-
-위 `02_create_pv.sh`를 실행하면 tmp/efs_static_pv.yaml 를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``02_create_pv.sh``를 실행하면 ``tmp/efs_static_pv.yaml`` 를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -680,33 +738,31 @@ spec:
     driver: efs.csi.aws.com
     volumeHandle: fs-002c6492a5482f394
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/efs_static_pv.yaml
 ----
-
-14. 실행 화면
-
++
+.실행 화면
 image::image/efs_static_creating_pv.png[1743754317428]
-
-15. 생성 결과 화면
-
++
 `kubectl get storageclass` 실행 시
-
++
+.생성 결과 화면
 image::image/result_efs_static_creating_pv.png[1743754468171]
 
-16. EFS Static PV용 PVC 생성
-
+. EFS Static PV용 PVC 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
 sh 03_create_pvc.sh
 ----
-
-위 `03_create_pvc.sh`를 실행하면 tmp/efs_static_pvc.yaml 를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``03_create_pvc.sh``를 실행하면 ``tmp/efs_static_pvc.yaml`` 를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -721,33 +777,31 @@ spec:
     requests:
       storage: 1Gi
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/efs_static_pvc.yaml
 ----
-
-17. 실행 화면
-
++
+.실행 화면
 image::image/efs_static_creating_pvc.png[1743754887670]
-
-18. 생성 결과 화면
-
-`kubectl get pvc` 실행 시
-
++
+``kubectl get pvc`` 실행 시
++
+.생성 결과 화면
 image::image/result_efs_static_creating_pvc.png[1743755102164]
 
-19. EFS Static PV용 Pod 생성
-
+. EFS Static PV용 Pod 생성
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
 sh 04_create_pod.sh
 ----
-
-위 `04_create_pod.sh`를 실행하면 tmp/efs_static_pod.yaml 를 만들어서 배포를 합니다.(참고용)
-
++
+위 ``04_create_pod.sh``를 실행하면 ``tmp/efs_static_pod.yaml`` 를 만들어서 배포를 합니다.(참고용)
++
 [,yaml]
 ----
 apiVersion: v1
@@ -768,51 +822,38 @@ spec:
     persistentVolumeClaim:
       claimName: efs-static-claim
 ----
-
++
 [,shell]
 ----
 # 배포
 kubectl apply -f tmp/efs_static_pod.yaml
 ----
-
-17. 실행 화면
-
++
+.실행 화면
 image::image/efs_static_creating_pod.png[1743755322640]
-
-18. 생성 결과 화면
-
-`kubectl get pod` 실행 시
-
++
+``kubectl get pod`` 실행 시
++
+.생성 결과 화면
 image::image/result_efs_static_creating_pod.png[1743755770589]
 
-# 5. 정리
-1. 리소스 삭제 ( 15분 소요 )
+## 리소스 정리
 
+. 리소스 삭제 ( 15분 소요 )
++
 [,shell]
 ----
 cd ~/environment/eks-edu/12_Storage_Management/99_delete
 sh 99_delete.sh
 ----
++
+위 `99_delete.sh`를 실행하면 아래 항목을 삭제합니다.
++
+* App 삭제
+* EBS Volume 삭제
+* EFS File System 삭제
+* Security Group 삭제
 
-위 `99_delete.sh`를 실행하면 아래 eksctl cli 와 aws cli가 실행됩니다. (참고용)
-
-[,shell]
-----
-# eks 삭제
-eksctl delete cluster --name eks-edu-cluster-9641173
-
-# vpc 정보 삭제
-aws cloudformation delete-stack \
- --stack-name eks-workshop-vpc-9641173
-----
-
-2. 실행 화면
-
-image::image/delete_resource.png[1743483981176]
-
-3. 결과 화면
-
-image::image/result_delete_resource.png[1743484066002]
 
 ## 관련 링크
 
