@@ -94,4 +94,9 @@ aws efs create-mount-target \
     --subnet-id ${AWS_PRIVATE_SUBNET2} \
     --security-groups ${EFS_SG_ID} ${PROFILE_STRING}
 
-echo "EFS ID 값을 기록하세요: ${EFS_ID}"
+if [ -f "./local_env.sh" ];then
+    rm -rf local_env.sh
+fi
+echo "#!/bin/bash" >> local_env.sh
+echo "export EFS_ID=${EFS_ID}" >> local_env.sh
+echo "export EFS_SECURITY_GROUP=${EFS_SG_ID}" >> local_env.sh

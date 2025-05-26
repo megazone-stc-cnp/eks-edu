@@ -1,10 +1,4 @@
 #!/bin/bash
-if [ -z "$1" ]; then
-    echo "사용법: $0 <VOLUME_ID>"
-    exit 1
-fi
-VOLUME_ID=$1
-
 if [ ! -f "../../env.sh" ];then
 	echo "env.sh 파일 세팅을 해주세요."
 	exit 1
@@ -16,6 +10,12 @@ if [ ! -f "../../vpc_env.sh" ];then
 	exit 1
 fi
 . ../../vpc_env.sh
+
+if [ ! -f "./local_env.sh" ];then
+	echo "01_create_volume 를 진행해 주세요."
+	exit 1
+fi
+. ./local_env.sh
 
 PV_NAME=ebs-static-pv
 VOLUME_SIZE="1"
