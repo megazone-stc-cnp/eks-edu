@@ -837,7 +837,7 @@ image::image/efs_static_creating_pod.png[1743755322640]
 .생성 결과 화면
 image::image/result_efs_static_creating_pod.png[1743755770589]
 
-## 리소스 정리
+== 리소스 정리
 
 . 리소스 삭제 ( 15분 소요 )
 +
@@ -854,8 +854,7 @@ sh 99_delete.sh
 * EFS File System 삭제
 * Security Group 삭제
 
-
-## 관련 링크
+== 관련 링크
 
 - [Amazon EBS에 Kubernetes 볼륨 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/ebs-csi.html)
 - [Amazon EFS를 사용한 탄력적 파일 시스템 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/efs-csi.html)
