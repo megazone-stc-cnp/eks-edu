@@ -11,7 +11,7 @@
    sh 01_install.sh
    ```
 
-   - 결과 화면
+    - 결과 화면
 
    ![1743652828666](image/result_ebs_efs_addon.png)
 
@@ -165,10 +165,10 @@ Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 �
 
    `kubectl get pv` 실행 시
    ![1743740621150](image/ebs_dynamic_pv_result_creating_pv.png)
-   - NAME : 자동으로 생성된 Volume이름으로 매핑
-   - STATUS : Pod가 생성시 Attach되어 Bound 상태
-   - CLAIM : 네임스페이스/PVC 이름
-   - STORAGECLASS : 1번단계에서 만들어진 Storageclass 이름
+    - NAME : 자동으로 생성된 Volume이름으로 매핑
+    - STATUS : Pod가 생성시 Attach되어 Bound 상태
+    - CLAIM : 네임스페이스/PVC 이름
+    - STORAGECLASS : 1번단계에서 만들어진 Storageclass 이름
 
 8. Volume 체크
 
@@ -307,37 +307,37 @@ Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 �
 
 10. Pod 생성
 
-   ```shell
-   cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
-   sh 04_create_pod.sh
-   ```
+```shell
+cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
+sh 04_create_pod.sh
+```
 
-   위 `04_create_pod.sh`를 실행하면 tmp/ebs_dynamic_pod.yaml를 만들어서 배포를 합니다.(참고용)
+위 `04_create_pod.sh`를 실행하면 tmp/ebs_dynamic_pod.yaml를 만들어서 배포를 합니다.(참고용)
 
-   ```yaml
-   apiVersion: v1
-   kind: Pod
-   metadata:
-     name: ebs-static-app
-   spec:
-     containers:
-     - name: app
-       image: public.ecr.aws/amazonlinux/amazonlinux
-       command: ["/bin/sh"]
-       args: ["-c", "while true; do echo Fri Apr  4 05:20:55 UTC 2025 >> /data/out.txt; sleep 5; done"]
-       volumeMounts:
-       - name: persistent-storage
-         mountPath: /data
-     volumes:
-     - name: persistent-storage
-       persistentVolumeClaim:
-         claimName: ebs-static-claim
-   ```
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-static-app
+spec:
+  containers:
+  - name: app
+    image: public.ecr.aws/amazonlinux/amazonlinux
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo Fri Apr  4 05:20:55 UTC 2025 >> /data/out.txt; sleep 5; done"]
+    volumeMounts:
+    - name: persistent-storage
+      mountPath: /data
+  volumes:
+  - name: persistent-storage
+    persistentVolumeClaim:
+      claimName: ebs-static-claim
+```
 
-   ```shell
-   # 배포
-   kubectl apply -f tmp/ebs_static_pod.yaml
-   ```
+```shell
+# 배포
+kubectl apply -f tmp/ebs_static_pod.yaml
+```
 
 2. 실행 화면
    ![1743744172083](image/ebs_static_pv_creating_pod.png)
@@ -406,7 +406,7 @@ Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 �
 3. 생성 결과 화면
    Security Group 생성
    ![1743748773963](image/result_security_group.png)
-   
+
    EFS FileSystem Id 생성
    ![1743748932455](image/result_efs_filesystem.png)
 
@@ -486,44 +486,44 @@ Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 �
 
 10. EFS Dynamic PV용 Pod 생성
 
-   ```shell
-   cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
-   sh 04_create_pod.sh
-   ```
+```shell
+cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
+sh 04_create_pod.sh
+```
 
-   위 `04_create_pod.sh`를 실행하면 tmp/efs_dynamic_pod.yaml를 만들어서 배포를 합니다.(참고용)
+위 `04_create_pod.sh`를 실행하면 tmp/efs_dynamic_pod.yaml를 만들어서 배포를 합니다.(참고용)
 
-   ```yaml
-   apiVersion: v1
-   kind: Pod
-   metadata:
-     name: efs-dynamic-app
-   spec:
-     containers:
-       - name: app
-         image: public.ecr.aws/amazonlinux/amazonlinux
-         command: ["/bin/sh"]
-         args: ["-c", "while true; do echo Fri Apr  4 07:30:45 UTC 2025 >> /data/out; sleep 5; done"]
-         volumeMounts:
-           - name: persistent-storage
-             mountPath: /data
-     volumes:
-       - name: persistent-storage
-         persistentVolumeClaim:
-           claimName: efs-dynamic-claim
-   ```
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: efs-dynamic-app
+spec:
+  containers:
+    - name: app
+      image: public.ecr.aws/amazonlinux/amazonlinux
+      command: ["/bin/sh"]
+      args: ["-c", "while true; do echo Fri Apr  4 07:30:45 UTC 2025 >> /data/out; sleep 5; done"]
+      volumeMounts:
+        - name: persistent-storage
+          mountPath: /data
+  volumes:
+    - name: persistent-storage
+      persistentVolumeClaim:
+        claimName: efs-dynamic-claim
+```
 
-   ```shell
-   # 배포
-   kubectl apply -f tmp/efs_dynamic_pod.yaml
-   ```
+```shell
+# 배포
+kubectl apply -f tmp/efs_dynamic_pod.yaml
+```
 
 11. 실행 화면
-   ![1743752217132](image/efs_dynamic_creating_pod.png)
+    ![1743752217132](image/efs_dynamic_creating_pod.png)
 
 12. 생성 결과 화면
-   `kubectl get pod` 실행 시
-   ![1743751699610](image/result_efs_dynamic_creating_pod.png)   
+    `kubectl get pod` 실행 시
+    ![1743751699610](image/result_efs_dynamic_creating_pod.png)
 
 ## EFS Static PV Provisioning
 
@@ -550,126 +550,126 @@ Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 �
    ```
 
 11. 실행 화면
-   ![1743753616166](image/efs_static_creating_storage_class.png)
+    ![1743753616166](image/efs_static_creating_storage_class.png)
 
 12. 생성 결과 화면
-   `kubectl get storageclass` 실행 시
-   ![1743753704451](image/result_efs_static_creating_storage_class.png)
-   
+    `kubectl get storageclass` 실행 시
+    ![1743753704451](image/result_efs_static_creating_storage_class.png)
+
 13. EFS Static PV용 PersistentVolume 생성
 
-   ```shell
-   cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
-   sh 02_create_pv.sh <filesystem_id>
-   ```
+```shell
+cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
+sh 02_create_pv.sh <filesystem_id>
+```
 
-   위 `02_create_pv.sh`를 실행하면 tmp/efs_static_pv.yaml 를 만들어서 배포를 합니다.(참고용)
+위 `02_create_pv.sh`를 실행하면 tmp/efs_static_pv.yaml 를 만들어서 배포를 합니다.(참고용)
 
-   ```yaml
-   apiVersion: v1
-   kind: PersistentVolume
-   metadata:
-     name: efs-static-pv
-   spec:
-     capacity:
-       storage: 1Gi
-     volumeMode: Filesystem
-     accessModes:
-       - ReadWriteOnce
-     storageClassName: efs-static-sc
-     persistentVolumeReclaimPolicy: Retain
-     csi:
-       driver: efs.csi.aws.com
-       volumeHandle: fs-002c6492a5482f394
-   ```
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: efs-static-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: efs-static-sc
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-002c6492a5482f394
+```
 
-   ```shell
-   # 배포
-   kubectl apply -f tmp/efs_static_pv.yaml
-   ```
+```shell
+# 배포
+kubectl apply -f tmp/efs_static_pv.yaml
+```
 
 14. 실행 화면
-   ![1743754317428](image/efs_static_creating_pv.png)
+    ![1743754317428](image/efs_static_creating_pv.png)
 
 15. 생성 결과 화면
-   `kubectl get storageclass` 실행 시
-   ![1743754468171](image/result_efs_static_creating_pv.png)
+    `kubectl get storageclass` 실행 시
+    ![1743754468171](image/result_efs_static_creating_pv.png)
 
 16. EFS Static PV용 PVC 생성
 
-   ```shell
-   cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
-   sh 03_create_pvc.sh
-   ```
+```shell
+cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
+sh 03_create_pvc.sh
+```
 
-   위 `03_create_pvc.sh`를 실행하면 tmp/efs_static_pvc.yaml 를 만들어서 배포를 합니다.(참고용)
+위 `03_create_pvc.sh`를 실행하면 tmp/efs_static_pvc.yaml 를 만들어서 배포를 합니다.(참고용)
 
-   ```yaml
-   apiVersion: v1
-   kind: PersistentVolumeClaim
-   metadata:
-     name: efs-static-pvc
-   spec:
-     accessModes:
-       - ReadWriteOnce
-     storageClassName: efs-static-sc
-     resources:
-       requests:
-         storage: 1Gi
-   ```
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: efs-static-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: efs-static-sc
+  resources:
+    requests:
+      storage: 1Gi
+```
 
-   ```shell
-   # 배포
-   kubectl apply -f tmp/efs_static_pvc.yaml
-   ```
+```shell
+# 배포
+kubectl apply -f tmp/efs_static_pvc.yaml
+```
 
 17. 실행 화면
-   ![1743754887670](image/efs_static_creating_pvc.png)
+    ![1743754887670](image/efs_static_creating_pvc.png)
 
 18. 생성 결과 화면
-   `kubectl get pvc` 실행 시
-   ![1743755102164](image/result_efs_static_creating_pvc.png)
+    `kubectl get pvc` 실행 시
+    ![1743755102164](image/result_efs_static_creating_pvc.png)
 
 19. EFS Static PV용 Pod 생성
 
-   ```shell
-   cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
-   sh 04_create_pod.sh
-   ```
+```shell
+cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
+sh 04_create_pod.sh
+```
 
-   위 `04_create_pod.sh`를 실행하면 tmp/efs_static_pod.yaml 를 만들어서 배포를 합니다.(참고용)
+위 `04_create_pod.sh`를 실행하면 tmp/efs_static_pod.yaml 를 만들어서 배포를 합니다.(참고용)
 
-   ```yaml
-   apiVersion: v1
-   kind: Pod
-   metadata:
-     name: efs-static-app
-   spec:
-     containers:
-     - name: app
-       image: public.ecr.aws/amazonlinux/amazonlinux
-       command: ["/bin/sh"]
-       args: ["-c", "while true; do echo Fri Apr  4 08:26:57 UTC 2025 >> /data/out.txt; sleep 5; done"]
-       volumeMounts:
-       - name: persistent-storage
-         mountPath: /data
-     volumes:
-     - name: persistent-storage
-       persistentVolumeClaim:
-         claimName: efs-static-claim
-   ```
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: efs-static-app
+spec:
+  containers:
+  - name: app
+    image: public.ecr.aws/amazonlinux/amazonlinux
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo Fri Apr  4 08:26:57 UTC 2025 >> /data/out.txt; sleep 5; done"]
+    volumeMounts:
+    - name: persistent-storage
+      mountPath: /data
+  volumes:
+  - name: persistent-storage
+    persistentVolumeClaim:
+      claimName: efs-static-claim
+```
 
-   ```shell
-   # 배포
-   kubectl apply -f tmp/efs_static_pod.yaml
-   ```
+```shell
+# 배포
+kubectl apply -f tmp/efs_static_pod.yaml
+```
 
 17. 실행 화면
-   ![1743755322640](image/efs_static_creating_pod.png)
+    ![1743755322640](image/efs_static_creating_pod.png)
 
 18. 생성 결과 화면
-   `kubectl get pod` 실행 시
-   ![1743755770589](image/result_efs_static_creating_pod.png)
+    `kubectl get pod` 실행 시
+    ![1743755770589](image/result_efs_static_creating_pod.png)
 # 5. 정리
 1. 리소스 삭제 ( 15분 소요 )
 
