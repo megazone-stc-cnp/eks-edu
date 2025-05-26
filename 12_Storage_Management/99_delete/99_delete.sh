@@ -20,7 +20,7 @@ kubectl delete pod efs-static-app
 
 # EBS 볼륨 삭제
 volume_ids=$(aws ec2 describe-volumes \
-  --filters Name=tag-key,Values="kubernetes.io/created-for/pvc/name" \
+  --filters Name=tag-key,Values="kubernetes.io/cluster/${CLUSTER_NAME}" \
   --query "Volumes[*].VolumeId" \
   --output text)
 

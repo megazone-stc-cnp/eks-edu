@@ -46,7 +46,8 @@ vpc_env.sh
 05_Manage_Access_1/image/.$clusterrole_drawio.drawio.bkp
 05_Manage_Access_1/image/.$clusterrole_drawio.png.bkp
 05_Manage_Access_1/image/clusterrole_drawio.drawio
-
+12_Storage_Management/02_ebs_static_pv/local_env.sh
+12_Storage_Management/03_efs_dynamic_pv/local_env.sh
 #------------------------------------------------------------------------------------------------------------
 # Local .terraform directories
 **/.terraform/*
