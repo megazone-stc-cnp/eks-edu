@@ -100,10 +100,3 @@ fi
 echo "#!/bin/bash" >> local_env.sh
 echo "export EFS_ID=${EFS_ID}" >> local_env.sh
 echo "export EFS_SECURITY_GROUP=${EFS_SECURITY_GROUP}" >> local_env.sh
-
-if [ -f "./local_env.sh" ];then
-    rm -rf local_env.sh
-fi
-echo "#!/bin/bash" >> local_env.sh
-echo "export EFS_ID=${EFS_ID}" >> local_env.sh
-echo "export EFS_SECURITY_GROUP=${EFS_SG_ID}" >> local_env.sh
