@@ -31,7 +31,7 @@ AWS EKS에 대해 기초부터 고급주제까지 학습하실 수 있도록 교
 - [9. 컴퓨팅 관리](09_Computing_1/README.adoc)
 - [10. 네트워크 관리-2](11_Network_2/README.adoc)
 - [11. Storage 관리](12_Storage_Management/README.adoc)
-- [12. Application 배포 - 기본](13_Application/README.md)
+- [13. Application 배포 - 기본](13_Application/README.md)
 - [13. Application 배포 - 고급](14_Application/README.md)
 - [14. AutoScaling](15_AutoScaling/README.md)
 - [15. Observability](16_Observability/README.md)
