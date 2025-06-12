@@ -27,7 +27,7 @@ endif::[]
 
 == 목표
 - Kubernetes의 Object에 대해서 학습
-- Deployment 전략 ( Blue/Green, Canary, Rolling ) 에 대해서 학습
+- Deployment 전략 ( Blue/Green, Rolling ) 에 대해서 학습
 - PDB에 대해서 학습
 - Helm 생성 하는 방법에 대해서 학습
 
@@ -327,6 +327,60 @@ sh 06_nginx_helm_install.sh <<Chart Version>>
 .실행 화면
 image::image/helm_chart_install.png[Nginx Helm Chart 설치]
 
+==== Blue/Green 배포 실습
+
+. Blue deployment 배포
++
+[,shell]
+----
+cd ~/environment/eks-edu/13_Application/05_blue_green/
+sh 01_create_blue_deployment.sh
+----
++
+위 ``01_create_blue_deployment.sh``를 실행하면 Blue deployment를 배포한다.
++
+.실행 화면
+image::image/create_blue_deployment.png[blue deployment 배포]
+
+. Service 배포
++
+[,shell]
+----
+cd ~/environment/eks-edu/13_Application/05_blue_green/
+sh 03_create_service.sh
+----
++
+위 ``03_create_service.sh``를 실행하면 Blue deployment 연결된 Service를 배포한다.
++
+.실행 화면
+image::image/create_service.png[Service 추가]
+
+. Green Deployment 배포
++
+[,shell]
+----
+cd ~/environment/eks-edu/13_Application/05_blue_green/
+sh 06_create_green_deployment.sh
+----
++
+위 ``06_create_green_deployment.sh``를 실행하면 Green deployment를 배포한다.
++
+.실행 화면
+image::image/create_green_deployment.png[Green Deploy 배포]
+
+. Green Deployment로 트래픽 전환
++
+[,shell]
+----
+cd ~/environment/eks-edu/13_Application/05_blue_green/
+sh 06_create_green_deployment.sh
+----
++
+위 ``06_create_green_deployment.sh``를 실행하면 Green deployment를 배포한다.
++
+.실행 화면
+image::image/traffic_change.png[Traffic 전환]
+
 == 관련 링크
 
--
+- [Kubernetes Object](https://kubernetes.io/docs/concepts/)
