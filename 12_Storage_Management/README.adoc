@@ -837,6 +837,9 @@ image::image/efs_static_creating_pod.png[1743755322640]
 .생성 결과 화면
 image::image/result_efs_static_creating_pod.png[1743755770589]
 
+== 숙제
+. EFS Dynamic PV 를 신규 EKS에 PV로 사용하고 싶다면 어떻게 해야 하는가?
+
 == 리소스 정리
 
 . 리소스 삭제 ( 15분 소요 )
