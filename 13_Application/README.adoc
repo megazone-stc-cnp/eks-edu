@@ -43,822 +43,241 @@ cd ~/environment/eks-edu/13_Application/00_pre_setup
 sh 01_install.sh
 ----
 
-.결과 화면
-image::image/result_ebs_efs_addon.png[EBS EFS Addon 설치 결과]
+== 이론
 
-== 볼륨이 중요한 이유
-- 데이터 지속성 : **컨테이너의 디스크 파일은 임시적이기 때문에 컨테이너에서 실행되는 애플리케이션에 몇 가지 문제가 발생**할 수 있습니다. **컨테이너가 충돌하거나 중지되면 컨테이너 상태가 저장되지 않아 컨테이너 수명 동안 생성되거나 수정된 모든 파일이 손실되는 문제가 발생**합니다. 충돌 후 kubelet은 컨테이너를 깨끗한 상태로 다시 시작합니다.
-- 공유 스토리지: 여러 컨테이너가 실행 중이고 Pod 파일을 공유해야 할 때 또 다른 문제가 발생합니다. 모든 컨테이너에서 공유 파일 시스템을 설정하고 액세스하는 것은 어려울 수 있습니다.
+=== Kubernetes의 Object란
+쿠버네티스 오브젝트는 *하나의 의도를 담은 레코드* 이다.
 
-=== 임시 볼륨 설명
-- 추가 스토리지가 필요하지만, 재시작 시에도 데이터가 영구적으로 저장되는지는 중요하지 않는 경우
+오브젝트를 생성하게 되면 쿠버네티스 시스템은 그 오브젝트 생성을 보장하기 위해 지속적으로 작동할 것이다.
 
-    예)  캐싱 서비스는 메모리 크기에 제한을 받는 경우가 많으며, 전체 성능에 거의 영향을 주지 않으면서 자주 사용되지 않는 데이터를 메모리보다 느린 스토리지로 옮길 수 있습니다
-
-- Pod의 수명 주기를 따르고 Pod와 함께 생성 및 삭제되므로, 영구 볼륨을 사용할 수 있는 위치에 제한받지 않고 Pod를 중지하고 다시 시작할 수 있습니다.
-
-==== 종류
-- emptyDir : Pod 시작 시 비어 있음, 저장소는 kubelet 기본 디렉토리(일반적으로 루트 디스크) 또는 RAM에서 로컬로 제공됨
+==== 관리 기법
+- 명령형 커맨드
 +
-[,yaml]
+[source,shell]
+----
+kubectl create deployment nginx --image nginx
+----
+
+- 명령형 오브젝트 구성
++
+[source,shell]
+----
+kubectl create -f nginx.yaml
+----
+
+=== Object 종류
+
+==== 명령어
+[source,shell]
+----
+# namespace 목록
+kubectl api-resources
+----
+
+==== namespace
+쿠버네티스에서 네임스페이스는 단일 클러스터 내에서의 리소스 그룹 격리 메커니즘을 제공한다.
+
+네임스페이스는 여러 개의 팀이나, 프로젝트에 걸쳐서 많은 사용자가 있는 환경에서 사용하도록 만들어 졌다.
+
+리소스 이름은 네임스페이스 내에서 유일해야 하며, 네임스페이스 간에는 유일할 필요는 없다.
+
+- 네임스페이스 기반 오브젝트 : Deployment, Service 등등
+- 클러스터 범위 오브젝트 : StorageClass, Node, PersistentVolume
+
+==== 조회
+[source,shell]
+----
+# namespace 목록
+kubectl get namespace
+
+# default namespace 설정
+kubectl config set-context --current --namespace=<insert-namespace-name-here>
+
+# 확인하기
+kubectl config view --minify | grep namespace:
+
+----
+==== 파이널라이저
+파이널라이저는 쿠버네티스가 오브젝트를 완전히 삭제하기 이전, 삭제 표시를 위해 특정 조건이 충족될 때까지 대기하도록 알려주기 위한 네이스페이스에 속한 키이다.
+
+리소스를 삭제하려 할 때는 삭제 요청을 처리하는 API 서버가 ``finalizers`` 필드의 값을 인식하고 다음을 수행
+- 삭제를 시작한 시간과 함께 ``metadata.deletionTimestamp`` 필드를 추가하도록 오브젝트를 수정한다.
+- 오브젝트의 ``metadata.finalizers`` 필드가 비워질 때까지 오브젝트가 제거되지 않도록 한다.
+
+파이널라이저의 일반적인 예로 ``퍼시스턴트 볼륨`` 오브젝트가 실수로 삭제되는 것을 방지하는 ``kubernetes.io/pv-protection`` 가 있다.
+파드가 ``퍼시스턴트 볼륨`` 오브젝트를 사용 중일 때 쿠버네티스틑 ``pv-protection`` 파이널라이저를 추가한다.
+``퍼시스턴트 볼륨``을 삭제하려 하면 ``Terminating`` 상태가 되지만 파이널라이저가 존재하기 때문에 컨트롤러가 삭제할 수 없다. 파드가 ``퍼시스턴트 볼륨``의 사용을 중지하면 쿠버네티스가 ``pv-protection`` 파이널 라이저를 해제하고 컨트롤러는 볼륨을 삭제한다.
+
+==== 레이블
+kubectl과 대시보드보다 더 많은 도구를 사용하여 쿠버네티스 객체를 시각화하고 관리할 수 있다. 공통 레이블 세트를 사용하면 도구들이 상호 운용 가능하게 작동하고, 모든 도구가 이해할 수 있는 공통된 방식으로 객체를 설명할 수 있다
+
+===== 추천 레이블
+.추천 라벨
+[%autowidth,cols="1s,,a,"]
+|===
+|Key |Description |Example |Type
+
+|app.kubernetes.io/name
+|The name of the application
+|mysql
+|string
+
+|app.kubernetes.io/instance
+|A unique name identifying the instance of an application
+|mysql-abcxyz
+|string
+
+|app.kubernetes.io/version
+|The current version of the application (e.g., a SemVer 1.0, revision hash, etc.)
+|5.7.21
+|string
+
+|app.kubernetes.io/component
+|The component within the architecture
+|database
+|string
+
+|app.kubernetes.io/part-of
+|The name of a higher level application this one is part of
+|wordpress
+|string
+
+|app.kubernetes.io/managed-by
+|The tool being used to manage the operation of an application
+|Helm
+|string
+|===
+
+예)
+[source,yaml]
+----
+# This is an excerpt
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/name: mysql
+    app.kubernetes.io/instance: mysql-abcxyz
+    app.kubernetes.io/version: "5.7.21"
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: wordpress
+    app.kubernetes.io/managed-by: Helm
+----
+
+[source,shell]
+----
+kubectl -n kube-system logs -l 'app.kubernetes.io/name=aws-ebs-csi-driver'
+----
+
+==== Pod
+파드는 쿠버네티스에서 생성하고 관리할 수 있는 배포 가능한 가장 작은 컴퓨팅 단위이다.
+파드는 하나 이상의 컨테이너 그룹이며, 이 그룹은 스토리지 및 네트워크를 공유하고, 해당 컨테이너를 구동하는 방식에 대한 명세를 갖는다.
+
+파드는 자체적으로 자가 치유되지 않는다. 파드가 노드에 스케줄된 후에 해당 노드가 실패하면 파드는 삭제된다. 마찬가지로 파드는 리소스 부족 또는 노드 유지 관리 작업으로 인한 축출에서 살아남지 못한다.
+
+===== 예시
+[source,yaml]
 ----
 apiVersion: v1
 kind: Pod
 metadata:
-  name: counter
+  name: nginx
 spec:
   containers:
-  - name: count
-    image: busybox:1.28
-    args:
-    - /bin/sh
-    - -c
-    - >
-      i=0;
-      while true;
-      do
-        echo "$i: $(date)" >> /var/log/1.log;
-        echo "$(date) INFO $i" >> /var/log/2.log;
-        i=$((i+1));
-        sleep 1;
-      done
-    volumeMounts:
-    - name: varlog
-      mountPath: /var/log
-  - name: count-log-1
-    image: busybox:1.28
-    args: [/bin/sh, -c, 'tail -n+1 -F /var/log/1.log']
-    volumeMounts:
-    - name: varlog
-      mountPath: /var/log
-  - name: count-log-2
-    image: busybox:1.28
-    args: [/bin/sh, -c, 'tail -n+1 -F /var/log/2.log']
-    volumeMounts:
-    - name: varlog
-      mountPath: /var/log
-  volumes:
-  - name: varlog
-    emptyDir: {}
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
 ----
-- configMap, secret : 다양한 종류의 Kubernetes 데이터를 Pod에 주입합니다.
-+
-[,yaml]
+
+===== 프로브 종류
+- livenessProbe : 컨테이너가 동작 중인지 여부를 나타낸다. liveness probe가 실패한다면, kubelet은 컨테이너를 죽이고, 해당 컨테이너는 재시작 정책 대상이 된다.
+- readinessProbe : 컨테이너가 요청을 처리할 준비가 되었는지 여부를 나타낸다. 만약 readiness probe가 실패한다면, 엔드포인트 컨트롤러는 파드에 연관된 모든 서비스들의 엔드포인트에서 파드의 IP주소를 제거한다.
+- startupProbe : 컨터에너 내의 애플리케이션이 시작되었는지를 나타낸다. startup probe가 주어진 경우, 성공할 때까지 다른 나머지 프로브는 활성화 되지 않는다. 만약 스타트업 프로브가 실패하면, kubelet이 컨테이너를 죽이고, 컨테이너는 재시작 정책에 따라 처리된다. ( 대량의 데이터 로딩, 구성 파일 또는 마이그레이션에 대한 작업 수행 )
+
+==== 컨테이너 프로브 체크 종류
+- exec : 컨테이너 내에서 지정된 명령어를 실행한다. 명령어가 상태 코드 0으로 종료되면 진단이 성공한 것으로 간주한다.
+- grpc : gRPC를 사용하여 원격 프로시저 호출을 수행한다. 체크 대상이 gRPC 헬스 체크를 구현해야 한다.
+- httpGet : 지정한 포트 및 경로에서 컨테이너의 IP주소에 대한 HTTP GET 요청을 수행한다. 응답의 상태 코드가 200이상 400미만이면 진단이 성공한 것으로 간주한다.
+- tcpSocket : 지정된 포트에서 컨테이너의 IP주소에 대해 TCP 검사를 수행한다. 포트가 활성화되어 있다면 진단이 성공한 것으로 간주한다.
+
+==== Pod Distruption Budgets
+애플리케이션이 **동시에 겪는 중단 수를 제한하여 가용성을 높이는 방법**을 보여준다.
+
+Kubernetes 서버는 버전 v1.21 이상이어야 한다.
+
+===== 예시
+https://kubernetes.io/ko/docs/concepts/workloads/pods/disruptions/#pdb-example
+
+==== Deployment
+여러 파드를 만들고 파드 장애 시 복제 및 롤아웃과 자동 복구를 처리한다.
+
+상태를 유지하지 않습니다.
+
+===== 사용 사례
+- ReplicaSet을 롤아웃하기 위한 배포를 생성합니다.
+- 배포의 PodTemplateSpec을 업데이트하여 Pod의 새 상태를 선업합니다.
+- 배포의 현재 상태가 안정적이지 않은 경우 이전 배포 개정판으로 롤백합니다.
+- 더 많은 부하를 처리할 수 있도록 배포를 확장합니다.
+- PodTemplateSpec에 여러 수정 사항을 적용하기 위해 배포 롤아웃을 일시 중지한 다음 다시 시작하여 새로운 롤아웃을 시작합니다.
+- 배포 상태를 롤아웃이 중단되었음을 나타내는 지표로 사용합니다.
+- 더 이상 필요하지 않은 오래된 ReplicaSet를 정리합니다.
+
+배포는 또한 원하는 Pod 수보다 일정 수의 Pod만 생성되도록 보장합니다. 기본적으로 원하는 Pod 수의 최대 125%(최대 25%)만 활성화되도록 합니다.
+
+==== 예제
+[source,shell]
 ----
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: mypod
+  name: nginx-deployment
+  labels:
+    app: nginx
 spec:
-  containers:
-  - name: mypod
-    image: redis
-    volumeMounts:
-    - name: foo
-      mountPath: "/etc/foo"
-      readOnly: true
-  volumes:
-  - name: foo
-    configMap:
-      name: myconfigmap
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: myconfigmap
-data:
-  username: k8s-admin
-  access_level: "1"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
 ----
 
-== EBS CSI Driver
 
-Amazon Elastic Block Store(Amazon EBS) CSI(Container Storage Interface) 드라이버에서는 **Amazon EBS 볼륨의 수명 주기를 사용자가 생성하는 Kubernetes 볼륨의 스토리지로 관리**합니다.
+=== 실습
+==== deploy 배포
+===== deployment에 nginx 버전 업그레이드
 
-Amazon EBS CSI 드라이버는 Amazon EBS 볼륨을 Kubernetes 볼륨 유형인 일반 임시 볼륨 및 **영구 볼륨**에 사용할 수 있도록 만듭니다.
+image::image/02_upgrade_deployment_exec.png[deployment에 nginx 버전 업그레이드]
 
-=== 고려 사항
+==== 관련 명령어
+[source,shell]
+----
+# 이미지 업데이트
+kubectl set image deployment/nginx-deployment nginx=nginx:1.16.1
+# replicas 상태
+kubectl get rs
 
-* Amazon **EBS CSI 컨트롤러를 EKS Auto Mode 클러스터에 설치할 필요가 없습**니다.
-* Amazon **EBS 볼륨을 Fargate 포드에 탑재할 수 없습**니다.
-* Amazon EBS CSI 컨트롤러는 Fargate 노드에서 실행할 수 있지만 **Amazon EBS CSI 노드 DaemonSet은(는) Amazon EC2 인스턴스에서만 실행**할 수 있습니다.
-* Amazon EBS 볼륨 및 Amazon EBS CSI 드라이버는 **Amazon EKS Hybrid Nodes와 호환되지 않습**니다.
-* 최신 추가 기능 버전과 하나의 이전 버전에 대한 지원이 제공됩니다. 최신 버전에서 발견된 버그나 취약성은 새 마이너 버전의 이전 릴리스로 백포트됩니다.
-* **ebs.csi.eks.amazonaws.com을 프로비저너로 사용하여 스토리지 클래스에서 생성된 플랫폼 버전만 EKS 자동 모드에서 생성한 노드에 탑재**할 수 있습니다. 볼륨 스냅샷을 사용하여 기존 플랫폼 버전을 새 스토리지 클래스로 마이그레이션해야 합니다.
+# 롤아웃 기록 확인
+kubectl rollout history deployment/nginx-deployment
 
-== EFS CSI Driver
+# 이전 개정판으로 롤백
+kubectl rollout undo deployment/nginx-deployment
 
-Amazon Elastic File System(Amazon EFS)은 완전히 탄력적인 서버리스 파일 스토리지를 제공하므로 **스토리지 용량과 성능을 프로비저닝하거나 관리하지 않고도 파일 데이터를 공유**할 수 있습니다.
+# 배포 확장
+kubectl scale deployment/nginx-deployment --replicas=10
 
-=== 고려 사항
 
-* Amazon EFS CSI 드라이버는 **Windows 기반 컨테이너 이미지와 호환되지 않습**니다.
-* **Fargate 노드에는 영구 볼륨에 대해 동적 프로비저닝을 사용할 수 없지**만 정적 프로비저닝은 사용할 수 있습니다.
-* 동적 프로비저닝은 1.2 이상의 드라이버가 필요합니다. 모든 지원되는 Amazon EKS 클러스터 버전에서 드라이버 버전 1.1을 사용하여 영구 볼륨에 대해 정적 프로비저닝을 사용할 수 있습니다.
-* 이 드라이버의 버전 **1.3.2 이상은 Amazon EC2 Graviton 기반 인스턴스를 포함하여 Arm64 아키텍처를 지원**합니다.
-* 이 드라이버의 버전 **1.4.2 이상은 파일 시스템 탑재에 FIPS 사용**을 지원합니다.
-* Amazon EFS의 리소스 할당량을 기록해 둡니다. 예를 들어, 각 **Amazon EFS 파일 시스템에 대해 생성할 수 있는 액세스 포인트 할당량은 1,000개**입니다.
-* 버전 2.0.0부터 이 드라이버는 TLS 연결에 stunnel를 사용하던 것을 efs-proxy로 전환했습니다. efs-proxy를 사용하면 실행 중인 노드의 코어 수에 1을 더한 것과 같은 수의 스레드가 열립니다.
-* Amazon EFS CSI 드라이버는 **Amazon EKS Hybrid Nodes와 호환되지 않습**니다.
-
-== Static Provisioning
-
-image::image/Static_Provisioning_draw.svg[Static Provisioning]
-
-== Dynamic Provisioning
-
-image::image/Dynamic_Provisioning_draw.svg[Dynamic Provisioning]
-
-== 실습
-
-=== EBS Dynamic Provisioning
-. EBS StorageClass 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/01_ebs_dynamic_pv
-sh 01_create_storageclass.sh
-----
-
-. 위 ``01_create_storageclass.sh```를 실행하면 ``tmp/ebs_dynamic_storageclass.yaml```를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
- name: ebs-dynamic-sc
-provisioner: ebs.csi.aws.com
-reclaimPolicy: Retain
-volumeBindingMode: WaitForFirstConsumer
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/ebs_dynamic_storageclass.yaml
-----
-+
-.실행 화면
-image::image/creating_ebs_dynamic_storageclass.png[1743738878537]
-+
-`kubectl get storageclass` 실행 시
-+
-.생성 결과 화면
-image::image/result_ebs_dynamic_storageclass.png[1743739043124]
-
-. EBS PVC 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/01_ebs_dynamic_pv
-sh 02_create_pvc.sh
-----
-+
-위 ``02_create_pvc.sh``를 실행하면 ``tmp/ebs_dynamic_pvc.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
- name: ebs-dynamic-claim
-spec:
- accessModes:
-   - ReadWriteOnce
- storageClassName: ebs-dynamic-sc
- resources:
-   requests:
-     storage: 1Gi
-----
-+
-.실행 화면
-image::image/creating_ebs_dynamic_pvc.png[1743739340663]
-+
-``kubectl get pvc`` 실행 시
-.생성 결과 화면
-image::image/result_ebs_dynamic_pvc.png[1743739496367]
-
-. Pod 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/01_ebs_dynamic_pv
-sh 03_create_pod.sh
-----
-+
-위 ``03_create_pod.sh``를 실행하면 ``tmp/ebs_dynamic_pod.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: Pod
-metadata:
- name: ebs-dynamic-app
-spec:
- containers:
- - name: app
-   image: public.ecr.aws/amazonlinux/amazonlinux
-   command: ["/bin/sh"]
-   args: ["-c", "while true; do echo Fri Apr  4 04:15:34 UTC 2025 >> /data/out.txt; sleep 5; done"]
-   volumeMounts:
-   - name: persistent-storage
-     mountPath: /data
- volumes:
- - name: persistent-storage
-   persistentVolumeClaim:
-     claimName: ebs-dynamic-claim
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/ebs_dynamic_pod.yaml
-----
-+
-.실행 화면
-image::image/ebs_dynamic_pv_creating_pod.png[1743740263503]
-+
-``kubectl get pods`` 실행 시
-+
-.생성 결과 화면
-image::image/ebs_dynamic_pv_result_creating_pod.png[1743740479731]
-+
-``kubectl get pv`` 실행 시
-+
-image::image/ebs_dynamic_pv_result_creating_pv.png[1743740621150]
-- NAME : 자동으로 생성된 Volume이름으로 매핑
-- STATUS : Pod가 생성시 Attach되어 Bound 상태
-- CLAIM : 네임스페이스/PVC 이름
-- STORAGECLASS : 1번단계에서 만들어진 Storageclass 이름
-
-. Volume 체크
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/01_ebs_dynamic_pv
-sh 04_check.sh
-----
-+
-위 `04_check.sh`를 실행하면 아래 kubectl 명령을 실행합니다..(참고용)
-+
-[,shell]
-----
-kubectl exec ebs-dynamic-app -- cat /data/out.txt
-----
-+
-.실행 결과 화면
-image::image/ebs_dynamic_pv_result_exec.png[1743740797263]
-
-. Pod가 삭제되어도 유지가 되는지 확인
-+
-[,shell]
-----
-kubectl delete pod app
-
-kubectl get pv
-
-date
-sh 03_create_pod.sh
-
-sh 04_check.sh
-----
-
-=== EBS Static Provisioning
-
-. EBS Volume 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
-sh 01_create_volume.sh
-----
-+
-위 ``01_create_volume.sh``를 실행하면 아래 aws cli 명령을 수행하여 EBS Volume을 생성 합니다.(참고용)
-+
-[,shell]
-----
-aws ec2 create-volume \
-   --volume-type gp3 \
-   --size 1 \
-   --availability-zone ap-northeast-1a \
-   --tag-specifications "ResourceType=volume,Tags=[{Key=Name,Value=eks-ebs-volume-9641173},{Key=kubernetes.io/cluster/eks-edu-cluster-9641173,Value=owned}]" \
-   --query "VolumeId" \
-   --output text
-----
-+
-.실행 화면
-image::image/ebs_static_pv_creating_volume.png[1743741491394]
-+
-.생성 결과 화면
-image::image/result_ebs_static_pv_creating_volume.png[1743741558026]
-
-. EBS Static PV 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
-sh 02_create_pv.sh
-----
-+
-위 ``02_create_pv.sh``를 실행하면 ``tmp/ebs_static_pv.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
- name: ebs-static-pv
-spec:
- accessModes:
- - ReadWriteOnce
- capacity:
-   storage: 1Gi
- csi:
-   driver: ebs.csi.aws.com
-   fsType: ext4
-   volumeHandle: vol-0eecb37dc650000cb
- nodeAffinity:
-   required:
-     nodeSelectorTerms:
-       - matchExpressions:
-           - key: topology.kubernetes.io/zone
-             operator: In
-             values:
-               - ap-northeast-1a
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/ebs_static_pv.yaml
-----
-+
-.실행 화면
-image::image/ebs_static_pv_creating_pv.png[1743743081863]
-+
-``kubectl get pv`` 실행 시
-+
-.생성 결과 화면
-image::image/result_ebs_static_pv_creating_pv.png[1743743312824]
-
-. EBS Static PVC 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
-sh 03_create_pvc.sh
-----
-+
-위 ``03_create_pvc.sh``를 실행하면 ``tmp/ebs_static_pvc.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
- name: ebs-static-claim
-spec:
- storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
- volumeName: ebs-static-pv
- accessModes:
-   - ReadWriteOnce
- resources:
-   requests:
-     storage: 1Gi
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/ebs_static_pvc.yaml
-----
-+
-.실행 화면
-image::image/ebs_static_pv_creating_pvc.png[1743743633856]
-+
-`kubectl get pvc` 실행 시
-+
-.생성 결과 화면
-image::image/result_ebs_static_pv_creating_pvc.png[1743743750740]
-
-. Pod 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/02_ebs_static_pv
-sh 04_create_pod.sh
-----
-+
-위 ``04_create_pod.sh``를 실행하면 ``tmp/ebs_dynamic_pod.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: ebs-static-app
-spec:
-  containers:
-  - name: app
-    image: public.ecr.aws/amazonlinux/amazonlinux
-    command: ["/bin/sh"]
-    args: ["-c", "while true; do echo Fri Apr  4 05:20:55 UTC 2025 >> /data/out.txt; sleep 5; done"]
-    volumeMounts:
-    - name: persistent-storage
-      mountPath: /data
-  volumes:
-  - name: persistent-storage
-    persistentVolumeClaim:
-      claimName: ebs-static-claim
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/ebs_static_pod.yaml
-----
-+
-.실행 화면
-image::image/ebs_static_pv_creating_pod.png[1743744172083]
-+
-`kubectl get pods` 실행 시
-+
-.생성 결과 화면
-image::image/result_ebs_static_pv_creating_pod.png[1743744268949]
-
-=== EFS Dynamic PV Provisioning
-
-. EFS Volume 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
-sh 01_create_filesystem.sh
-----
-+
-위 ``01_create_filesystem.sh``를 실행하면 아래 aws cli 명령을 수행하여 EFS FileSystem을 생성 합니다.(참고용)
-+
-[,shell]
-----
-# EFS Filesystem에서 사용할 Security Group 값을 생성
-aws ec2 create-security-group \
-  --group-name eks-edu-efs-sg-9641173 \
-  --description "Security group for EFS in EKS" \
-  --vpc-id vpc-08e8baa7184e84f70 \
-  --query "GroupId" \
-  --output text
-
-# 생성된 Security Group에 VPC Cidr에 NFS Port을 허용 등록
-aws ec2 authorize-security-group-ingress \
-  --group-id sg-0bea82704736e1ff2 \
-  --protocol tcp \
-  --port 2049 \
-  --cidr 192.168.0.0/24
-
-# File System Id를 등록
-aws efs create-file-system \
-  --performance-mode generalPurpose \
-  --throughput-mode bursting \
-  --encrypted \
-  --tags Key=Name,Value=eks-edu-efs-id-9641173 \
-  --query "FileSystemId" \
-  --output text
-
-# File System 에 Network에 SG 등록 (AZ1)
-aws efs create-mount-target \
-  --file-system-id fs-002c6492a5482f394 \
-  --subnet-id subnet-0299cae5ee766caa8 \
-  --security-groups sg-0bea82704736e1ff2
-
-# File System 에 Network에 SG 등록 (AZ2)
-aws efs create-mount-target \
-  --file-system-id fs-002c6492a5482f394 \
-  --subnet-id subnet-0838f6d3cec5cb929 \
-  --security-groups sg-0bea82704736e1ff2
 
 ----
-+
-.실행 화면
-image::image/creating_efs_filesystem.png[1743748628768]
-+
-Security Group 생성
-+
-.생성 결과 화면
-image::image/result_security_group.png[1743748773963]
-+
-.EFS FileSystem Id 생성
-image::image/result_efs_filesystem.png[1743748932455]
-
-. EFS Dynamic PV용 Storageclass 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
-sh 02_create_storageclass.sh
-----
-+
-위 ``02_create_storageclass.sh``를 실행하면 ``tmp/efs_dynamic_storageclass.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
- name: efs-dynamic-sc
-provisioner: efs.csi.aws.com
-parameters:
- provisioningMode: efs-ap
- fileSystemId: fs-002c6492a5482f394
- directoryPerms: "700"
- gidRangeStart: "1000" # optional
- gidRangeEnd: "2000" # optional
- basePath: "/dynamic_provisioning" # optional
- subPathPattern: "${.PVC.namespace}/${.PVC.name}" # optional
- ensureUniqueDirectory: "true" # optional
- reuseAccessPoint: "false" # optional
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/efs_dynamic_storageclass.yaml
-----
-+
-.실행 화면
-image::image/ebs_static_pv_creating_storageclass.png[1743750771429]
-+
-``kubectl get storageclass`` 실행 시
-+
-.생성 결과 화면
-image::image/result_ebs_static_pv_creating_storageclass.png[1743750907226]
-
-. EFS Dynamic PV용 PVC 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
-sh 03_create_pvc.sh
-----
-+
-위 ``03_create_pvc.sh``를 실행하면 ``tmp/efs_dynamic_pvc.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
- name: efs-dynamic-claim
-spec:
- accessModes:
-   - ReadWriteMany
- storageClassName: efs-dynamic-sc
- resources:
-   requests:
-     storage: 1Gi
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/efs_dynamic_pvc.yaml
-----
-+
-.실행 화면
-image::image/efs_dynamic_creating_pvc.png[1743751588167]
-+
-``kubectl get pvc`` 실행 시
-+
-.생성 결과 화면
-image::image/result_efs_dynamic_creating_pvc.png[1743751699610]
-
-. EFS Dynamic PV용 Pod 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/03_efs_dynamic_pv
-sh 04_create_pod.sh
-----
-+
-위 ``04_create_pod.sh``를 실행하면 ``tmp/efs_dynamic_pod.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: efs-dynamic-app
-spec:
-  containers:
-    - name: app
-      image: public.ecr.aws/amazonlinux/amazonlinux
-      command: ["/bin/sh"]
-      args: ["-c", "while true; do echo Fri Apr  4 07:30:45 UTC 2025 >> /data/out; sleep 5; done"]
-      volumeMounts:
-        - name: persistent-storage
-          mountPath: /data
-  volumes:
-    - name: persistent-storage
-      persistentVolumeClaim:
-        claimName: efs-dynamic-claim
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/efs_dynamic_pod.yaml
-----
-+
-.실행 화면
-image::image/efs_dynamic_creating_pod.png[1743752217132]
-+
-``kubectl get pod`` 실행 시
-+
-.생성 결과 화면
-image::image/result_efs_dynamic_creating_pod.png[1743751699610]
-
-=== EFS Static PV Provisioning
-
-. EFS Static PV용 StorageClass 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
-sh 01_create_storageclass.sh
-----
-+
-위 ``01_create_storageclass.sh``를 실행하면 ``tmp/efs_static_storageclass.yaml``를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
- name: efs-static-sc
-provisioner: efs.csi.aws.com
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/efs_static_storageclass.yaml
-----
-+
-.실행 화면
-image::image/efs_static_creating_storage_class.png[1743753616166]
-+
-``kubectl get storageclass`` 실행 시
-+
-.생성 결과 화면
-image::image/result_efs_static_creating_storage_class.png[1743753704451]
-
-. EFS Static PV용 PersistentVolume 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
-sh 02_create_pv.sh
-----
-+
-위 ``02_create_pv.sh``를 실행하면 ``tmp/efs_static_pv.yaml`` 를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: efs-static-pv
-spec:
-  capacity:
-    storage: 1Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: efs-static-sc
-  persistentVolumeReclaimPolicy: Retain
-  csi:
-    driver: efs.csi.aws.com
-    volumeHandle: fs-002c6492a5482f394
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/efs_static_pv.yaml
-----
-+
-.실행 화면
-image::image/efs_static_creating_pv.png[1743754317428]
-+
-`kubectl get storageclass` 실행 시
-+
-.생성 결과 화면
-image::image/result_efs_static_creating_pv.png[1743754468171]
-
-. EFS Static PV용 PVC 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
-sh 03_create_pvc.sh
-----
-+
-위 ``03_create_pvc.sh``를 실행하면 ``tmp/efs_static_pvc.yaml`` 를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: efs-static-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: efs-static-sc
-  resources:
-    requests:
-      storage: 1Gi
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/efs_static_pvc.yaml
-----
-+
-.실행 화면
-image::image/efs_static_creating_pvc.png[1743754887670]
-+
-``kubectl get pvc`` 실행 시
-+
-.생성 결과 화면
-image::image/result_efs_static_creating_pvc.png[1743755102164]
-
-. EFS Static PV용 Pod 생성
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/04_efs_static_pv
-sh 04_create_pod.sh
-----
-+
-위 ``04_create_pod.sh``를 실행하면 ``tmp/efs_static_pod.yaml`` 를 만들어서 배포를 합니다.(참고용)
-+
-[,yaml]
-----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: efs-static-app
-spec:
-  containers:
-  - name: app
-    image: public.ecr.aws/amazonlinux/amazonlinux
-    command: ["/bin/sh"]
-    args: ["-c", "while true; do echo Fri Apr  4 08:26:57 UTC 2025 >> /data/out.txt; sleep 5; done"]
-    volumeMounts:
-    - name: persistent-storage
-      mountPath: /data
-  volumes:
-  - name: persistent-storage
-    persistentVolumeClaim:
-      claimName: efs-static-claim
-----
-+
-[,shell]
-----
-# 배포
-kubectl apply -f tmp/efs_static_pod.yaml
-----
-+
-.실행 화면
-image::image/efs_static_creating_pod.png[1743755322640]
-+
-``kubectl get pod`` 실행 시
-+
-.생성 결과 화면
-image::image/result_efs_static_creating_pod.png[1743755770589]
-
-== 리소스 정리
-
-. 리소스 삭제 ( 15분 소요 )
-+
-[,shell]
-----
-cd ~/environment/eks-edu/12_Storage_Management/99_delete
-sh 99_delete.sh
-----
-+
-위 `99_delete.sh`를 실행하면 아래 항목을 삭제합니다.
-+
-* App 삭제
-* EBS Volume 삭제
-* EFS File System 삭제
-* Security Group 삭제
-
-== 관련 링크
-
-- [Amazon EBS에 Kubernetes 볼륨 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/ebs-csi.html)
-- [Amazon EFS를 사용한 탄력적 파일 시스템 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/efs-csi.html)
-- [Dynamic Volume Provisioning](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/examples/kubernetes/dynamic-provisioning/README.md)
-- [StorageClass 파라미터 참조](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/create-storage-class.html#_storageclass_parameters_reference)
+==== DaemonSet
+Unix/POSIX 서버의 시스템 데몬과 유사한 역할을 수행
+- 예
