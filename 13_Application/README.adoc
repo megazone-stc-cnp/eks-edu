@@ -51,7 +51,7 @@ sh 01_install.sh
 
 ==== App 전체 구성도
 
-image::image/K8S_App_구성도.svg[K8S App 구성도]
+image::image/K8S_App_Arctitecture.svg[K8S App 구성도]
 
 ==== 관리 기법
 - 명령형 커맨드
