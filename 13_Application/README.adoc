@@ -78,7 +78,7 @@ kubectl api-resources
 ----
 
 .오브젝트 종류
-[%autowidth,cols="1s,,a,"]
+[%autowidth,cols="1s,a,"]
 |===
 |이름 |설명 |조회 명령어
 
