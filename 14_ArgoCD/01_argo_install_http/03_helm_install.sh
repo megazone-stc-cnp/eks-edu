@@ -6,6 +6,10 @@ if [ -z "$1" ]; then
 fi
 CHART_VERSION=$1
 
+if [ ! -d "tmp" ]; then
+    mkdir -p tmp
+fi
+
 cat >tmp/custom_values.yaml <<EOF
 global:
   domain: ""
