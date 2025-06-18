@@ -12,4 +12,7 @@ USER_NAME=hcseo
 PASSWORD_NAME=admin123!
 # =====================================
 
+echo "argocd repo add ${WEB_URL} --username ${USER_NAME} --password ${PASSWORD_NAME} --insecure-skip-server-verification"
+echo ""
+
 argocd repo add ${WEB_URL} --username ${USER_NAME} --password ${PASSWORD_NAME} --insecure-skip-server-verification

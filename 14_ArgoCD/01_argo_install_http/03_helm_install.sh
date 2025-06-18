@@ -18,35 +18,24 @@ configs:
   params:
     server.insecure: true
 
-service:
-  type: ClusterIP
-  port: 80
-  targetPort: 8080
-
 server:
   extraArgs:
     - --insecure
-  ingressGrpc:
-    enabled: false
   ingress:
     enabled: true
-    controller: aws
     ingressClassName: alb
+    hostname: ""
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/backend-protocol: HTTP
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+      alb.ingress.kubernetes.io/security-groups: sg-09283f6474746392a
+      alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
+      alb.ingress.kubernetes.io/deletion-protection.enabled: false
+      alb.ingress.kubernetes.io/healthcheck-interval-seconds: "15"
+      alb.ingress.kubernetes.io/healthcheck-path: /healthz
     hosts: []  # 빈 배열로 설정
-    aws:
-      serviceType: ClusterIP # <- Used with target-type: ip
-      backendProtocolVersion: HTTP1
-    paths:
-      - /
-    pathType: Prefix
-
-# TLS 비활성화 (HTTP 사용)
-tls: []
 EOF
 
 REPO_NAME=argo

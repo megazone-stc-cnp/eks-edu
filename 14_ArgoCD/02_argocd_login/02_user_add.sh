@@ -7,7 +7,7 @@ fi
 ADMIN_PASSWORD=$1
 
 NEW_USER_NAME=user1
-NEW_USER_PASSWORD=user1pass
+NEW_USER_PASSWORD=admin123!
 NAMESPACE_NAME=argocd
 APP_DEPLOY_NAME=my-argocd
 # =============================================
@@ -31,3 +31,7 @@ echo "PASSWORD : ${NEW_USER_PASSWORD}"
 echo "kubectl -n ${NAMESPACE_NAME} rollout restart deployment ${APP_DEPLOY_NAME}-server"
 kubectl -n ${NAMESPACE_NAME} rollout restart deployment ${APP_DEPLOY_NAME}-server
 echo ""
+
+echo "kubectl -n ${NAMESPACE_NAME} deployment ${APP_DEPLOY_NAME}-server"
+echo ""
+kubectl -n ${NAMESPACE_NAME} deployment ${APP_DEPLOY_NAME}-server
