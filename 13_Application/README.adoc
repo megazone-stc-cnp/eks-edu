@@ -150,7 +150,7 @@ kubectl api-resources
 파드가 ``퍼시스턴트 볼륨`` 오브젝트를 사용 중일 때 쿠버네티스틑 ``pv-protection`` 파이널라이저를 추가한다.
 ``퍼시스턴트 볼륨``을 삭제하려 하면 ``Terminating`` 상태가 되지만 파이널라이저가 존재하기 때문에 컨트롤러가 삭제할 수 없다. 파드가 ``퍼시스턴트 볼륨``의 사용을 중지하면 쿠버네티스가 ``pv-protection`` 파이널 라이저를 해제하고 컨트롤러는 볼륨을 삭제한다.
 
-===== 프로브 종류
+==== 프로브 종류
 - livenessProbe : 컨테이너가 동작 중인지 여부를 나타낸다. liveness probe가 실패한다면, kubelet은 컨테이너를 죽이고, 해당 컨테이너는 재시작 정책 대상이 된다.
 - readinessProbe : 컨테이너가 요청을 처리할 준비가 되었는지 여부를 나타낸다. 만약 readiness probe가 실패한다면, 엔드포인트 컨트롤러는 파드에 연관된 모든 서비스들의 엔드포인트에서 파드의 IP주소를 제거한다.
 - startupProbe : 컨터에너 내의 애플리케이션이 시작되었는지를 나타낸다. startup probe가 주어진 경우, 성공할 때까지 다른 나머지 프로브는 활성화 되지 않는다. 만약 스타트업 프로브가 실패하면, kubelet이 컨테이너를 죽이고, 컨테이너는 재시작 정책에 따라 처리된다. ( 대량의 데이터 로딩, 구성 파일 또는 마이그레이션에 대한 작업 수행 )
@@ -180,18 +180,18 @@ image::image/02_upgrade_deployment_exec.png[deployment에 nginx 버전 업그레
 [source,shell]
 ----
 # 이미지 업데이트
-kubectl set image deployment/nginx-deployment nginx=nginx:1.16.1
+kubectl set image deployment/nginx-deploy nginx=public.ecr.aws/nginx/nginx:1.28
 # replicas 상태
 kubectl get rs
 
 # 롤아웃 기록 확인
-kubectl rollout history deployment/nginx-deployment
+kubectl rollout history deployment/nginx-deploy
 
 # 이전 개정판으로 롤백
-kubectl rollout undo deployment/nginx-deployment
+kubectl rollout undo deployment/nginx-deploy
 
 # 배포 확장
-kubectl scale deployment/nginx-deployment --replicas=10
+kubectl scale deployment/nginx-deploy --replicas=10
 ----
 
 ==== PDB 실습
@@ -239,7 +239,7 @@ min-available 값이 2이므로 동시에 Evicting이 되지 않지만 한대는
 .실행 화면
 image::image/node_drain.png[Node Drain 작업]
 +
-문제가 되는 상황은 1대의 Pod에 min-available 값이 50% 인 경우
+CAUTION: 문제가 되는 상황은 1대의 Pod에 min-available 값이 50% 인 경우
 
 ==== Helm 실습
 

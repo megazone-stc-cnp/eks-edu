@@ -112,6 +112,103 @@ image::images/ArgoCD-Architecture.png[ArgoCD Architecture]
 
 == 실습
 === ArgoCD 서버 설치
+. argocd repo 등록
+[,shell]
+----
+cd ~/environment/eks-edu/14_ArgoCD/01_argo_install_http
+sh 01_argocd_repo_add.sh
+----
++
+위 ``01_argocd_repo_add.sh``를 실행하면 ``helm repo add`` 명령어로 repo를 등록 합니다.(참고용)
++
+[,shell]
+----
+# 배포
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+----
++
+.실행 화면
+image::images/argocd_helm_repo_add.png[ArgoCD Helm Repo 추가]
+
+. Helm Version 체크
+[,shell]
+----
+cd ~/environment/eks-edu/14_ArgoCD/01_argo_install_http
+sh 02_argocd_helm_version.sh
+----
++
+위 ``sh 02_argocd_helm_version.sh``를 실행하면 ``helm search repo`` 명령어로 Version 목록을 출력합니다. Helm 설치할 때 파라미터로 입력이 필요합니다.(참고용)
++
+[,shell]
+----
+# 배포
+helm search repo argo/argo-cd --versions
+----
++
+.실행 화면
+image::images/argocd_helm_search_repo.png[Helm Chart 목록 조회]
+
+. Helm 설치
+[,shell]
+----
+cd ~/environment/eks-edu/14_ArgoCD/01_argo_install_http
+sh 03_helm_install.sh 8.0.0
+----
++
+위 ``sh 03_helm_install.sh``를 실행하면 ``tmp/custom_values.yaml`` 파일을 생성하여 ``argocd`` Namespace를 생성하여 ``my-argocd`` App을 생성합니다. (참고용)
++
+[,shell]
+----
+# 배포
+helm -n argocd upgrade --install my-argocd \
+    argo/argo-cd \
+    --create-namespace \
+    -f tmp/custom_values.yaml \
+    --version 8.0.0
+----
++
+.실행 화면
+image::images/argocd_helm_install.png[ArgoCD Helm Install]
+
+. Admin 계정 초기 패스워드 조회
+[,shell]
+----
+cd ~/environment/eks-edu/14_ArgoCD/01_argo_install_http
+sh 04_get_initial_password.sh
+----
++
+위 ``sh 04_get_initial_password.sh``를 실행하면 Admin 계정의 초기 패스워드를 조회합니다. (참고용)
++
+[,shell]
+----
+# 배포
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+----
++
+.실행 화면
+image::images/CleanShot 2025-06-17 at 10.45.45.png[초기 패스워드 조회]
+
+. ArgoCD 접속용 Ingress 조회
+[,shell]
+----
+cd ~/environment/eks-edu/14_ArgoCD/01_argo_install_http
+sh 05_get_ingress.sh
+----
++
+위 ``sh 05_get_ingress.sh``를 실행하면 ArgoCD 웹페이지를 접속할 URL를 조회합니다. (참고용)
++
+[,shell]
+----
+# 배포
+kubectl get ingress -n argocd
+----
++
+.실행 화면
+image::images/argocd_get_ingress.png[ArgoCD Ingress 조회]
++
+.사이트 접속 화면
+image::images/argocd_web_site.png[ArgoCD 웹 사이트]
 
 === User 등록
 
@@ -122,3 +219,4 @@ image::images/ArgoCD-Architecture.png[ArgoCD Architecture]
 == 관련 링크
 
 - [ArgoCD 공식 문서](https://argo-cd.readthedocs.io/en/stable/)
+- [argocd repo add Command Reference](https://argo-cd.readthedocs.io/en/stable/user-guide/commands/argocd_repo_add/)

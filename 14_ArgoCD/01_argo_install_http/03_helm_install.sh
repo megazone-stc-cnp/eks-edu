@@ -19,19 +19,14 @@ configs:
     server.insecure: true
 
 server:
-  extraArgs:
-    - --insecure
   ingress:
     enabled: true
     ingressClassName: alb
-    hostname: ""
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/backend-protocol: HTTP
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
-      alb.ingress.kubernetes.io/security-groups: sg-09283f6474746392a
-      alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
       alb.ingress.kubernetes.io/deletion-protection.enabled: false
       alb.ingress.kubernetes.io/healthcheck-interval-seconds: "15"
       alb.ingress.kubernetes.io/healthcheck-path: /healthz
