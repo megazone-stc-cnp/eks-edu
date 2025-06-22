@@ -33,7 +33,7 @@ endif::[]
 
 1. link:00_Setup/[0. 교육 환경 구성하기]를 이용해 기본 실습 환경 생성이 되어 있어야 합니다.
 2. link:00_Setup/[0. 교육 환경 구성하기]를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
-3. link:12_Storage_Management/[12. Storage 관리]에 00_pre_setup/01_install.sh 를 실행하여 EBS CSI DRiver/EFS CSI Driver Addon이 같이 설치된 EKS를 구축합니다.
+3. link:12_Storage_Management/[12. Storage 관리]에 00_pre_setup/01_install.sh 를 실행하여 EBS CSI Driver/EFS CSI Driver Addon이 같이 설치된 EKS를 구축합니다.
 
 [source,shell]
 ----
@@ -138,11 +138,11 @@ Amazon EBS CSI 드라이버는 Amazon EBS 볼륨을 Kubernetes 볼륨 유형인 
 === 고려 사항
 
 * Amazon **EBS CSI 컨트롤러를 EKS Auto Mode 클러스터에 설치할 필요가 없습**니다.
+* **ebs.csi.eks.amazonaws.com을 프로비저너로 사용하여 스토리지 클래스에서 생성된 플랫폼 버전만 EKS 자동 모드에서 생성한 노드에 탑재**할 수 있습니다. 볼륨 스냅샷을 사용하여 기존 플랫폼 버전을 새 스토리지 클래스로 마이그레이션해야 합니다.
 * Amazon **EBS 볼륨을 Fargate 포드에 탑재할 수 없습**니다.
 * Amazon EBS CSI 컨트롤러는 Fargate 노드에서 실행할 수 있지만 **Amazon EBS CSI 노드 DaemonSet은(는) Amazon EC2 인스턴스에서만 실행**할 수 있습니다.
 * Amazon EBS 볼륨 및 Amazon EBS CSI 드라이버는 **Amazon EKS Hybrid Nodes와 호환되지 않습**니다.
 * 최신 추가 기능 버전과 하나의 이전 버전에 대한 지원이 제공됩니다. 최신 버전에서 발견된 버그나 취약성은 새 마이너 버전의 이전 릴리스로 백포트됩니다.
-* **ebs.csi.eks.amazonaws.com을 프로비저너로 사용하여 스토리지 클래스에서 생성된 플랫폼 버전만 EKS 자동 모드에서 생성한 노드에 탑재**할 수 있습니다. 볼륨 스냅샷을 사용하여 기존 플랫폼 버전을 새 스토리지 클래스로 마이그레이션해야 합니다.
 
 == EFS CSI Driver
 
@@ -234,6 +234,7 @@ spec:
 image::image/creating_ebs_dynamic_pvc.png[1743739340663]
 +
 ``kubectl get pvc`` 실행 시
++
 .생성 결과 화면
 image::image/result_ebs_dynamic_pvc.png[1743739496367]
 
