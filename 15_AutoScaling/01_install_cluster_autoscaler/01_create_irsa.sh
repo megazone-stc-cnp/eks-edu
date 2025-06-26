@@ -1,0 +1,85 @@
+#!/bin/bash
+
+if [ ! -f "../../env.sh" ];then
+	echo "env.sh 파일 세팅을 해주세요."
+	exit 1
+fi
+. ../../env.sh
+
+SERVICE_NAME=s3-csi-driver-sa
+NAMESPACE_NAME=kube-system
+POLICY_NAME="cluster-autoscaler-policy-${IDE_NAME}"
+ROLE_NAME="cluster-autoscaler-role-${IDE_NAME}"
+# ==================================================================
+if [ ! -d "tmp" ]; then
+    mkdir -p tmp
+fi
+
+# Check if policy exists
+EXISTING_POLICY=$(aws iam get-policy --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING} 2>/dev/null)
+
+if [ ! -z "$EXISTING_POLICY" ]; then
+    echo "Policy ${POLICY_NAME} 가 존재합니다."
+    exit 0
+fi
+
+cat >tmp/${POLICY_NAME}.json <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:SetDesiredCapacity",
+                "autoscaling:TerminateInstanceInAutoScalingGroup"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/k8s.io/cluster-autoscaler/enabled": "true",
+                    "aws:ResourceTag/k8s.io/cluster-autoscaler/${CLUSTER_NAME}": "owned"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeAutoScalingInstances",
+                "autoscaling:DescribeLaunchConfigurations",
+                "autoscaling:DescribeScalingActivities",
+                "autoscaling:DescribeTags",
+                "ec2:DescribeImages",
+                "ec2:DescribeInstanceTypes",
+                "ec2:DescribeLaunchTemplateVersions",
+                "ec2:GetInstanceTypesFromInstanceRequirements",
+                "eks:DescribeNodegroup"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+
+echo "${POLICY_NAME} 생성중..."
+# eks user policy 생성
+echo "aws iam create-policy --policy-name ${POLICY_NAME} \\
+	--policy-document file://tmp/${POLICY_NAME}.json ${PROFILE_STRING}"
+
+aws iam create-policy --policy-name ${POLICY_NAME} \
+	--policy-document file://tmp/${POLICY_NAME}.json ${PROFILE_STRING}
+
+aws iam wait policy-exists \
+    --policy-arn arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} ${PROFILE_STRING}
+
+echo "${POLICY_NAME} 생성완료..."
+
+eksctl create iamserviceaccount \
+  --name ${SERVICE_NAME} \
+  --namespace ${NAMESPACE_NAME} \
+  --cluster ${CLUSTER_NAME} \
+  --attach-policy-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME}" \
+  --approve \
+  --role-name ${ROLE_NAME} \
+  --region ${AWS_REGION} \
+  --role-only

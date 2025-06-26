@@ -1,0 +1,48 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eks-edu-cluster-${IDE_NAME}
+  region: ${AWS_REGION}
+  version: "${EKS_VERSION}"
+  tags:
+    karpenter.sh/discovery: eks-edu-cluster-${IDE_NAME}
+    created-by: eks-workshop-v2
+    env: eks-edu-cluster-${IDE_NAME}
+iam:
+  withOIDC: true
+vpc:
+  id: "${VPC_ID}"  # (optional, must match VPC ID used for each subnet below)
+  controlPlaneSecurityGroupIDs: ["${EKS_ADDITIONAL_SG}"]  
+  subnets:
+    # must provide 'private' and/or 'public' subnets by availability zone as shown
+    private:
+      ${AWS_AZ1}:
+        id: "${AWS_PRIVATE_SUBNET1}"
+      ${AWS_AZ2}:
+        id: "${AWS_PRIVATE_SUBNET2}"
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: true
+managedNodeGroups:
+  - name: ops-nodegroup
+    instanceType: t3.medium
+    spot: false
+    desiredCapacity: 1
+    privateNetworking: true # if only 'Private' subnets are given, this must be enabled
+    labels: {role: ops}
+  - name: app-nodegroup
+    instanceType: t3.medium
+    desiredCapacity: 2
+    privateNetworking: true # if only 'Private' subnets are given, this must be enabled
+    labels: {role: app}
+addons:
+  - name: vpc-cni # no version is specified so it deploys the default version
+    attachPolicyARNs:
+      - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+  - name: coredns
+    version: latest # auto discovers the latest available
+  - name: kube-proxy
+    version: latest
+  - name: aws-ebs-csi-driver
+    wellKnownPolicies:      # add IAM and service account
+      ebsCSIController: true

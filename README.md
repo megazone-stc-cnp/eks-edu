@@ -33,7 +33,7 @@ AWS EKS에 대해 기초부터 고급주제까지 학습하실 수 있도록 교
 - [11. Storage 관리](12_Storage_Management/README.adoc)
 - [13. Application 배포 - 기본](13_Application/README.adoc)
 - [13. Application 배포 - 고급](14_ArgoCD/README.md)
-- [14. AutoScaling](15_AutoScaling/README.md)
+- [14. AutoScaling](15_AutoScaling/README.adoc)
 - [15. Observability](16_Observability/README.md)
 - [16. EKS Upgrade 이론](17_EKS_Upgrade/README.md)
 - [17. EKS Upgrade 실습](18_EKS_Upgrade/README.md)
