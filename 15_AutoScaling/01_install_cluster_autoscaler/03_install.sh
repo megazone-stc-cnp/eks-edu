@@ -1,10 +1,23 @@
 #!/bin/bash
 
+if [ -z "$1" ]; then
+    echo "사용법: $0 <CHART_VERSION>"
+    exit 1
+fi
+CHART_VERSION=$1
+
+if [ ! -f "../../env.sh" ];then
+	echo "env.sh 파일 세팅을 해주세요."
+	exit 1
+fi
+. ../../env.sh
+
 REPO_NAME=autoscaler
 CHART_NAME=cluster-autoscaler
 NAMESPACE_NAME=kube-system
 APP_NAME=cluster-autoscaler
-CLUSTER_AUTOSCALER_CHART_VERSION=
+SERVICE_ACCOUNT_NAME=cluster-autoscaler-sa
+ROLE_NAME="cluster-autoscaler-role-${IDE_NAME}"
 # ==================================================================
 if [ ! -d "tmp" ]; then
     mkdir -p tmp
@@ -12,20 +25,18 @@ fi
 
 cat > tmp/cluster_autoscaler_value.yaml<<EOF
 autoDiscovery:
-  clusterName: eks-edu-cluster-9641173
-awsRegion: ap-northeast-1
+  clusterName: ${CLUSTER_NAME}
+awsRegion: ${AWS_REGION}
 containerSecurityContext:
   capabilities:
     drop:
     - ALL
 extraArgs:
-  balance-similar-node-groups: true
-  expander: least-waste
   logtostderr: true
-  skip-nodes-with-local-storage: false
-  skip-nodes-with-system-pods: false
   stderrthreshold: info
   v: 4
+  skip-nodes-with-local-storage: false
+  expander: least-waste
 extraVolumeMounts:
 - mountPath: /etc/ssl/certs/ca-certificates.crt
   name: ssl-certs
@@ -36,27 +47,25 @@ extraVolumes:
   name: ssl-certs
 fullnameOverride: cluster-autoscaler
 image:
-  repository: 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/eks/cluster-autoscaler
-  tag: v1.32.0
-podDisruptionBudget:
-  maxUnavailable: 1
+  repository: registry.k8s.io/autoscaling/cluster-autoscaler
+  tag: v${EKS_VERSION}.0
 rbac:
   create: true
   pspEnabled: false
   serviceAccount:
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::539666729110:role/mzc-an1-hcseo-stg-eks-add-autoscaler-iamrol
+      eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${ROLE_NAME}
     automountServiceAccountToken: true
     create: true
-    name: cluster-autoscaler-sa
+    name: ${SERVICE_ACCOUNT_NAME}
 replicaCount: 1
 resources:
   limits:
     cpu: 100m
-    memory: 100Mi
+    memory: 600Mi
   requests:
     cpu: 100m
-    memory: 100Mi
+    memory: 600Mi
 securityContext:
   runAsGroup: 1001
   runAsNonRoot: true
@@ -68,12 +77,7 @@ serviceMonitor:
   path: /metrics
 EOF
 
-if [[ $(helm repo list | grep "^cluster-autoscaler " | wc -l) == 0 ]];then
-    helm repo add ${REPO_NAME} https://kubernetes.github.io/autoscaler
-fi
-helm repo update
-
 helm upgrade --install ${APP_NAME} ${REPO_NAME}/${CHART_NAME} \
-  --version "${CLUSTER_AUTOSCALER_CHART_VERSION}" \
+  --version "${CHART_VERSION}" \
   --namespace ${NAMESPACE_NAME} \
   --wait

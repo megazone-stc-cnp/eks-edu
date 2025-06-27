@@ -6,7 +6,7 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
-SERVICE_NAME=s3-csi-driver-sa
+SERVICE_ACCOUNT_NAME=cluster-autoscaler-sa
 NAMESPACE_NAME=kube-system
 POLICY_NAME="cluster-autoscaler-policy-${IDE_NAME}"
 ROLE_NAME="cluster-autoscaler-role-${IDE_NAME}"
@@ -73,9 +73,21 @@ aws iam wait policy-exists \
     --policy-arn arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} ${PROFILE_STRING}
 
 echo "${POLICY_NAME} 생성완료..."
+echo ""
+
+echo "eksctl create iamserviceaccount \\
+        --name ${SERVICE_ACCOUNT_NAME} \\
+        --namespace ${NAMESPACE_NAME} \\
+        --cluster ${CLUSTER_NAME} \\
+        --attach-policy-arn \"arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME}\" \\
+        --approve \\
+        --role-name ${ROLE_NAME} \\
+        --region ${AWS_REGION} \\
+        --role-only"
+echo ""
 
 eksctl create iamserviceaccount \
-  --name ${SERVICE_NAME} \
+  --name ${SERVICE_ACCOUNT_NAME} \
   --namespace ${NAMESPACE_NAME} \
   --cluster ${CLUSTER_NAME} \
   --attach-policy-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME}" \
