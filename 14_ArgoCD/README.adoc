@@ -36,7 +36,7 @@ endif::[]
 [source,shell]
 ----
 cd ~/environment/eks-edu/14_ArgoCD/00_pre_setup
-sh 01_install.sh
+sh 03_install.sh
 ----
 . link:11_Network_2/[11. Network_2]에 `create-aws-lbc-irsa.sh`를 실행하여 AWS LBC Controller를 설치합니다.
 [source,shell]
@@ -263,8 +263,6 @@ kubectl -n argocd rollout restart deployment my-argocd-server
 +
 .실행 화면
 image::images/argocd_user_add.png[ArgoCD User 등록]
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 . argocd repo 등록
 +

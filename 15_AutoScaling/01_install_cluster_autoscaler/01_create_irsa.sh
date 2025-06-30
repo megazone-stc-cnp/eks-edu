@@ -70,7 +70,7 @@ aws iam create-policy --policy-name ${POLICY_NAME} \
 	--policy-document file://tmp/${POLICY_NAME}.json ${PROFILE_STRING}
 
 aws iam wait policy-exists \
-    --policy-arn arn:aws:iam::${AWS_REPO_ACCOUNT}:policy/${POLICY_NAME} ${PROFILE_STRING}
+    --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME} ${PROFILE_STRING}
 
 echo "${POLICY_NAME} 생성완료..."
 echo ""

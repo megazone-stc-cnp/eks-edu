@@ -54,7 +54,7 @@ rbac:
   pspEnabled: false
   serviceAccount:
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_REPO_ACCOUNT}:role/${ROLE_NAME}
+      eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}
     automountServiceAccountToken: true
     create: true
     name: ${SERVICE_ACCOUNT_NAME}
@@ -77,7 +77,14 @@ serviceMonitor:
   path: /metrics
 EOF
 
+echo "helm upgrade --install ${APP_NAME} ${REPO_NAME}/${CHART_NAME} \\
+        --version "${CHART_VERSION}" \\
+        --namespace ${NAMESPACE_NAME} \\
+        -f tmp/cluster_autoscaler_value.yaml \\
+        --wait"
+
 helm upgrade --install ${APP_NAME} ${REPO_NAME}/${CHART_NAME} \
   --version "${CHART_VERSION}" \
   --namespace ${NAMESPACE_NAME} \
+  -f tmp/cluster_autoscaler_value.yaml \
   --wait

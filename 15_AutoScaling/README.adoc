@@ -37,7 +37,7 @@ endif::[]
 [source,shell]
 ----
 cd ~/environment/eks-edu/15_AutoScaling/00_pre_setup
-sh 02_install.sh
+sh 03_install.sh
 ----
 
 == 이론
@@ -65,3 +65,131 @@ CAUTION: `01-3_make_eksctl_cluster_nodegroup_pod_identity_template.sh` 사용 �
 == 실습
 
 === Cluster AutoScaler 설치
+. IRSA Role 설정
++
+[,shell]
+----
+cd ~/environment/eks-edu/15_AutoScaling/01_install_cluster_autoscaler
+sh 01_create_irsa.sh
+----
++
+위 ``01_create_irsa.sh``를 실행하면 IRSA Role을 생성한다.(참고용)
++
+[,shell]
+----
+aws iam create-policy --policy-name cluster-autoscaler-policy-9641173 \
+        --policy-document file://tmp/cluster-autoscaler-policy-9641173.json
+
+eksctl create iamserviceaccount \
+  --name cluster-autoscaler-sa \
+  --namespace kube-system \
+  --cluster eks-edu-cluster-9641173 \
+  --attach-policy-arn "arn:aws:iam::539666729110:policy/cluster-autoscaler-policy-9641173" \
+  --approve \
+  --role-name cluster-autoscaler-role-9641173 \
+  --region ap-northeast-1
+----
++
+.실행 화면
+image::images/cluster-autoscaler-iamserviceaccount.png[Cluster Autoscaler IRSA 설정]
++
+.생성 결과 화면
+image::images/cluster-autoscaler-iamserviceaccount-result.png[Cluster Autoscaler IRSA 결과]
+
+. Helm Version 체크
++
+[,shell]
+----
+cd ~/environment/eks-edu/15_AutoScaling/01_install_cluster_autoscaler
+sh 02_cluster_autoscaler_helm_version.sh
+----
++
+위 ``01_create_irsa.sh``를 실행하면 IRSA Role을 생성한다.(참고용)
++
+[,shell]
+----
+helm repo add autoscaler https://kubernetes.github.io/autoscaler
+
+helm repo update
+
+helm search repo autoscaler/cluster-autoscaler --versions
+----
++
+.실행 화면
+image::images/cluster_autoscaler_helm_version.png[Cluster Autoscaler Helm Version 체크]
+
+CAUTION: App Version이 EKS의 버전과 매칭되어야 한다.
+
+. Cluster Autoscaler Helm Chart 설치
++
+[,shell]
+----
+cd ~/environment/eks-edu/15_AutoScaling/01_install_cluster_autoscaler
+sh 03_install.sh
+----
++
+위 ``03_install.sh``를 실행하면 ``tmp/cluster_autoscaler_value.yaml`` 를 생성해서 ``helm install``을 수행한다. +
+아래 내용이 value 내용이다.
++
+[,yaml]
+----
+autoDiscovery:
+  clusterName: eks-edu-cluster-9641173
+awsRegion: ap-northeast-1
+containerSecurityContext:
+  capabilities:
+    drop:
+    - ALL
+extraArgs:
+  logtostderr: true
+  stderrthreshold: info
+  v: 4
+  skip-nodes-with-local-storage: false
+  expander: least-waste
+extraVolumeMounts:
+- mountPath: /etc/ssl/certs/ca-certificates.crt
+  name: ssl-certs
+  readOnly: true
+extraVolumes:
+- hostPath:
+    path: /etc/ssl/certs/ca-bundle.crt
+  name: ssl-certs
+fullnameOverride: cluster-autoscaler
+image:
+  repository: registry.k8s.io/autoscaling/cluster-autoscaler
+  tag: v1.32.0
+rbac:
+  create: true
+  pspEnabled: false
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::539666729110:role/cluster-autoscaler-role-9641173
+    automountServiceAccountToken: true
+    create: false
+    name: cluster-autoscaler-sa
+replicaCount: 1
+resources:
+  limits:
+    cpu: 100m
+    memory: 600Mi
+  requests:
+    cpu: 100m
+    memory: 600Mi
+securityContext:
+  runAsGroup: 1001
+  runAsNonRoot: true
+  runAsUser: 1001
+serviceMonitor:
+  enabled: false
+  interval: 15s
+  namespace: kube-system
+  path: /metrics
+
+----
++
+.실행 화면
+image::images/cluster-autoscaler-iamserviceaccount.png[Cluster Autoscaler IRSA 설정]
++
+.생성 결과 화면
+image::images/cluster-autoscaler-iamserviceaccount-result.png[Cluster Autoscaler IRSA 결과]
+
