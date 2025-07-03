@@ -6,10 +6,14 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
-SERVICE_ACCOUNT_NAME=cluster-autoscaler-sa
-NAMESPACE_NAME=kube-system
-POLICY_NAME="cluster-autoscaler-policy-${IDE_NAME}"
-ROLE_NAME="cluster-autoscaler-role-${IDE_NAME}"
+if [ ! -f "./local_env.sh" ];then
+	echo "local_env.sh 파일 세팅을 해주세요."
+	exit 1
+fi
+. ./local_env.sh
+
+POLICY_NAME="${APP_NAME}-policy-${IDE_NAME}"
+ROLE_NAME="${APP_NAME}-role-${IDE_NAME}"
 # ==================================================================
 if [ ! -d "tmp" ]; then
     mkdir -p tmp
@@ -23,43 +27,7 @@ if [ ! -z "$EXISTING_POLICY" ]; then
     exit 0
 fi
 
-cat >tmp/${POLICY_NAME}.json <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "autoscaling:SetDesiredCapacity",
-                "autoscaling:TerminateInstanceInAutoScalingGroup"
-            ],
-            "Resource": "*",
-            "Condition": {
-                "StringEquals": {
-                    "aws:ResourceTag/k8s.io/cluster-autoscaler/enabled": "true",
-                    "aws:ResourceTag/k8s.io/cluster-autoscaler/${CLUSTER_NAME}": "owned"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:DescribeAutoScalingInstances",
-                "autoscaling:DescribeLaunchConfigurations",
-                "autoscaling:DescribeScalingActivities",
-                "autoscaling:DescribeTags",
-                "ec2:DescribeImages",
-                "ec2:DescribeInstanceTypes",
-                "ec2:DescribeLaunchTemplateVersions",
-                "ec2:GetInstanceTypesFromInstanceRequirements",
-                "eks:DescribeNodegroup"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
+echo "$POLICY_JSON" > tmp/${POLICY_NAME}.json
 
 echo "${POLICY_NAME} 생성중..."
 # eks user policy 생성

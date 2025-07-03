@@ -6,12 +6,15 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
+if [ ! -f "./local_env.sh" ];then
+	echo "local_env.sh 파일 세팅을 해주세요."
+	exit 1
+fi
+. ./local_env.sh
+
 # 삭제할 정책 ARN 설정
-SERVICE_ACCOUNT_NAME=cluster-autoscaler-sa
-POLICY_NAME="cluster-autoscaler-policy-${IDE_NAME}"
-ROLE_NAME="cluster-autoscaler-role-${IDE_NAME}"
-APP_NAME=cluster-autoscaler
-NAMESPACE_NAME=kube-system
+POLICY_NAME="${APP_NAME}-policy-${IDE_NAME}"
+ROLE_NAME="${APP_NAME}-role-${IDE_NAME}"
 # ===================================================================================
 POLICY_ARN=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME}
 
@@ -20,8 +23,8 @@ helm uninstall ${APP_NAME} -n ${NAMESPACE_NAME}
 
 echo "eksctl delete iamserviceaccount \\
   --name ${SERVICE_ACCOUNT_NAME} \\
-  --namespace kube-system \\
-  --cluster ${NAMESPACE_NAME} \\
+  --namespace ${NAMESPACE_NAME} \\
+  --cluster ${CLUSTER_NAME} \\
   --region ${AWS_REGION} \\
   --wait"
 

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-
 cd ../../03_Default_Environment/01_create_vpc
 
 # VPC 생성

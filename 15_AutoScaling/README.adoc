@@ -57,6 +57,8 @@ CAUTION: `01-3_make_eksctl_cluster_nodegroup_pod_identity_template.sh` 사용 �
 
 === Vertical Pod Autoscaler
 
+=== Karpenter
+
 == 관련 링크
 * Cluster Autoscaler : https://docs.aws.amazon.com/ko_kr/eks/latest/best-practices/cas.html
 * AWS Cluster Autoscaler github : https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws
@@ -101,7 +103,7 @@ image::images/cluster-autoscaler-iamserviceaccount-result.png[Cluster Autoscaler
 [,shell]
 ----
 cd ~/environment/eks-edu/15_AutoScaling/01_install_cluster_autoscaler
-sh 02_cluster_autoscaler_helm_version.sh
+sh 02_helm_version.sh
 ----
 +
 위 ``01_create_irsa.sh``를 실행하면 IRSA Role을 생성한다.(참고용)
