@@ -1,0 +1,31 @@
+# 작업해야 하는 부분
+1. Storage Management
+    1. 임시 볼륨, 영구 볼륨
+    2. EBS CSI Driver
+    3. EFS CSI Driver
+    4. Static Provisioning / Dynamic Provisioning
+2. Application
+    1. Kubernetes Object
+    2. deploy 배포
+    3. PDB
+    4. Blue/Green 배포
+3. ArgoCD
+    1. ArgoCD 기능
+    2. ArgoCD 서버 설치
+    3. User 등록
+    4. Application 등록
+4. AutoScaling
+    1. Cluster AutoScaler
+    2. Karpenter
+    3. Horizontal Pod AutoScaler
+    4. Vertical Pod AutoScaler
+5. Observability
+    1. Control Plain Log
+    2. Pod Log
+    3. 모니터링 툴 ( Container Insight, AMP/AMG )
+6. EKS Upgrade
+    1. 인그레이스 업그레이드 전략
+    2. 블루-그린 업그레이드 전략
+7. Backstage
+    1. Backstage를 써야 하는 이유
+    2.
