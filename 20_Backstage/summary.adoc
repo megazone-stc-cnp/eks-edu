@@ -309,3 +309,205 @@ image::../16_Observability/images/scraper_add.png[스크레이퍼 추가]
 
 === Amazon CloudWatch
 Amazon CloudWatch는 클라우드 리소스에서 지표와 로그를 수집하는 모니터링 서비스이다. EKS 버전 1.28 이상의 새 클러스터를 사용할 때 몇가지 기본 Amazon EKS 지표를 무료로 제공한다. 그러나 **CloudWatch Observility Operator를 Amazon EKS 추가 기능으로 사용하면 향상된 관찰성 기능을 이용**할 수 있다.
+
+.기본 지표 목록
+[%autowidth,cols="1s,a,"]
+|===
+|메트릭 이름 |설명 | 단위
+
+|scheduler_schedule_attempts_total
+|지정된 기간 동안 스케줄러가 클러스터에서 포드를 예약하려는 총 시도 횟수입니다. 이 지표는 스케줄러의 워크로드를 모니터링하는 데 도움이 되며 예약 압력이나 포드 배치의 잠재적 문제를 나타낼 수 있습니다.
+|단위: 개
+
+유효 통계: Sum
+
+|scheduler_schedule_attempts_SCHEDULED
+|지정된 기간 동안 스케줄러가 클러스터의 노드에 포드를 예약하려는 시도가 성공한 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|scheduler_schedule_attempts_UNSCHEDULABLE
+|노드의 CPU나 메모리가 부족한 등 유효한 제약 조건으로 인해 지정된 기간 동안 예약할 수 없었던 포드의 예약 시도 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|scheduler_schedule_attempts_ERROR
+|API 서버 연결 문제와 같은 스케줄러 자체의 내부 문제로 인해 지정된 기간 동안 실패한 포드 예약 시도 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|scheduler_pending_pods
+|지정된 기간 동안 클러스터에서 스케줄러가 예약할 보류 중인 총 포드 수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|scheduler_pending_pods_ACTIVEQ
+|지정된 기간 동안 클러스터에서 예약 대기 중인 activeQ의 보류 중인 포드 수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|scheduler_pending_pods_UNSCHEDULABLE
+|스케줄러가 예약을 시도했지만 실패하여 재시도를 위해 예약 불가 상태로 유지되는 보류 중인 포드 수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|scheduler_pending_pods_BACKOFF
+|백오프 상태에서 백오프 기간이 만료되기를 기다리는 backoffQ의 보류 중인 포드 수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|CronJob
+|반복 일정에 따라 잡을 만든다
+|kubectl get cj -n <namespace>
+
+|scheduler_pending_pods_GATED
+|필요한 조건을 충족할 때까지 예약할 수 없어 비공개 상태에서 현재 대기하고 있는 보류 중인 포드 수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_request_total
+|클러스터의 모든 API 서버에서 이루어진 HTTP 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_request_total_4XX
+|4XX(클라이언트 오류) 상태 코드를 초래한 클러스터의 모든 API 서버에 대한 HTTP 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_request_total_429
+|클라이언트가 비율 제한 임곗값을 초과할 때 발생하는 429 상태 코드를 초래한 클러스터의 모든 API 서버에 대한 HTTP 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_request_total_5XX
+|5XX(서버 오류) 상태 코드를 초래한 클러스터의 모든 API 서버에 대한 HTTP 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_request_total_LIST_PODS
+|클러스터의 모든 API 서버에 대한 LIST 포드 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_request_duration_seconds_PUT_P99
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 PUT 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 PUT 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_request_duration_seconds_PATCH_P99
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 PATCH 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 PATCH 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_request_duration_seconds_POST_P99
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 POST 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 POST 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_request_duration_seconds_GET_P99
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 GET 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 GET 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_request_duration_seconds_LIST_P99
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 LIST 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 LIST 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_request_duration_seconds_DELETE_P99
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 DELETE 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 DELETE 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_current_inflight_requests_MUTATING
+|클러스터의 모든 API 서버에서 현재 처리 중인 변경 요청(POST, PUT, DELETE, PATCH) 횟수입니다. 이 지표는 진행 중이며 아직 처리가 완료되지 않은 요청을 나타냅니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_current_inflight_requests_READONLY
+|클러스터의 모든 API 서버에서 현재 처리 중인 읽기 전용 요청(GET, LIST) 횟수입니다. 이 지표는 진행 중이며 아직 처리가 완료되지 않은 요청을 나타냅니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_admission_webhook_request_total
+|클러스터의 모든 API 서버에서 수행된 승인 웹후크 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_admission_webhook_request_total_ADMIT
+|클러스터의 모든 API 서버에서 수행된 변경 승인 웹후크 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_admission_webhook_request_total_VALIDATING
+|클러스터의 모든 API 서버에서 수행된 승인 웹후크 요청의 검증 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_admission_webhook_rejection_count
+|클러스터의 모든 API 서버에서 거부된 승인 웹후크 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_admission_webhook_rejection_count_ADMIT
+|클러스터의 모든 API 서버에서 거부된 변경 승인 웹후크 요청 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_admission_webhook_rejection_count_VALIDATING
+|거부된 클러스터의 모든 API 서버에서 수행된 승인 웹후크 요청의 검증 횟수입니다.
+|단위: 개
+
+유효 통계: Sum
+
+|apiserver_admission_webhook_admission_duration_seconds
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 타사 승인 웹후크 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 타사 승인 웹후크 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_admission_webhook_admission_duration_seconds_ADMIT_P99
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 타사 변경 승인 웹후크 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 타사 변경 승인 웹후크 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_admission_webhook_admission_duration_seconds_VALIDATING_P99
+|클러스터의 모든 API 서버의 모든 요청에서 계산된 타사 검증 승인 웹후크 요청에 대한 지연 시간의 99번째 백분위수입니다. 모든 타사 검증 승인 웹후크 요청의 99%가 완료되는 응답 시간을 나타냅니다.
+|단위: 초
+
+유효 통계: Average
+
+|apiserver_storage_size_bytes
+|클러스터의 API 서버에서 사용하는 etcd 스토리지 데이터베이스 파일의 물리적 크기(바이트)입니다. 이 지표는 스토리지에 할당된 실제 디스크 공간을 나타냅니다.
+|단위: 바이트
+
+유효 통계: Maximum
+|===
