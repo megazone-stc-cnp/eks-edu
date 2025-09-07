@@ -6,6 +6,12 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
+if [ ! -f "../upgrade_env.sh" ];then
+  echo "upgrade_env.sh 파일 세팅을 해주세요."
+  exit 1
+fi
+. ../upgrade_env.sh
+
 ADDON_NAME=vpc-cni
 # ================================
 aws eks describe-addon-versions --kubernetes-version ${EKS_UPGRADE_CLUSTER_VERSION} \
