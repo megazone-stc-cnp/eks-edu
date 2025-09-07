@@ -13,6 +13,5 @@ fi
 . ../../env.sh
 
 # ==================================================================
-NODE_NAME=ip-100-124-26-57.ap-northeast-2.compute.internal
 kubectl cordon ${NODE_NAME}
 kubectl drain ${NODE_NAME} --ignore-daemonsets --delete-emptydir-data
