@@ -29,7 +29,7 @@ fi
 ADDON_NAME=vpc-cni
 VPC_CNI_ROLE_NAME=eks-edu-vpc-cni-pod-identity-role-${IDE_NAME}
 # ==================================================================
-# echo aws eks create-addon --cluster-name ${EKS_CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${VPC_CNI_VERSION} --configuration-values "{\"env\":{\"AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG\":\"true\",     \"ENABLE_PREFIX_DELEGATION\": \"true\"}, \"EniConfig\": {\"create\": true,\"region\": \"${REGION_NAME}\",\"subnets\": { \"${AZ_1_NAME}\": { \"id\": \"${POD_SUBNET_ID_1}\", \"securityGroups\": [ \"${EKS_ADD_SG}\" ] },\"${AZ_2_NAME}\": { \"id\": \"${POD_SUBNET_ID_2}\", \"securityGroups\": [ \"${EKS_ADD_SG}\" ] } } } }" --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${VPC_CNI_ROLE_NAME} --resolve-conflicts OVERWRITE --profile ${PROFILE_NAME} --region ${REGION_NAME}
+# echo aws eks create-addon --cluster-name ${EKS_CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${VPC_CNI_VERSION} --configuration-values "{\"env\":{\"AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG\":\"true\",     \"ENABLE_PREFIX_DELEGATION\": \"true\"}, \"EniConfig\": {\"create\": true,\"region\": \"${AWS_REGION}\",\"subnets\": { \"${AZ_1_NAME}\": { \"id\": \"${POD_SUBNET_ID_1}\", \"securityGroups\": [ \"${EKS_ADD_SG}\" ] },\"${AZ_2_NAME}\": { \"id\": \"${POD_SUBNET_ID_2}\", \"securityGroups\": [ \"${EKS_ADD_SG}\" ] } } } }" --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${VPC_CNI_ROLE_NAME} --resolve-conflicts OVERWRITE --profile ${PROFILE_NAME} --region ${AWS_REGION}
 cat >configuration-values.json<<EOF
 {
   "env": {

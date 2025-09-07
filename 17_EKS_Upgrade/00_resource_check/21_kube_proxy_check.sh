@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ ! -f "../../env.sh" ];then
+  echo "env.sh 파일 세팅을 해주세요."
+  exit 1
+fi
+. ../../env.sh
+
+ADDON_NAME=kube-proxy
+# ================================
+aws eks describe-addon \
+    --cluster-name ${EKS_CLUSTER_NAME} \
+    --addon-name ${ADDON_NAME} \
+    --profile ${PROFILE_NAME} \
+    --region ${REGION_NAME}
