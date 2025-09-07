@@ -181,14 +181,14 @@ sh 10_coredns_configmap_backup.sh
 # 기존 버전 체크
 sh 11_coredns_check.sh
 -> addonVersion: ????-eksbuild.??
-
+예) v1.11.4-eksbuild.22
 #################################
 # 신규 버전 체크
 sh 12_coredns_upgrade_check.sh
 -> 결과 목록 중에 존재하지 않는지 체크
 
 #################################
-#OPTION 만약에 업그레이드 범위에 포함이 안되는 문제가 있다면 업그레이드 작업을 해줘야 한다.
+# OPTION 만약에 업그레이드 범위에 포함이 안되는 문제가 있다면 업그레이드 작업을 해줘야 한다.
 # 기존 버전에서 호환이 되는 범위를 찾기
 sh 13_coredns_available_current_version.sh
 -> 12번에 나온 범위와 현재 버전에서 최신 버전과 매칭되는값 확인
@@ -196,7 +196,7 @@ sh 13_coredns_available_current_version.sh
 #################################
 #OPTION 업그레이드가 필요로 하다면 업그레이드 작업
 sh 14_coredns_current_eks_upgrade.sh <<매칭 버전>>
-예) sh 14_coredns_current_eks_upgrade.sh v1.11.3-eksbuild.1
+예) sh 14_coredns_current_eks_upgrade.sh v1.11.4-eksbuild.22
 -> id: 60b068b0-d17e-3cc0-a4c0-9c516d4cd761
 
 #################################
@@ -209,6 +209,766 @@ sh 11_coredns_check.sh
 eks-sample/network-multitool 명령을 이용해서 도메인 호출이 잘 되는지 체크
 $ 03_exec.sh
 $ nslookup sts.ap-northeast-1.amazonaws.com
+```
+
+===== kube-proxy
+
+. addon 호환성 체크
++
+```
+# 기존 버전 체크
+sh 21_kube_proxy_check.sh
+-> addonVersion : ????-eksbuild.??
+예) v1.32.6-eksbuild.8
+
+# 신규 버전 체크
+sh 22_kube_proxy_upgrade_check.sh
+-> 결과 목록 중에 존재하지 않는지 체크
+[
+  {
+    "Version": "v1.33.3-eksbuild.6",
+    "Defaultversion": false
+  },
+...
+]
+#TODO 만약에 업그레이드 범위에 포함이 안되는 문제가 있다면 업그레이드 작업을 해줘야 한다.
+# 기존 버전에서 호환이 되는 범위를 찾기
+sh 23_kube_proxy_available_current_version.sh
+-> 22번에 나온 범위와 현재 버전에서 최신 버전과 매칭되는값 확인
+[
+  {
+    "Version": "v1.32.6-eksbuild.8",
+    "Defaultversion": false
+  },
+...
+]
+
+sh 24_kube_proxy_current_eks_upgrade.sh <<매칭 버전>>
+예) sh 24_kube_proxy_current_eks_upgrade.sh v1.32.6-eksbuild.8
+# 상태가 ACTIVE 일 때까지 대기
+sh 21_kube_proxy_check.sh
+-> status: ACTIVE
+```
+
+===== vpc-cni
+
+. addon 호환성 체크
++
+```
+# 사전 자료 백업
+sh 30_vpc_cni_daemonset_backup.sh
+mv aws-node-daemonset-backup.yaml aws-node-daemonset-old.yaml
+-> aws-node-daemonset-old.yaml 에 저장됨
+
+# 기존 버전 체크
+sh 31_vpc_cni_check.sh
+-> addonVersion: ????-eksbuild.??
+-> serviceAccountRoleArn: ?????-iamrol
+예) v1.19.2-eksbuild.1 , arn:aws:iam::467796444876:role/eksctl-eks-edu-cluster-9641173-addon-vpc-cni-Role1-eQ0ITbCGGlKY
+
+# 신규 버전 체크
+sh 32_vpc_cni_upgrade_check.sh
+-> 결과 목록 중에 존재하지 않는지 체크
+[
+  {
+    "Version": "v1.20.1-eksbuild.3",
+    "Defaultversion": false
+  },
+...
+]
+#TODO 만약에 업그레이드 범위에 포함이 안되는 문제가 있다면 업그레이드 작업을 해줘야 한다.
+# 기존 버전에서 호환이 되는 범위를 찾기
+sh 33_vpc_cni_available_current_version.sh
+-> 32번에 나온 범위와 현재 버전에서 최신 버전과 매칭되는값 확인
+[
+  {
+    "Version": "v1.20.1-eksbuild.3",
+    "Defaultversion": false
+  },
+...
+]
+
+sh 34_vpc_cni_current_eks_upgrade.sh <<매칭 버전>> <<serviceAccontRoleName>>
+예) sh 34_vpc_cni_current_eks_upgrade.sh v1.20.1-eksbuild.3 eksctl-eks-edu-cluster-9641173-addon-vpc-cni-Role1-eQ0ITbCGGlKY
+
+# 상태가 ACTIVE 일 때까지 대기
+sh 31_vpc_cni_check.sh
+-> status: ACTIVE
+
+# 정상적으로 잘 올라갔는지 체크
+kubectl get pods -n kube-system
+sh 30_vpc_cni_daemonset_backup.sh
+aws-node-daemonset-old.yaml aws-node-daemonset-backup.yaml 비교
+kubectl get eniconfigs
+```
+
+===== ebs-csi-driver
+
+. addon 호환성 체크
++
+```
+# 기존 버전 체크
+sh 41_ebs_csi_check.sh
+-> addonVersion: ????-eksbuild.??
+-> serviceAccountRoleArn : ?????-iamrol
+예) v1.48.0-eksbuild.2 , eksctl-eks-edu-cluster-9641173-addon-aws-ebs--Role1-GoXhnWYHYbnu
+
+# 신규 버전 체크
+sh 42_ebs_csi_upgrade_check.sh
+-> 결과 목록 중에 존재하지 않는지 체크
+[
+  {
+    "Version": "v1.48.0-eksbuild.2",
+    "Defaultversion": true
+  },
+...
+]
+
+#TODO 만약에 업그레이드 범위에 포함이 안되는 문제가 있다면 업그레이드 작업을 해줘야 한다.
+# 기존 버전에서 호환이 되는 범위를 찾기
+sh 43_ebs_csi_available_current_version.sh
+-> 42번에 나온 범위와 현재 버전에서 최신 버전과 매칭되는값 확인
+[
+  {
+    "Version": "v1.48.0-eksbuild.2",
+    "Defaultversion": true
+  },
+...
+]
+
+sh 44_ebs_csi_current_eks_upgrade.sh <<매칭 버전>> <<serviceAccontRoleName>>
+예) sh 44_ebs_csi_current_eks_upgrade.sh v1.48.0-eksbuild.2 eksctl-eks-edu-cluster-9641173-addon-aws-ebs--Role1-GoXhnWYHYbnu
+
+# 상태가 ACTIVE 일 때까지 대기
+sh 41_ebs_csi_check.sh
+-> status: ACTIVE
+
+# 테스트
+cd <<eks-sample 프로젝트>>
+sh nodegroup/storage/00_ebs_deploy.sh
+k get pods -n default | grep ebs
+-> Pod가 Running 상태
+k get pv -n default | grep ebs-pvc
+-> pv가 Bound 상태
+```
+
+===== efs-csi-driver
+
+. addon 호환성 체크
++
+```
+# 기존 버전 체크
+sh 51_efs_csi_check.sh
+-> addonVersion: ????-eksbuild.??
+-> serviceAccountRoleArn: ?????-iamrol
+예) v2.1.11-eksbuild.1, eksctl-eks-edu-cluster-9641173-addon-aws-efs--Role1-MmLoNJcoRD2O
+
+# 신규 버전 체크
+sh 52_efs_csi_upgrade_check.sh
+[
+  {
+    "Version": "v2.1.11-eksbuild.1",
+    "Defaultversion": true
+  },
+...
+]
+
+#TODO 만약에 업그레이드 범위에 포함이 안되는 문제가 있다면 업그레이드 작업을 해줘야 한다.
+# 기존 버전에서 호환이 되는 범위를 찾기
+
+sh 53_efs_csi_available_current_version.sh
+-> 52번에 나온 범위와 현재 버전에서 최신 버전과 매칭되는값 확인
+[
+  {
+    "Version": "v2.1.11-eksbuild.1",
+    "Defaultversion": true
+  },
+...
+]
+
+sh 54_efs_csi_current_eks_upgrade.sh <<매칭 버전>> <<serviceAccontRoleName>>
+예) sh 54_efs_csi_current_eks_upgrade.sh v2.1.11-eksbuild.1 eksctl-eks-edu-cluster-9641173-addon-aws-efs--Role1-MmLoNJcoRD2O
+
+# 상태가 ACTIVE 일 때까지 대기
+sh 51_efs_csi_check.sh
+-> status: ACTIVE
+
+# default-efs storageclass가 존재하는지 체크
+kubectl get sc default-efs
+
+# 테스트
+cd <<eks-sample 프로젝트>>
+sh nodegroup/storage/01_efs_deploy.sh
+k get pods -n default | grep efs
+-> Pod가 Running 상태
+k get pv -n default | grep efs-pvc
+-> pv가 Bound 상태
+```
+
+==== Helm으로 설치한 Role 권한 체크
+```
+kubectl get sa -A -o yaml | grep eks.amazonaws.com/role-arn | grep -e 'alb' -e 'autoscal'
+
+-> ????????-eks-add-alb-iamrol
+-> ????????-eks-add-autoscaler-iamrol
+
+# alb irsa 권한 체크
+sh 20_get_policy_in_role.sh ??????-eks-add-alb-iamrol
+# policy 부분이 아래 URL과 비교
+# https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/main/docs/install/iam_policy.json
+
+sh 20_get_policy_in_role.sh ??????-eks-add-autoscaler-iamrol
+# policy 부분이 아래 URL과 비교
+# https://docs.aws.amazon.com/eks/latest/best-practices/cas.html
+```
+
+==== IP 부족한지 확인
+```
+sh 01_subnet_ip_check.sh
+
+[
+  [
+    "subnet-05ee32b9fa4460dc6",
+    "ap-northeast-1a",
+    50
+  ],
+  [
+    "subnet-02bd7f15e4a7f5d65",
+    "ap-northeast-1c",
+    51
+  ]
+]
+```
+
+==== ebs insight 확인
+```
+sh 02_insight_check.sh
+
+{
+  "insights": [
+    {
+      "id": "1c73d28f-83b6-49ef-a41d-851d7ac1bb5f",
+      "name": "Cluster health issues",
+      "category": "UPGRADE_READINESS",
+      "kubernetesVersion": "1.33",
+      "lastRefreshTime": "2025-09-07T12:55:15+00:00",
+      "lastTransitionTime": "2025-09-07T12:55:02+00:00",
+      "description": "Checks for any cluster health issues that prevent successful upgrade to the next Kubernetes version on EKS.",
+      "insightStatus": {
+        "status": "PASSING",
+        "reason": "No cluster health issues detected."
+      }
+    },
+    {
+      "id": "94aaa179-c669-4c33-a36d-621a6d227ec5",
+      "name": "Kubelet version skew",
+      "category": "UPGRADE_READINESS",
+      "kubernetesVersion": "1.33",
+      "lastRefreshTime": "2025-09-07T12:55:02+00:00",
+      "lastTransitionTime": "2025-09-07T12:55:02+00:00",
+      "description": "Checks for kubelet versions of worker nodes in the cluster to see if upgrade would cause non compliance with supported Kubernetes kubelet version skew policy.",
+      "insightStatus": {
+        "status": "UNKNOWN",
+        "reason": "Unable to determine status of node kubelet versions."
+      }
+    },
+    {
+      "id": "7e8aeceb-b523-44e5-bf72-1d6dcb753ebb",
+      "name": "kube-proxy version skew",
+      "category": "UPGRADE_READINESS",
+      "kubernetesVersion": "1.33",
+      "lastRefreshTime": "2025-09-07T12:55:09+00:00",
+      "lastTransitionTime": "2025-09-07T12:55:02+00:00",
+      "description": "Checks version of kube-proxy in cluster to see if upgrade would cause non compliance with supported Kubernetes kube-proxy version skew policy.",
+      "insightStatus": {
+        "status": "PASSING",
+        "reason": "kube-proxy versions match the cluster control plane version."
+      }
+    },
+    {
+      "id": "2116ca48-cdf6-4152-9793-3a8630dc25df",
+      "name": "EKS add-on version compatibility",
+      "category": "UPGRADE_READINESS",
+      "kubernetesVersion": "1.33",
+      "lastRefreshTime": "2025-09-07T12:55:15+00:00",
+      "lastTransitionTime": "2025-09-07T12:55:02+00:00",
+      "description": "Checks version of installed EKS add-ons to ensure they are compatible with the next version of Kubernetes. ",
+      "insightStatus": {
+        "status": "PASSING",
+        "reason": "All installed EKS add-on versions are compatible with next Kubernetes version."
+      }
+    },
+    {
+      "id": "c27a25b1-cb0d-49dc-b7e3-ad4ea5151899",
+      "name": "Amazon Linux 2 compatibility",
+      "category": "UPGRADE_READINESS",
+      "kubernetesVersion": "1.33",
+      "lastRefreshTime": "2025-09-07T12:55:09+00:00",
+      "lastTransitionTime": "2025-09-07T12:55:02+00:00",
+      "description": "Checks if any nodes in the cluster are running Amazon Linux 2. Support for Amazon Linux 2 on Amazon EKS will end on November 26, 2025. Additionally, Amazon EKS will not release Amazon Linux 2 AMIs for Kubernetes version 1.33 and higher",
+      "insightStatus": {
+        "status": "UNKNOWN",
+        "reason": "Unable to determine cluster node version."
+      }
+    }
+  ]
+}
+```
+
+==== NodeGroup Role 에 아래 Policy가 있는지 확인
+```
+1. AmazonEC2ContainerRegistryReadOnly
+2. AmazonEKS_CNI_Policy
+3. AmazonEKSWorkerNodePolicy
+4. AmazonSSMFullAccess
+5. AmazonSSMManagedInstanceCore
+6. CREATE-EC2-NAME-TAG
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:CreateTags"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+==== Helm Chart 호환성 체크
+. aws loadbalancer controller 호환성 체크 ( https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases )
+.. artifact-hub 사이트에 helm chart 버전 정보 : https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller
++
+```
+helm list -n kube-system | grep aws-load-balancer-controller
+-> helm chart 정보 :
+-> image 버전 정보 :
+```
++
+. aws cluster autoscaler 호환성 체크 ( https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/README.md#releases )
+.. artifact-hub 사이트에 helm chart 버전 정보 ( https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler )
++
+```
+helm list -n kube-system | grep cluster-autoscaler
+-> helm chart 정보 :
+-> image 버전 정보 :
+```
++
+. metrics-server 호환성 체크 ( https://github.com/kubernetes-sigs/metrics-server/releases )
+.. artifact-hub 사이트에 helm chart 버전 정보
++
+```
+helm list -n kube-system | grep metrics-server
+-> helm chart 정보 :
+-> image 버전 정보 :
+```
+
+=== EKS Upgrade 작업
+
+==== EKS Cluster Upgrade
+. 1.32 에서 1.33으로 업그레이드
++
+```
+cd ~/environment/eks-edu/17_EKS_Upgrade/02_eks_cluster_upgrade
+sh 01_cluster_upgrade.sh 1.33
+-> upgrade 값 저장
+
+sh 02_upgrade_completed.sh <ID>
+예) sh 02_upgrade_completed.sh 4fed5c8c-15b1-331a-ad2e-fc56f060cf4c
+```
+
+==== Addon Upgrade 작업
+
+===== coredns addon upgrade ( 버전 업그레이드가 가능하다면 ? )
+```
+cd ~/environment/eks-edu/17_EKS_Upgrade/03_coredns_addon_upgrade
+# 버전 호환성 범위 확인
+sh 01_coredns_upgrade_check.sh
+
+[
+  {
+    "Version": "v1.12.3-eksbuild.1",
+    "Defaultversion": false
+  },
+...
+]
+
+# 업그레이드
+sh 02_coredns_upgrade.sh <<최신 버전>>
+예) sh 02_coredns_upgrade.sh v1.12.3-eksbuild.1
+
+# 업그레이드 진행상태가 Active 일 때 까지 대기
+sh 03_coredns_upgrade_wait.sh
+```
+
+===== kube-proxy addon upgrade ( 버전 업그레이드가 가능하다면 ? )
+```
+cd ../04_kube_proxy_addon_upgrade
+# 버전 호환성 범위 확인
+sh 01_kube_proxy_check.sh
+
+# 업그레이드
+sh 02_kube_proxy_upgrade.sh <<최신 버전>>
+
+# 업그레이드 진행상태가 Active 일 때 까지 대기
+sh 03_kube_proxy_upgrade_wait.sh
+-> status: ACTIVE
+```
+
+===== VPC CNI addon upgrade
+```
+cd ../05_vpc_cni_addon_upgrade
+# 버전 호환성 범위 확인
+sh 01_vpc_cni_upgrade_check.sh
+
+# 업그레이드
+sh 02_vpc_cni_current_eks_upgrade.sh <<최신 버전>> <<serviceaccount Role>>
+
+# 업그레이드 진행상태가 Active 일 때 까지 대기
+sh 03_vpc_cni_upgrade_wait.sh
+-> status: ACTIVE
+```
+
+===== ebs-csi-driver addon upgrade
+```
+cd ../06_ebs_csi_driver_addon_upgrade
+# 버전 호환성 범위 확인
+sh 01_ebs_csi_upgrade_check.sh
+
+# 업그레이드
+sh 02_ebs_csi_current_eks_upgrade.sh <<최신 버전>> <<serviceaccount Role>>
+
+# 업그레이드 진행상태가 Active 일 때 까지 대기
+sh 03_ebs_csi_upgrade_wait.sh
+-> status: ACTIVE
+```
+
+===== efs-csi-driver addon upgrade
+```
+cd ../07_efs_csi_driver_addon_upgrade
+# 버전 호환성 범위 확인
+sh 01_efs_csi_upgrade_check.sh
+
+# 업그레이드
+sh 02_efs_csi_current_eks_upgrade.sh <Upgrade Version> <IRSA Role>
+
+# 업그레이드 진행상태가 Active 일 때 까지 대기
+sh 03_efs_csi_upgrade_wait.sh
+-> status: ACTIVE
+```
+
+==== Node Group 업그레이드 ( NodeGroup 용 )
+
+===== 기존 노드 그룹 정보 읽기
+```
+cd ~/environment/eks-edu/17_EKS_Upgrade/10_nodegroup_add
+sh 01_get_nodegroups.sh
+예)
+==================================
+app-nodegroup
+{
+  "nodegroupName": "app-nodegroup",
+  "scalingConfig": {
+    "minSize": 2,
+    "maxSize": 2,
+    "desiredSize": 2
+  },
+  "subnets": [
+    "subnet-05ee32b9fa4460dc6",
+    "subnet-02bd7f15e4a7f5d65"
+  ],
+  "amiType": "AL2023_x86_64_STANDARD",
+  "nodeRole": "arn:aws:iam::467796444876:role/eksctl-eks-edu-cluster-9641173-nod-NodeInstanceRole-ix9z8SnUsXUq",
+  "labels": {
+    "alpha.eksctl.io/cluster-name": "eks-edu-cluster-9641173",
+    "alpha.eksctl.io/nodegroup-name": "app-nodegroup",
+    "role": "app"
+  },
+  "launchTemplate": {
+    "name": "eksctl-eks-edu-cluster-9641173-nodegroup-app-nodegroup",
+    "version": "1",
+    "id": "lt-06090f6697bbe83ea"
+  },
+  "tags": {
+    "aws:cloudformation:stack-name": "eksctl-eks-edu-cluster-9641173-nodegroup-app-nodegroup",
+    "alpha.eksctl.io/cluster-name": "eks-edu-cluster-9641173",
+    "alpha.eksctl.io/nodegroup-name": "app-nodegroup",
+    "karpenter.sh/discovery": "eks-edu-cluster-9641173",
+    "aws:cloudformation:stack-id": "arn:aws:cloudformation:ap-northeast-1:467796444876:stack/eksctl-eks-edu-cluster-9641173-nodegroup-app-nodegroup/c77c5360-8be9-11f0-8f07-0645e4e68e2b",
+    "eksctl.cluster.k8s.io/v1alpha1/cluster-name": "eks-edu-cluster-9641173",
+    "aws:cloudformation:logical-id": "ManagedNodeGroup",
+    "alpha.eksctl.io/nodegroup-type": "managed",
+    "env": "eks-edu-cluster-9641173",
+    "alpha.eksctl.io/eksctl-version": "0.206.0",
+    "created-by": "eks-workshop-v2"
+  }
+}
+======================================================
+ops-nodegroup
+{
+  "nodegroupName": "ops-nodegroup",
+  "scalingConfig": {
+    "minSize": 1,
+    "maxSize": 1,
+    "desiredSize": 1
+  },
+  "subnets": [
+    "subnet-05ee32b9fa4460dc6",
+    "subnet-02bd7f15e4a7f5d65"
+  ],
+  "amiType": "AL2023_x86_64_STANDARD",
+  "nodeRole": "arn:aws:iam::467796444876:role/eksctl-eks-edu-cluster-9641173-nod-NodeInstanceRole-wqy31tVuqWh1",
+  "labels": {
+    "alpha.eksctl.io/cluster-name": "eks-edu-cluster-9641173",
+    "alpha.eksctl.io/nodegroup-name": "ops-nodegroup",
+    "role": "ops"
+  },
+  "launchTemplate": {
+    "name": "eksctl-eks-edu-cluster-9641173-nodegroup-ops-nodegroup",
+    "version": "1",
+    "id": "lt-0300ac633a93dc36d"
+  },
+  "tags": {
+    "aws:cloudformation:stack-name": "eksctl-eks-edu-cluster-9641173-nodegroup-ops-nodegroup",
+    "alpha.eksctl.io/cluster-name": "eks-edu-cluster-9641173",
+    "alpha.eksctl.io/nodegroup-name": "ops-nodegroup",
+    "karpenter.sh/discovery": "eks-edu-cluster-9641173",
+    "aws:cloudformation:stack-id": "arn:aws:cloudformation:ap-northeast-1:467796444876:stack/eksctl-eks-edu-cluster-9641173-nodegroup-ops-nodegroup/c77af3d0-8be9-11f0-b21c-0adfb5a396bd",
+    "eksctl.cluster.k8s.io/v1alpha1/cluster-name": "eks-edu-cluster-9641173",
+    "aws:cloudformation:logical-id": "ManagedNodeGroup",
+    "alpha.eksctl.io/nodegroup-type": "managed",
+    "env": "eks-edu-cluster-9641173",
+    "alpha.eksctl.io/eksctl-version": "0.206.0",
+    "created-by": "eks-workshop-v2"
+  }
+}
+
+-> launchTemplate.id
+-> launchTemplate.version
+-> nodeRole
+```
+
+===== 기존 노드 그룹의 Launch Template으로 신규 Launch Template 생성
+```
+sh 02_get_launch_template.sh <launch-template-id> <launch-template-version>
+-> luanch-template.json 정보
+예) sh 02_get_launch_template.sh lt-06090f6697bbe83ea 1
+
+# 만약 userdata.sh 내용을 수정하려고 하면 userdata.sh.data에 내용을 입력하고
+sh 03_make_userdata.sh
+-> 출력된 String을 luanch-template.json 의 userdata에 정보 입력
+# Amazon Linux 2 에서 Amazon Linux 2023으로 변경시 AMI ID가 지정안되어 있으면
+# launch-template.json 추가해 줘야 한다.
+"ImageId": "ami-0f9ad2b210408cf91",
+
+sh 04_create_new_launch_template.sh <<launchtemplate name>> <<이전 Launchtemplate id>> <<이전 Launchtemplate version>>
+예) sh 04_create_new_launch_template.sh app-nodegroup-v33 lt-0300ac633a93dc36d 1
+```
+
+===== 기존 노드 그룹의 Launch Template으로 신규 Version 생성
+```
+Naming : ccs1-sa-stg-ng
+lt-03dca67163c9e3572    2     ccs2-br-hmc-stg-ng-iamrol
+Naming : ccs2-br-hmc-stg-ng
+lt-0b78ad460dbd6bed7    3     ccs2-br-hmc-stg-ng-iamrol
+
+sh 00_clean.sh
+sh 02_get_launch_template.sh lt-0b78ad460dbd6bed7 3
+-> luanch-template.json 정보
+cd tmp
+cp launch-template.json ccs2-br-hmc-stg-ng-launch-template.json
+# 만약 userdata.sh 내용을 수정하려고 하면 userdata.sh.data에 내용을 입력하고
+sh 03_make_userdata.sh
+-> 출력된 String을 luanch-template.json 의 userdata에 정보 입력
+
+# Amazon Linux 2 에서 Amazon Linux 2023으로 변경시 AMI ID가 지정안되어 있으면
+# launch-template.json 추가해 줘야 한다.
+# vi launch-template.json
+"ImageId": "ami-0eda79c7923806019",
+SnapshopId: "snap-0243cb03f5659b80b"
+cd ..
+sh 05_create_new_version.sh lt-0b78ad460dbd6bed7 3
+예) sh 05_create_new_version.sh lt-03dca67163c9e3572 2
+```
+
+===== 기존 노드 그룹 목록 저장
+```
+kubectl get nodes --show-labels | grep <<이전 nodegroup이름>> | cut -d' ' -f1 | tee node-group.txt
+-> node-group.txt에 저장
+```
+
+===== 신규 노드 그룹 생성 ( web console 수작업 )
+```
+EKS Console 메뉴 > Clusters > Compute > [Add node group]
+- Name: 기존이름-v31
+- Node IAM role : <기존과 동일>
+- Launch template : Use launch template ( 신규 LuanchTemplate )
+```
+
+===== 기존 노드 그룹 cordon drain 작업
+```
+제외해야 할 node Instance-id ( node-group.txt 에 저장되어 있음)
+cd ~/environment/eks-edu/17_EKS_Upgrade/11_node_instance_cordon
+# instance 개수 만큼 작업 cordon 작업
+sh 01_cordon_instance.sh <<node-name>>
+sh 02_cordon_check.sh <<node-name>>
+
+예) sh 01_cordon_instance.sh ip-192-168-0-119.ap-northeast-1.compute.internal
+sh 02_cordon_check.sh ip-192-168-0-119.ap-northeast-1.compute.internal
+...
+```
+
+==== Helm Chart 업그레이드
+
+===== aws loadbalancer controller
+. helm value 백업
++
+```
+k ns kube-system
+cd ~/environment/eks-edu/17_EKS_Upgrade/12_aws_loadbalancer_controller
+sh 01_helm_value_backup.sh
+```
++
+. ECR 업로드
++
+```
+# 이미지 없로드는 MAC에서 진행하면 안된다. ( cloudshell 사용 )
+# 02_alb_image_changer.sh에 IMAGE_VERSION에 업로드 하고 싶은 버전 명시
+sh 02_alb_image_changer.sh
+```
++
+. values 부분에 ECR 교체
++
+```
+vi aws-load-balancer-controller-values.yaml
+# tag 부분에 업로드한 버전으로 변경
+tag: v2.11.0
+# ecr 경로가 오래된 버전이면 틀릴 수 있다. ( 예전은 eks/ 이 빠짐 )
+※ repository: 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/eks/aws-load-balancer-controller
+```
++
+. helm upgrade
++
+```
+helm repo list | grep aws-load-balancer-controller
+# 만약 helm repo가 추가가 안되어 있다면 아래 명령으로 추가
+helm repo add eks https://aws.github.io/eks-charts
+
+helm repo update
+# helm upgrade
+sh 03_helm_upgrade.sh 1.11.0
+```
++
+. 체크
++
+```
+kubectl get pods
+kubectl describe pods <alb-pod-id>
+k get ingress -A
+
+# ingress app 재배포 해보기
+cd <<eks-sample 프로젝트>>
+sh nodegroup/storage/00_ebs_deploy.sh
+kubectl get ingress -n default
+```
+
+===== aws cluster-autoscaler
+. helm value 백업
++
+```
+k ns kube-system
+cd cd ~/environment/eks-edu/17_EKS_Upgrade/13_aws_cluster_autoscaler
+sh 01_helm_value_backup.sh
+```
++
+. ECR 업로드
++
+```
+# 이미지 없로드는 MAC에서 진행하면 안된다. ( cloudshell 사용 )
+# 02_cluster_autoscaler_image_changer.sh 에 IMAGE_VERSION에 업로드 하고 싶은 버전 명시
+sh 02_cluster_autoscaler_image_changer.sh
+```
++
+. values 부분에 ECR 교체
++
+```
+vi aws-cluster-autoscaler-values.yaml
+# tag 부분에 업로드한 버전으로 변경
+tag: v1.31.0
+```
++
+. helm upgrade
++
+```
+helm repo list | grep cluster-autoscaler
+# 만약 helm repo가 추가가 안되어 있다면 아래 명령으로 추가
+helm repo add autoscaler https://kubernetes.github.io/autoscaler
+
+helm repo update
+# helm upgrade ( 1.31용 )
+sh 03_helm_upgrade.sh 9.44.0
+```
++
+. 체크
++
+```
+kubectl get pods -n kube-system
+kubectl describe pods <cluster-autoscaler-pod-id>
+```
+
+===== metrics-server
+. helm value 백업
++
+```
+k ns kube-system
+cd ~/environment/eks-edu/17_EKS_Upgrade/14_metrics_server_helm
+sh 01_helm_value_backup.sh
+```
++
+. ECR 업로드
++
+```
+# 이미지 없로드는 MAC에서 진행하면 안된다. ( cloudshell 사용 )
+# 02_metrics_server_image_changer.sh 에 IMAGE_VERSION에 업로드 하고 싶은 버전 명시
+sh 02_metrics_server_image_changer.sh
+```
++
+. values 부분에 ECR 교체
++
+```
+vi metrics-server-values.yaml
+# tag 부분에 업로드한 버전으로 변경
+tag: v0.7.2
+```
++
+. helm upgrade
++
+```
+helm repo list | grep metrics-server
+# 만약 helm repo가 추가가 안되어 있다면 아래 명령으로 추가
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+
+helm repo update
+# helm upgrade ( 1.31용 )
+sh 03_helm_upgrade.sh 3.12.2
+```
++
+. 체크
++
+```
+kubectl get pods -n kube-system
+kubectl describe pods <metrics-server-id>
+kubectl top nodes
+kubectl top pods
+```
+
+==== 기존 노드 삭제
+```
+cd ~/environment/eks-edu/17_EKS_Upgrade/15_delete_node
+sh 01_delete_node.sh <<이전 노드 이름>>
+sh 02_delete_check.sh <<이전 노드 이름>>
 ```
 
 == 관련 링크
