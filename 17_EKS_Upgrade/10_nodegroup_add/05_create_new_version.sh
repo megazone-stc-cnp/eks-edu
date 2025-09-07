@@ -27,5 +27,5 @@ aws ec2 create-launch-template-version \
     --source-version ${LAUNCHTEMPLATE_VERSION} \
     --launch-template-data "${TEMPLATE_DATA}" \
     --version-description "Change Version" \
-    --profile ${PROFILE_NAME} --region ${REGION_NAME}
+    --profile ${PROFILE_NAME} --region ${AWS_REGION}
 

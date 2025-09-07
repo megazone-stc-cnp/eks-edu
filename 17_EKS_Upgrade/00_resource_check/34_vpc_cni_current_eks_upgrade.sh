@@ -19,11 +19,6 @@ fi
 
 ADDON_NAME=vpc-cni
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
-
 rm -rf configuration-values.json
 
 if [ -z "${SECURITY_GROUPS}" ]; then
@@ -39,7 +34,7 @@ cat >configuration-values.json<<EOF
   },
   "eniConfig": {
     "create": true,
-    "region": "${REGION_NAME}",
+    "region": "${AWS_REGION}",
     "subnets": {
       "${AZ1}": {
         "id": "${SUBNET_1}",
@@ -66,7 +61,7 @@ cat >configuration-values.json<<EOF
   },
   "eniConfig": {
     "create": true,
-    "region": "${REGION_NAME}",
+    "region": "${AWS_REGION}",
     "subnets": {
       "${AZ1}": {
         "id": "${SUBNET_1}",

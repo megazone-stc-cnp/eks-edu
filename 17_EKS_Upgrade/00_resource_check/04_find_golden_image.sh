@@ -15,14 +15,12 @@ fi
 # ==============================================================
 echo "aws ec2 describe-images \\
     --image-ids ${GOLDEN_IMAGE_ID} \\
-    --region ${REGION_NAME} \\
-    --profile ${PROFILE_NAME} \\
+    --region ${AWS_REGION} ${PROFILE_STRING} \\
     --output table"
 
 aws ec2 describe-images \
     --image-ids ${GOLDEN_IMAGE_ID} \
-    --region ${REGION_NAME} \
-    --profile ${PROFILE_NAME} \
+    --region ${AWS_REGION} ${PROFILE_STRING} \
     --output table
 
 

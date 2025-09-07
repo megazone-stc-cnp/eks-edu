@@ -17,5 +17,4 @@ fi
 aws eks describe-insight \
     --region $AWS_REGION \
     --id ${ID} \
-    --cluster-name ${EKS_CLUSTER_NAME} \
-    --profile ${PROFILE_NAME}
+    --cluster-name ${EKS_CLUSTER_NAME} ${PROFILE_STRING}

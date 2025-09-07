@@ -24,6 +24,6 @@ fi
         --addon-name ${ADDON_NAME} \
         --addon-version ${ADDON_VERSION} \
         --resolve-conflicts PRESERVE \
-    --region ${REGION_NAME} ${PROFILE_STRING}
+    --region ${AWS_REGION} ${PROFILE_STRING}
         # --service-account-role-arn arn:aws:iam::111122223333:role/eksctl-my-eks-cluster-addon-vpc-cni-Role1-YfakrqOC1UTm \
         # --configuration-values '{"resources": {"limits":{"cpu":"100m"}, "requests":{"cpu":"50m"}}}' \

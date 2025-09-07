@@ -19,7 +19,7 @@ fi
 
 # ================================
 # Role 이름에 해당하는 정보 조회
-POLICY_ARN=$(aws iam list-attached-role-policies --role-name ${ROLE_NAME} --profile ${PROFILE_NAME} --query "AttachedPolicies[0].PolicyArn" --output json  2>/dev/null)
+POLICY_ARN=$(aws iam list-attached-role-policies --role-name ${ROLE_NAME} ${PROFILE_STRING} --query "AttachedPolicies[0].PolicyArn" --output json  2>/dev/null)
 
 # Role이 존재하는지 확인
 if [ -z "$POLICY_ARN" ]; then
@@ -27,6 +27,6 @@ if [ -z "$POLICY_ARN" ]; then
   exit 1
 fi
 
-VERSION_ID=$(aws iam get-policy --policy-arn $(echo ${POLICY_ARN} | tr -d '"') --query "Policy.DefaultVersionId" --profile ${PROFILE_NAME})
+VERSION_ID=$(aws iam get-policy --policy-arn $(echo ${POLICY_ARN} | tr -d '"') --query "Policy.DefaultVersionId" ${PROFILE_STRING})
 
-aws iam get-policy-version --policy-arn $(echo ${POLICY_ARN} | tr -d '"') --version-id $(echo ${VERSION_ID} | tr -d '"') --profile ${PROFILE_NAME} --no-cli-pager
+aws iam get-policy-version --policy-arn $(echo ${POLICY_ARN} | tr -d '"') --version-id $(echo ${VERSION_ID} | tr -d '"') ${PROFILE_STRING} --no-cli-pager

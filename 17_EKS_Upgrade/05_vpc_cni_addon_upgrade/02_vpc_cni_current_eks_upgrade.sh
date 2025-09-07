@@ -39,7 +39,7 @@ cat >configuration-values.json<<EOF
   },
   "eniConfig": {
     "create": true,
-    "region": "${REGION_NAME}",
+    "region": "${AWS_REGION}",
     "subnets": {
       "${AZ1}": {
         "id": "${SUBNET_1}",
@@ -66,7 +66,7 @@ cat >configuration-values.json<<EOF
   },
   "eniConfig": {
     "create": true,
-    "region": "${REGION_NAME}",
+    "region": "${AWS_REGION}",
     "subnets": {
       "${AZ1}": {
         "id": "${SUBNET_1}",

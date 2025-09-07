@@ -17,6 +17,6 @@ fi
 aws eks describe-update \
     --name ${EKS_CLUSTER_NAME}  \
     --update-id ${UPGRADE_ID} \
-    --region ${REGION_NAME} \
+    --region ${AWS_REGION} \
     --profile ${PROFILE_NAME}
 

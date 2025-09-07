@@ -11,9 +11,7 @@ aws ec2 describe-subnets --subnet-ids \
   $(aws eks describe-cluster --name ${EKS_CLUSTER_NAME} \
   --query 'cluster.resourcesVpcConfig.subnetIds' \
   --output text \
-  --region ${REGION_NAME} \
-  --profile ${PROFILE_NAME}) \
+  --region ${AWS_REGION} ${PROFILE_STRING}) \
   --query 'Subnets[*].[SubnetId,AvailabilityZone,AvailableIpAddressCount]' \
   --output table \
-  --region ${REGION_NAME} \
-  --profile ${PROFILE_NAME}
+  --region ${AWS_REGION} ${PROFILE_STRING}

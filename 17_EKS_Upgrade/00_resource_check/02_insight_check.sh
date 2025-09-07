@@ -10,7 +10,6 @@ fi
 aws eks list-insights  \
 	--cluster-name ${EKS_CLUSTER_NAME} \
 	--filter kubernetesVersions=${EKS_UPGRADE_CLUSTER_VERSION} \
-	--region ${REGION_NAME} \
-	--profile ${PROFILE_NAME} \
+	--region ${AWS_REGION} ${PROFILE_STRING} \
 	--no-paginate \
 	--output json 

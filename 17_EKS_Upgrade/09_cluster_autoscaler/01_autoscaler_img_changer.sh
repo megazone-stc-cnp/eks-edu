@@ -14,7 +14,7 @@ img_repo_change() {
   IMG_TAG=$2
   ORIGIN_IMG=$REPO_FULLPATH:$IMG_TAG
   # OLD_AWS_ECR_REPO_NAME=$(echo $ORIGIN_IMG | cut -d '/' -f2- | cut -d ':' -f1)
-  PRIVATE_ECR=$ACCOUNT_ID.dkr.ecr.$REGION_NAME.amazonaws.com
+  PRIVATE_ECR=$ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com
   PRIVATE_ECR_IMG=$PRIVATE_ECR/$AWS_ECR_REPO_NAME:$IMG_TAG
 
   echo $AWS_ECR_REPO_NAME
@@ -30,12 +30,12 @@ img_repo_change() {
   # ECR Login
   echo "
   # Docker Login
-  aws --profile $PROFILE_NAME ecr get-login-password --region $REGION_NAME | docker login --username AWS --password-stdin $PRIVATE_ECR
+  aws --profile $PROFILE_NAME ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin $PRIVATE_ECR
   "
   if [ -z "$PROFILE_NAME" ]; then
-    aws ecr get-login-password --region $REGION_NAME | docker login --username AWS --password-stdin $PRIVATE_ECR
+    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin $PRIVATE_ECR
   else
-    aws --profile $PROFILE_NAME ecr get-login-password --region $REGION_NAME | docker login --username AWS --password-stdin $PRIVATE_ECR
+    aws --profile $PROFILE_NAME ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin $PRIVATE_ECR
   fi
 
   # Image Tag Change

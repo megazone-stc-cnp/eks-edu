@@ -16,7 +16,7 @@ fi
 aws eks update-cluster-version \
     --name ${EKS_CLUSTER_NAME}  \
     --kubernetes-version ${EKS_TARGET_VERSION} \
-    --region ${REGION_NAME} \
+    --region ${AWS_REGION} \
     --profile ${PROFILE_NAME}
 
 echo "Upgrade ID 값을 카피해서 업그레이드 진행 상태 체크시 사용하세요"

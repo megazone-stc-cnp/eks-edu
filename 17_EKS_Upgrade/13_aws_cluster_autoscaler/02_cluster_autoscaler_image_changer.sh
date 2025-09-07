@@ -37,7 +37,7 @@ function img_repo_change {
   
   echo "aws ${PROFILE_STRING} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin $PRIVATE_ECR"
   
-  aws ${PROFILE_STRING} ecr get-login-password --region $REGION_NAME | docker login --username AWS --password-stdin $PRIVATE_ECR  
+  aws ${PROFILE_STRING} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin $PRIVATE_ECR
 
   # Image Tag Change
   docker tag $ORIGIN_IMG $PRIVATE_ECR_IMG
