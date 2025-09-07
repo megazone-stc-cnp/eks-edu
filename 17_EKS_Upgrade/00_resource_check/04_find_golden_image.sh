@@ -16,11 +16,11 @@ fi
 echo "aws ec2 describe-images \\
     --image-ids ${GOLDEN_IMAGE_ID} \\
     --region ${AWS_REGION} ${PROFILE_STRING} \\
-    --output table"
+    --output json"
 
 aws ec2 describe-images \
     --image-ids ${GOLDEN_IMAGE_ID} \
     --region ${AWS_REGION} ${PROFILE_STRING} \
-    --output table
+    --output json
 
 

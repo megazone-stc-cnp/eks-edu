@@ -140,13 +140,75 @@ image::image/eks-release-calendar.png[EKS Release]
 . <GOLDEN-AMI-ID> 가 존재하는지 체크를 한다.
 +
 ```
-cd 00_resource_check
+cd ~/environment/eks-edu/17_EKS_Upgrade/00_resource_check
 sh 04_find_golden_image.sh <GOLDEN-AMI-ID>
 ```
 +
 . 실행 내용
 +
+```shell
+aws ec2 describe-images \
+    --image-ids ami-0de2ef448f55c52f2 \
+    --region ap-northeast-1  \
+    --output json
 ```
+
+==== 업그레이드 환경 변수 세팅
+
+. 17_EKS_Upgrade내 upgrade_env.sh.sample을 upgrade_env.sh 로 변경하고 값을 세팅한다.
+```
+EKS_UPGRADE_CLUSTER_VERSION=1.33
+
+# eniconfig의 A/C Zone의 Security Group 정보 입력
+SECURITY_GROUPS="\"sg-086f23e88800250b1\""
+```
+
+==== Addon 호환성 체크
+
+===== coredns
+
+. addon 호환성 체크
++
+```
+cd ~/environment/eks-edu/17_EKS_Upgrade/00_resource_check
+
+#################################
+# 사전 자료 백업
+sh 10_coredns_configmap_backup.sh
+-> coredns-cm-backup.yaml 에 저장됨
+
+#################################
+# 기존 버전 체크
+sh 11_coredns_check.sh
+-> addonVersion: ????-eksbuild.??
+
+#################################
+# 신규 버전 체크
+sh 12_coredns_upgrade_check.sh
+-> 결과 목록 중에 존재하지 않는지 체크
+
+#################################
+#OPTION 만약에 업그레이드 범위에 포함이 안되는 문제가 있다면 업그레이드 작업을 해줘야 한다.
+# 기존 버전에서 호환이 되는 범위를 찾기
+sh 13_coredns_available_current_version.sh
+-> 12번에 나온 범위와 현재 버전에서 최신 버전과 매칭되는값 확인
+
+#################################
+#OPTION 업그레이드가 필요로 하다면 업그레이드 작업
+sh 14_coredns_current_eks_upgrade.sh <<매칭 버전>>
+예) sh 14_coredns_current_eks_upgrade.sh v1.11.3-eksbuild.1
+-> id: 60b068b0-d17e-3cc0-a4c0-9c516d4cd761
+
+#################################
+#OPTION 상태가 ACTIVE 일 때까지 진행
+sh 11_coredns_check.sh
+-> status: ACTIVE
+
+#################################
+#OPTION 테스트
+eks-sample/network-multitool 명령을 이용해서 도메인 호출이 잘 되는지 체크
+$ 03_exec.sh
+$ nslookup sts.ap-northeast-1.amazonaws.com
 ```
 
 == 관련 링크

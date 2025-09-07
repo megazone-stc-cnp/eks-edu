@@ -1,3 +1,7 @@
 #!/bin/bash
 
-kubectl get cm coredns -n kube-system -o yaml | kubectl neat | tee coredns-cm-backup.yaml
+if [ ! -d "tmp" ]; then
+    mkdir -p tmp
+fi
+
+kubectl get cm coredns -n kube-system -o yaml | tee tmp/coredns-cm-backup.yaml
