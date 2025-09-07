@@ -247,3 +247,4 @@ Temporary Items
 .idea/git_toolbox_*.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/macos
+/17_EKS_Upgrade/upgrade_env.sh
