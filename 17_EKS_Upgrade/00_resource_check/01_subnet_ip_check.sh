@@ -7,11 +7,20 @@ fi
 . ../../env.sh
 
 # ==============================================================
+echo "aws ec2 describe-subnets --subnet-ids \\
+  $\(aws eks describe-cluster --name ${CLUSTER_NAME} \\
+  --query 'cluster.resourcesVpcConfig.subnetIds' \\
+  --output text \\
+  --region ${AWS_REGION} ${PROFILE_STRING}\) \\
+  --query 'Subnets[*].[SubnetId,AvailabilityZone,AvailableIpAddressCount]' \\
+  --output json \\
+  --region ${AWS_REGION} ${PROFILE_STRING}"
+
 aws ec2 describe-subnets --subnet-ids \
   $(aws eks describe-cluster --name ${CLUSTER_NAME} \
   --query 'cluster.resourcesVpcConfig.subnetIds' \
   --output text \
   --region ${AWS_REGION} ${PROFILE_STRING}) \
   --query 'Subnets[*].[SubnetId,AvailabilityZone,AvailableIpAddressCount]' \
-  --output table \
+  --output json \
   --region ${AWS_REGION} ${PROFILE_STRING}

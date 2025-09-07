@@ -12,11 +12,21 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
+if [ ! -f "../upgrade_env.sh" ];then
+  echo "upgrade_env.sh 파일 세팅을 해주세요."
+  exit 1
+fi
+. ../upgrade_env.sh
+
 # ==============================================================
+echo "aws eks update-cluster-version \\
+    --name ${CLUSTER_NAME}  \\
+    --kubernetes-version ${EKS_TARGET_VERSION} \\
+    --region ${AWS_REGION} ${PROFILE_STRING}"
+
 aws eks update-cluster-version \
     --name ${CLUSTER_NAME}  \
     --kubernetes-version ${EKS_TARGET_VERSION} \
-    --region ${AWS_REGION} \
-    --profile ${PROFILE_NAME}
+    --region ${AWS_REGION} ${PROFILE_STRING}
 
 echo "Upgrade ID 값을 카피해서 업그레이드 진행 상태 체크시 사용하세요"

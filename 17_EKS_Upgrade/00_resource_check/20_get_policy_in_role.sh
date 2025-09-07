@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ ! -f "../env.sh" ]; then
-    echo "Error: ../env.sh 파일이 존재하지 않습니다."
-    exit 1
-fi
-
 if [ -z "$1" ]; then
     echo "사용법: $0 <ROLE_NAME>"
     exit 1

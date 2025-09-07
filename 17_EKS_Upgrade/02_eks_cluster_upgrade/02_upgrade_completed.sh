@@ -13,10 +13,13 @@ fi
 . ../../env.sh
 
 # ==============================================================
+echo "aws eks describe-update \\
+    --name ${CLUSTER_NAME}  \\
+    --update-id ${UPGRADE_ID} \\
+    --region ${AWS_REGION} ${PROFILE_STRING}"
 
 aws eks describe-update \
     --name ${CLUSTER_NAME}  \
     --update-id ${UPGRADE_ID} \
-    --region ${AWS_REGION} \
-    --profile ${PROFILE_NAME}
+    --region ${AWS_REGION} ${PROFILE_STRING}
 
