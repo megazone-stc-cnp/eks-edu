@@ -24,9 +24,9 @@ if [ -n "$PROFILE_NAME" ]; then
     PROFILE_STRING="--profile ${PROFILE_NAME}"
 fi
 
-echo aws eks update-addon --cluster-name ${EKS_CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${ADDON_VERSION} --resolve-conflicts PRESERVE --region ${AWS_REGION} ${PROFILE_STRING}
+echo aws eks update-addon --cluster-name ${CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${ADDON_VERSION} --resolve-conflicts PRESERVE --region ${AWS_REGION} ${PROFILE_STRING}
 aws eks update-addon \
-    --cluster-name ${EKS_CLUSTER_NAME} \
+    --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --addon-version ${ADDON_VERSION} \
     --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME} \

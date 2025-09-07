@@ -8,8 +8,8 @@ fi
 
 ADDON_NAME=aws-ebs-csi-driver
 # ================================
-echo aws eks describe-addon --cluster-name ${EKS_CLUSTER_NAME} --addon-name ${ADDON_NAME} ${PROFILE_STRING} --region ${AWS_REGION}
+echo aws eks describe-addon --cluster-name ${CLUSTER_NAME} --addon-name ${ADDON_NAME} ${PROFILE_STRING} --region ${AWS_REGION}
 aws eks describe-addon \
-    --cluster-name ${EKS_CLUSTER_NAME} \
+    --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --region ${AWS_REGION} ${PROFILE_STRING}

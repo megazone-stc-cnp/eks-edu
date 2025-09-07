@@ -14,7 +14,7 @@ fi
 
 # ==============================================================
 aws eks update-cluster-version \
-    --name ${EKS_CLUSTER_NAME}  \
+    --name ${CLUSTER_NAME}  \
     --kubernetes-version ${EKS_TARGET_VERSION} \
     --region ${AWS_REGION} \
     --profile ${PROFILE_NAME}

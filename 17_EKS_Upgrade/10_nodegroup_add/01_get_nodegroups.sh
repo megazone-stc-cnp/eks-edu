@@ -7,15 +7,15 @@ fi
 . ../../env.sh
 
 # ==================================================================
-echo "aws eks list-nodegroups --cluster-name ${EKS_CLUSTER_NAME} --profile ${PROFILE_NAME} --region ${AWS_REGION} | jq -r '.nodegroups[]'"
+echo "aws eks list-nodegroups --cluster-name ${CLUSTER_NAME} --profile ${PROFILE_NAME} --region ${AWS_REGION} | jq -r '.nodegroups[]'"
 
-NODEGROUP_LIST=$(aws eks list-nodegroups --cluster-name ${EKS_CLUSTER_NAME} --profile ${PROFILE_NAME} --region ${AWS_REGION} | jq -r '.nodegroups[]')
+NODEGROUP_LIST=$(aws eks list-nodegroups --cluster-name ${CLUSTER_NAME} --profile ${PROFILE_NAME} --region ${AWS_REGION} | jq -r '.nodegroups[]')
 
 while IFS= read -r nodegroup_name; do
 echo "======================================================"
 echo "${nodegroup_name}"
 aws eks describe-nodegroup \
-    --cluster-name ${EKS_CLUSTER_NAME} \
+    --cluster-name ${CLUSTER_NAME} \
     --nodegroup-name ${nodegroup_name} \
     --profile ${PROFILE_NAME} --region ${AWS_REGION} | jq '.nodegroup | {nodegroupName, scalingConfig, subnets, amiType, nodeRole, labels, launchTemplate, tags}'
 done <<< "$NODEGROUP_LIST"    

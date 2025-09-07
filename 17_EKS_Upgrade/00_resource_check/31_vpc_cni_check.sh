@@ -9,7 +9,7 @@ fi
 ADDON_NAME=vpc-cni
 # ================================
 aws eks describe-addon \
-    --cluster-name ${EKS_CLUSTER_NAME} \
+    --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --region ${AWS_REGION} ${PROFILE_STRING} \
     --output json

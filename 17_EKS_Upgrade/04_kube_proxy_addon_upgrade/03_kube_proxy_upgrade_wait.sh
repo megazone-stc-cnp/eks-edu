@@ -9,7 +9,7 @@ fi
 ADDON_NAME=kube-proxy
 # ================================
 aws eks describe-addon \
-    --cluster-name ${EKS_CLUSTER_NAME} \
+    --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --profile ${PROFILE_NAME} \
     --region ${AWS_REGION}

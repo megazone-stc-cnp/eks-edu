@@ -8,7 +8,7 @@ fi
 
 # ==============================================================
 aws eks list-insights  \
-	--cluster-name ${EKS_CLUSTER_NAME} \
+	--cluster-name ${CLUSTER_NAME} \
 	--filter kubernetesVersions=${EKS_UPGRADE_CLUSTER_VERSION} \
 	--region ${AWS_REGION} ${PROFILE_STRING} \
 	--no-paginate \

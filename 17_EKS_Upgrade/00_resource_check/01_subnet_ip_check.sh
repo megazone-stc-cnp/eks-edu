@@ -8,7 +8,7 @@ fi
 
 # ==============================================================
 aws ec2 describe-subnets --subnet-ids \
-  $(aws eks describe-cluster --name ${EKS_CLUSTER_NAME} \
+  $(aws eks describe-cluster --name ${CLUSTER_NAME} \
   --query 'cluster.resourcesVpcConfig.subnetIds' \
   --output text \
   --region ${AWS_REGION} ${PROFILE_STRING}) \

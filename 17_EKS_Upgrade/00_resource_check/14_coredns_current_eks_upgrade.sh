@@ -15,9 +15,9 @@ fi
 ADDON_NAME=coredns
 # ==================================================================
 
-echo aws eks update-addon --cluster-name ${EKS_CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${ADDON_VERSION} --resolve-conflicts PRESERVE --region ${AWS_REGION} ${PROFILE_STRING}
+echo aws eks update-addon --cluster-name ${CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${ADDON_VERSION} --resolve-conflicts PRESERVE --region ${AWS_REGION} ${PROFILE_STRING}
 aws eks update-addon \
-    --cluster-name ${EKS_CLUSTER_NAME} \
+    --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --addon-version ${ADDON_VERSION} \
     --resolve-conflicts PRESERVE \

@@ -78,7 +78,7 @@ EOF
 fi
 # ${SECURITY_GROUPS}
 aws eks update-addon \
-    --cluster-name ${EKS_CLUSTER_NAME} \
+    --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --addon-version ${ADDON_VERSION} \
     --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME} \

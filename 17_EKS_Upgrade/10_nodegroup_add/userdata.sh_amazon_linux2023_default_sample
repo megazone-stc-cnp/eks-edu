@@ -9,7 +9,7 @@ Content-Type: text/x-shellscript; charset="us-ascii"
 EC2_NAME_PREFIX=hcseo-node
 VOL_NAME_PREFIX=hcseo-node-volume
 
-EKS_CLUSTER_NAME=mzc-an1-hcseo-stg
+CLUSTER_NAME=mzc-an1-hcseo-stg
 EKS_NODE_GROUP_NAME=kr-default-v31
 EKS_REGION=ap-northeast-1
 
@@ -32,9 +32,9 @@ echo $(aws ec2 create-tags --resources ${EC2_ID} --tags Key="Name",Value=${EC2_N
 echo $(aws ec2 create-tags --resources ${VOL_ID} --tags Key="Name",Value=${VOL_NAME} --region ${EKS_REGION})
 
 #bootstrap
-B64_CLUSTER_CA=$( aws eks describe-cluster --query "cluster.certificateAuthority.data" --output text --name ${EKS_CLUSTER_NAME} --region ${EKS_REGION} )
-API_SERVER_URL=$( aws eks describe-cluster --query "cluster.endpoint" --output text --name ${EKS_CLUSTER_NAME} --region ${EKS_REGION} )
-K8S_CLUSTER_DNS_IP=$( aws eks describe-cluster --query "cluster.kubernetesNetworkConfig.serviceIpv4Cidr" --output text --name ${EKS_CLUSTER_NAME} --region ${EKS_REGION} )
+B64_CLUSTER_CA=$( aws eks describe-cluster --query "cluster.certificateAuthority.data" --output text --name ${CLUSTER_NAME} --region ${EKS_REGION} )
+API_SERVER_URL=$( aws eks describe-cluster --query "cluster.endpoint" --output text --name ${CLUSTER_NAME} --region ${EKS_REGION} )
+K8S_CLUSTER_DNS_IP=$( aws eks describe-cluster --query "cluster.kubernetesNetworkConfig.serviceIpv4Cidr" --output text --name ${CLUSTER_NAME} --region ${EKS_REGION} )
 
 cat << EOF >> /root/nodeadm.yaml
 ---
@@ -42,7 +42,7 @@ apiVersion: node.eks.aws/v1alpha1
 kind: NodeConfig
 spec:
   cluster:
-    name: ${EKS_CLUSTER_NAME}
+    name: ${CLUSTER_NAME}
     apiServerEndpoint: ${API_SERVER_URL}
     certificateAuthority: ${B64_CLUSTER_CA}
     cidr: ${K8S_CLUSTER_DNS_IP}

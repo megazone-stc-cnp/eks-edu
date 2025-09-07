@@ -20,7 +20,7 @@ if [ -n "$PROFILE_NAME" ]; then
 fi
 
     aws eks update-addon \
-        --cluster-name ${EKS_CLUSTER_NAME} \
+        --cluster-name ${CLUSTER_NAME} \
         --addon-name ${ADDON_NAME} \
         --addon-version ${ADDON_VERSION} \
         --resolve-conflicts PRESERVE \
