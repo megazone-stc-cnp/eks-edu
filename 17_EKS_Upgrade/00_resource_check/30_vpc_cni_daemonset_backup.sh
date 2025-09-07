@@ -1,3 +1,7 @@
 #!/bin/bash
 
-kubectl get daemonset aws-node -n kube-system -o yaml | kubectl neat | tee aws-node-daemonset-backup.yaml
+if [ ! -d "tmp" ]; then
+    mkdir -p tmp
+fi
+
+kubectl get daemonset aws-node -n kube-system -o yaml | tee tmp/aws-node-daemonset-backup.yaml
