@@ -8,11 +8,6 @@ fi
 
 IMAGE_VERSION=v0.7.2
 # =====================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${AWS_REPO_PROFILE}"
-fi
-
 img_repo_change() {
   REPO_FULLPATH=$1
   IMG_TAG=$2

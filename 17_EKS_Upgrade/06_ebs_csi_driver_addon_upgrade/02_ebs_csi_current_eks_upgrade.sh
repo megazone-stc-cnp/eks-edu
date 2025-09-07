@@ -19,11 +19,6 @@ fi
 
 ADDON_NAME=aws-ebs-csi-driver
 # ==================================================================
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${PROFILE_NAME}"
-fi
-
 echo aws eks update-addon --cluster-name ${CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${ADDON_VERSION} --resolve-conflicts PRESERVE --region ${AWS_REGION} ${PROFILE_STRING}
 aws eks update-addon \
     --cluster-name ${CLUSTER_NAME} \

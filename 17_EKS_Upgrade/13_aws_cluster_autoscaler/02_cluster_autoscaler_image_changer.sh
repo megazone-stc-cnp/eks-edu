@@ -11,10 +11,6 @@ fi
 IMAGE_VERSION=v1.31.0
 # =====================================================================
 # 741466665369.dkr.ecr.ap-northeast-2.amazonaws.com/autoscaling/cluster-autoscaler
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${AWS_REPO_PROFILE}"
-fi
 function img_repo_change {
   REPO_FULLPATH=$1
   IMG_TAG=$2

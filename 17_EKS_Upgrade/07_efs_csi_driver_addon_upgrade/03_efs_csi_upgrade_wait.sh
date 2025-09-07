@@ -11,6 +11,5 @@ ADDON_NAME=aws-efs-csi-driver
 aws eks describe-addon \
     --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
-    --profile ${PROFILE_NAME} \
-    --region ${AWS_REGION} \
+    --region ${AWS_REGION} ${PROFILE_STRING} \
     --output json

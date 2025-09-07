@@ -11,10 +11,6 @@ fi
 IMAGE_VERSION=v2.11.0
 # =====================================================================
 # 741466665369.dkr.ecr.ap-northeast-2.amazonaws.com/eks/aws-load-balancer-controller
-PROFILE_STRING=""
-if [ -n "$PROFILE_NAME" ]; then
-    PROFILE_STRING="--profile ${AWS_REPO_PROFILE}"
-fi
 img_repo_change() {
   REPO_FULLPATH=$1
   IMG_TAG=$2

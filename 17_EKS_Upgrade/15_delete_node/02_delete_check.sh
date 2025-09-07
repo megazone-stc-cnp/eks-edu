@@ -16,5 +16,4 @@ fi
 aws eks describe-nodegroup \
     --cluster-name ${CLUSTER_NAME} \
     --nodegroup-name ${NODE_NAME} \
-    --region ${AWS_REGION} \
-    --profile ${PROFILE_NAME}  
+    --region ${AWS_REGION} ${PROFILE_STRING}

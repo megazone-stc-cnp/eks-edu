@@ -29,4 +29,4 @@ aws ec2 create-launch-template \
     --launch-template-name ${LAUNCHTEMPLATE_NAME} \
     --version-description "Cloned from $EXISTING_TEMPLATE_ID version $EXIT_LAUNCHTEMPLATE_VERSION" \
     --launch-template-data "$TEMPLATE_DATA" \
-    --profile ${PROFILE_NAME} --region ${AWS_REGION}
+    --region ${AWS_REGION} ${PROFILE_STRING}

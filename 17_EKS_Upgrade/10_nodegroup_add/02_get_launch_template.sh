@@ -22,13 +22,13 @@ if [ ! -d "tmp" ]; then
     mkdir -p tmp
 fi
 
-echo aws ec2 describe-launch-template-versions --launch-template-id "$EXIT_LAUNCHTEMPLATE_ID" --versions "$EXIT_LAUNCHTEMPLATE_VERSION" --query "LaunchTemplateVersions[0].LaunchTemplateData" --profile ${PROFILE_NAME} --region ${AWS_REGION} --output json
+echo aws ec2 describe-launch-template-versions --launch-template-id "$EXIT_LAUNCHTEMPLATE_ID" --versions "$EXIT_LAUNCHTEMPLATE_VERSION" --query "LaunchTemplateVersions[0].LaunchTemplateData" --region ${AWS_REGION} ${PROFILE_STRING} --output json
 
 TEMPLATE_DATA=$(aws ec2 describe-launch-template-versions \
   --launch-template-id "$EXIT_LAUNCHTEMPLATE_ID" \
   --versions "$EXIT_LAUNCHTEMPLATE_VERSION" \
   --query "LaunchTemplateVersions[0].LaunchTemplateData" \
-  --profile ${PROFILE_NAME} --region ${AWS_REGION} \
+  --region ${AWS_REGION} ${PROFILE_STRING} \
   --output json)
 
 rm -rf tmp/launch-template.json
