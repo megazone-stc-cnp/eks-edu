@@ -17,6 +17,12 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
+if [ ! -f "../../vpc_env.sh" ];then
+  echo "vpc_env.sh 파일 세팅을 해주세요."
+  exit 1
+fi
+. ../../vpc_env.sh
+
 if [ ! -f "../upgrade_env.sh" ];then
   echo "upgrade_env.sh 파일 세팅을 해주세요."
   exit 1
@@ -25,10 +31,12 @@ fi
 
 ADDON_NAME=vpc-cni
 # ==================================================================
-rm -rf configuration-values.json
+if [ ! -d "tmp" ]; then
+    mkdir -p tmp
+fi
 
 if [ -z "${SECURITY_GROUPS}" ]; then
-cat >configuration-values.json<<EOF
+cat >tmp/configuration-values.json<<EOF
 {
   "env": {
     "AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG": "true",
@@ -55,7 +63,7 @@ cat >configuration-values.json<<EOF
 }
 EOF
 else
-cat >configuration-values.json<<EOF
+cat >tmp/configuration-values.json<<EOF
 {
   "env": {
     "AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG": "true",
@@ -83,12 +91,20 @@ cat >configuration-values.json<<EOF
 EOF
 fi
 # ${SECURITY_GROUPS}
+echo "aws eks update-addon \\
+    --cluster-name ${CLUSTER_NAME} \\
+    --addon-name ${ADDON_NAME} \\
+    --addon-version ${ADDON_VERSION} \\
+    --service-account-role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME} \\
+    --resolve-conflicts PRESERVE \\
+    --configuration-values 'file://tmp/configuration-values.json'"
+
 aws eks update-addon \
     --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --addon-version ${ADDON_VERSION} \
-    --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME} \
+    --service-account-role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME} \
     --resolve-conflicts PRESERVE \
-    --configuration-values 'file://configuration-values.json'
+    --configuration-values 'file://tmp/configuration-values.json'
 
 echo "INFO: ${ADDON_NAME} Addon Complete check in aws management console !!!"

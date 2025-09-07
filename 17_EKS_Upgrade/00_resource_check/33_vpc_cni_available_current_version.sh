@@ -10,7 +10,7 @@ ADDON_NAME=vpc-cni
 # ================================
 echo "${ADDON_NAME} include version check"
 
-echo aws eks describe-addon-versions --kubernetes-version ${EKS_VERSION} --addon-name ${ADDON_NAME} --query 'addons[].addonVersions[].{Version: addonVersion, Defaultversion: compatibilities[0].defaultVersion}' --output table ${PROFILE_STRING}
+echo aws eks describe-addon-versions --kubernetes-version ${EKS_VERSION} --addon-name ${ADDON_NAME} --query 'addons[].addonVersions[].{Version: addonVersion, Defaultversion: compatibilities[0].defaultVersion}' --output json ${PROFILE_STRING}
 aws eks describe-addon-versions --kubernetes-version ${EKS_VERSION} \
     --addon-name ${ADDON_NAME} \
-    --query 'addons[].addonVersions[].{Version: addonVersion, Defaultversion: compatibilities[0].defaultVersion}' --output table ${PROFILE_STRING}
+    --query 'addons[].addonVersions[].{Version: addonVersion, Defaultversion: compatibilities[0].defaultVersion}' --output json ${PROFILE_STRING}
