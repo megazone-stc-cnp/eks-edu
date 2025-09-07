@@ -19,12 +19,18 @@ fi
 
 ADDON_NAME=aws-ebs-csi-driver
 # ==================================================================
-echo aws eks update-addon --cluster-name ${CLUSTER_NAME} --addon-name ${ADDON_NAME} --addon-version ${ADDON_VERSION} --resolve-conflicts PRESERVE --region ${AWS_REGION} ${PROFILE_STRING}
+echo "aws eks update-addon \\
+    --cluster-name ${CLUSTER_NAME} \\
+    --addon-name ${ADDON_NAME} \\
+    --addon-version ${ADDON_VERSION} \\
+    --service-account-role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME} \\
+    --resolve-conflicts PRESERVE --region ${AWS_REGION} ${PROFILE_STRING}"
+
 aws eks update-addon \
     --cluster-name ${CLUSTER_NAME} \
     --addon-name ${ADDON_NAME} \
     --addon-version ${ADDON_VERSION} \
-    --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME} \
+    --service-account-role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME} \
     --resolve-conflicts PRESERVE \
     --region ${AWS_REGION} ${PROFILE_STRING}
     # --service-account-role-arn arn:aws:iam::111122223333:role/eksctl-my-eks-cluster-addon-vpc-cni-Role1-YfakrqOC1UTm \
