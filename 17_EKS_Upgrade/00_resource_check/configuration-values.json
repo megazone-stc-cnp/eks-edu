@@ -1,0 +1,24 @@
+{
+  "env": {
+    "AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG": "true",
+    "ENI_CONFIG_LABEL_DEF": "topology.kubernetes.io/zone",
+    "ENABLE_PREFIX_DELEGATION": "true",
+    "WARM_PREFIX_TARGET": "1",
+    "WARM_ENI_TARGET": "1",
+    "WARM_IP_TARGET": "2"
+  },
+  "eniConfig": {
+    "create": true,
+    "region": "ap-northeast-1",
+    "subnets": {
+      "ap-northeast-1a": {
+        "id": "subnet-030931663d1e874dd",
+        "securityGroups": ["sg-0552c85ff53c42d63"]
+      },
+      "ap-northeast-1c": {
+        "id": "subnet-0165c301b69a5ada6",
+        "securityGroups": ["sg-0552c85ff53c42d63"]
+      }
+    }
+  }
+}

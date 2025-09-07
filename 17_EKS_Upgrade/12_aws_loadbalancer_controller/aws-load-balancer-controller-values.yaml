@@ -1,0 +1,52 @@
+USER-SUPPLIED VALUES:
+USER-SUPPLIED VALUES: null
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - aws-load-balancer-controller
+        topologyKey: kubernetes.io/hostname
+      weight: 100
+clusterName: mzc-an1-hcseo-stg
+enableShield: false
+enableWaf: false
+enableWafv2: false
+image:
+  pullPolicy: IfNotPresent
+  repository: 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/eks/aws-load-balancer-controller
+  tag: v2.11.0
+ingressClass: alb
+podDisruptionBudget:
+  minAvailable: 1
+region: ap-northeast-1
+replicaCount: 2
+resources:
+  limits:
+    cpu: 100m
+    memory: 150Mi
+  requests:
+    cpu: 70m
+    memory: 70Mi
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::539666729110:role/mzc-an1-hcseo-eks-add-alb-iamrol
+  automountServiceAccountToken: true
+  create: true
+  name: alb-controller-sa
+serviceMonitor:
+  additionalLabels: {}
+  enabled: false
+  interval: 30s
+topologySpreadConstraints:
+- labelSelector:
+    matchLabels:
+      app.kubernetes.io/name: aws-load-balancer-controller
+  maxSkew: 1
+  topologyKey: topology.kubernetes.io/zone
+  whenUnsatisfiable: DoNotSchedule
+vpcId: vpc-09371e491965712cb

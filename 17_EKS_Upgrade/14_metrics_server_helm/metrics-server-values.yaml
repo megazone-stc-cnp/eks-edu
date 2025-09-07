@@ -1,0 +1,47 @@
+USER-SUPPLIED VALUES:
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - metrics-server
+        topologyKey: kubernetes.io/hostname
+      weight: 100
+containerPort: 10250
+defaultArgs:
+- --cert-dir=/tmp
+- --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+- --kubelet-use-node-status-port
+- --metric-resolution=15s
+- --kubelet-insecure-tls
+image:
+  pullPolicy: IfNotPresent
+  repository: 539666729110.dkr.ecr.ap-northeast-1.amazonaws.com/metrics-server/metrics-server
+  tag: v0.7.2
+metrics:
+  enabled: true
+nameOverride: ""
+replicas: 1
+resources:
+  limits:
+    cpu: 150m
+    memory: 250Mi
+  requests:
+    cpu: 100m
+    memory: 200Mi
+serviceMonitor:
+  additionalLabels: {}
+  enabled: false
+  interval: 15s
+  scrapeTimeout: 10s
+topologySpreadConstraints:
+- labelSelector:
+    matchLabels:
+      app.kubernetes.io/name: metrics-server
+  maxSkew: 1
+  topologyKey: topology.kubernetes.io/zone
+  whenUnsatisfiable: DoNotSchedule
