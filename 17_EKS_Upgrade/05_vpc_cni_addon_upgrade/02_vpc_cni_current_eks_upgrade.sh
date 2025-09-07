@@ -41,12 +41,12 @@ cat >configuration-values.json<<EOF
     "create": true,
     "region": "${AWS_REGION}",
     "subnets": {
-      "${AZ1}": {
-        "id": "${SUBNET_1}",
+      "${AWS_AZ1}": {
+        "id": "${AWS_POD_SUBNET1}",
         "securityGroups": []
       },
-      "${AZ2}": {
-        "id": "${SUBNET_2}",
+      "${AWS_AZ2}": {
+        "id": "${AWS_POD_SUBNET2}",
         "securityGroups": []
       }
     }
@@ -68,12 +68,12 @@ cat >configuration-values.json<<EOF
     "create": true,
     "region": "${AWS_REGION}",
     "subnets": {
-      "${AZ1}": {
-        "id": "${SUBNET_1}",
+      "${AWS_AZ1}": {
+        "id": "${AWS_POD_SUBNET1}",
         "securityGroups": [${SECURITY_GROUPS}]
       },
-      "${AZ2}": {
-        "id": "${SUBNET_2}",
+      "${AWS_AZ2}": {
+        "id": "${AWS_POD_SUBNET2}",
         "securityGroups": [${SECURITY_GROUPS}]
       }
     }

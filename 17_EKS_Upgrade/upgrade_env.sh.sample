@@ -1,0 +1,6 @@
+#!/bin/bash
+
+EKS_UPGRADE_CLUSTER_VERSION=1.33
+
+# eniconfig의 A/C Zone의 Security Group 정보 입력
+SECURITY_GROUPS="\"sg-086f23e88800250b1\""
