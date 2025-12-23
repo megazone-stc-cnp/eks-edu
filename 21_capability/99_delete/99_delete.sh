@@ -5,42 +5,22 @@ if [ ! -f "../../env.sh" ];then
 fi
 . ../../env.sh
 
-CAPABILITY_NAME=argocd-${IDE_NAME}
-ARGOCD_CAPABILITY_ROLE_NAME=eks-edu-argocd-capability-role-${IDE_NAME}
-# export AWS_REGION=ap-northeast-2
-# ======================================================
+# App 삭제
+cd ../04_app_deploy
+bash 99_delete.sh
+cd ../99_delete
 
-# capability 삭제
-CAPABILITY_EXISTED=$(aws eks describe-capability --cluster-name $CLUSTER_NAME --capability-name ${CAPABILITY_NAME} --query 'capability.capabilityName' ${PROFILE_STRING} --no-cli-pager --output text 2> /dev/null)
-if [ "$CAPABILITY_EXISTED" == $CAPABILITY_NAME ]; then
-  echo "aws eks delete-capability \\
-    --region ${AWS_REGION} \\
-    --cluster-name ${CLUSTER_NAME} \\
-    --capability-name ${CAPABILITY_NAME} ${PROFILE_STRING}"
+# cluster 삭제
+cd ../03_register_cluster
+bash 99_delete.sh
+cd ../99_delete
 
-  aws eks delete-capability \
-    --region ${AWS_REGION} \
-    --cluster-name ${CLUSTER_NAME} \
-    --capability-name ${CAPABILITY_NAME} ${PROFILE_STRING}
-fi
+# github register repository 삭제
+cd ../02_github_register_repository
+bash 99_delete.sh
+cd ../99_delete
 
-# Role 삭제
-CAPABILITY_ROLE_EXISTS=$(aws iam get-role --role-name ${ARGOCD_CAPABILITY_ROLE_NAME} ${PROFILE_STRING} 2>&1 || echo "ROLE_NOT_FOUND")
-if [[ ! "$CAPABILITY_ROLE_EXISTS" == *"ROLE_NOT_FOUND"* ]]; then
-    CAPABILITY_POLICIES=$(aws iam list-attached-role-policies --role-name "$CAPABILITY_NAME" --query 'AttachedPolicies[].PolicyArn' --output text ${PROFILE_STRING})
-
-    for POLICY_ARN in $CAPABILITY_POLICIES; do
-        echo "aws iam detach-role-policy --role-name $ARGOCD_CAPABILITY_ROLE_NAME --policy-arn $POLICY_ARN ${PROFILE_STRING}"
-        aws iam detach-role-policy --role-name "$ARGOCD_CAPABILITY_ROLE_NAME" --policy-arn "$POLICY_ARN" ${PROFILE_STRING}
-    done
-
-    IRSA_INLINE_POLICIES=$(aws iam list-role-policies --role-name "$ARGOCD_CAPABILITY_ROLE_NAME" --query 'PolicyNames[]' --output text ${PROFILE_STRING})
-
-    for POLICY_NAME in $IRSA_INLINE_POLICIES; do
-      echo "aws iam delete-role-policy --role-name $ARGOCD_CAPABILITY_ROLE_NAME --policy-name $POLICY_NAME ${PROFILE_STRING}"
-      aws iam delete-role-policy --role-name "$ARGOCD_CAPABILITY_ROLE_NAME" --policy-name "$POLICY_NAME" ${PROFILE_STRING}
-    done
-
-	echo "aws iam delete-role --role-name $ARGOCD_CAPABILITY_ROLE_NAME ${PROFILE_STRING}"
-	aws iam delete-role --role-name $ARGOCD_CAPABILITY_ROLE_NAME ${PROFILE_STRING}
-fi
+# Capability / Role 삭제
+#cd ../01_argocd
+#bash 99_delete.sh
+#cd ../99_delete
