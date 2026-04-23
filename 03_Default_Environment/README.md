@@ -238,13 +238,13 @@ EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성
    ![1743479348193](image/creating_eksctl_cluster.png)
 7. 결과 화면
 
-- cloudformation 화면
+- cloudformation 화면 ( 검색:cloudformation )
 
   ![1743574233575](image/result_eksctl_cloudformation.png)
-- eks cluster 생성 화면
+- eks cluster 생성 화면 ( 검색 : eks )
 
   ![1743480747351](image/result_eksctl_cluster.png)
-- eks nodegroup 생성 화면
+- eks nodegroup 생성 화면 ( 검색 : eks > 클러스터 선택 > 컴퓨팅 )
 
   ![1743574400471](image/result_eksctl_nodegroup.png)
 
@@ -272,7 +272,7 @@ EKS를 생성하기 위해서는 VPC와 Public Subnet / Private Subnet에 생성
 
    ![1743483981176](image/delete_resource.png)
 
-3. 결과 화면
+3. 결과 화면 ( 검색:cloudformation )
 
    ![1743484066002](image/result_delete_resource.png)
 

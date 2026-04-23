@@ -861,3 +861,26 @@ kubectl apply -f ~/environment/eks-edu/01_Container/manifests/pod-trouble.yaml
 ![](images/kubectl-12.png)
 
 실행 결과를 확인해 보니 Pod의 상태가 정상적으로 `Running` 상태로 된 것을 확인할 수 있습니다.
+
+---
+
+## 3. 실습 환경 삭제하기
+
+실습이 모두 완료되었다면, 실습 중 생성한 리소스들을 삭제하여 환경을 정리합니다.
+
+---
+
+### 3-1. Kind 클러스터 삭제
+
+Kind로 생성한 Kubernetes 클러스터를 삭제합니다.
+
+```bash
+kind delete cluster
+```
+
+클러스터가 정상적으로 삭제되면 아래와 같은 메세지가 출력됩니다.
+
+```bash
+Deleting cluster "kind" ...
+Deleted nodes: ["kind-control-plane"]
+```
