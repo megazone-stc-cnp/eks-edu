@@ -105,9 +105,9 @@ AWS에 로그인 한 후, CloudShell로 이동하여 다음 명령어를 입력�
 | ---- | ------- | ------------ |
 | [docker](https://github.com/moby/moby) | 25.0.8 | 2025-02-05 |
 | [docker-compose](https://github.com/docker/compose) | 2.34.0 | - |
-| [kubectl](https://kubernetes.io/docs/reference/kubectl/) | 1.31.6 | 2025-02-11 |
-| [helm](https://helm.sh) | 3.17.2 | 2025-03-14 |
-| [eksctl](https://github.com/eksctl-io/eksctl) | 0.206.0 | 2025-03-23 |
+| [kubectl](https://kubernetes.io/docs/reference/kubectl/) | 1.35.3 | 2026-03-19 |
+| [helm](https://helm.sh) | 3.20.2 | 2026-04-09 |
+| [eksctl](https://github.com/eksctl-io/eksctl) | 0.225.0 | 2026-03-30 |
 | [kubeseal](https://github.com/bitnami-labs/sealed-secrets) | 0.28.0 | 2025-01-16 |
 | [argocd](https://github.com/argoproj/argo-cd) | 2.14.8 | 2025-03-25 |
 | [AWS CLI](https://aws.amazon.com/ko/cli/) | v2 | - |

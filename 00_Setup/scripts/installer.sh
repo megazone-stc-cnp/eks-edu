@@ -9,13 +9,13 @@ docker_compose_version='2.34.0'                 # unknown
 kind_version='0.27.0'                           # 2025-02-15
 
 # renovate: depName=kubernetes/kubernetes
-kubectl_version='1.31.6'                        # 2025-02-11
+kubectl_version='1.35.3'                        # 2026-03-19
 
 # renovate: depName=helm/helm
-helm_version='3.17.2'                           # 2025-03-14
+helm_version='3.20.2'                           # 2026-04-09
 
 # renovate: depName=eksctl-io/eksctl
-eksctl_version='0.206.0'                        # 2025-03-23
+eksctl_version='0.225.0'                        # 2026-03-30
 
 # renovate: depName=bitnami-labs/sealed-secrets
 kubeseal_version='0.28.0'                       # 2025-01-16
@@ -27,7 +27,7 @@ krew_version='0.5.1'                            # 2025-03-25
 yq_version='4.45.1'                             # 2025-01-12
 
 # renovate: depName=argoproj/argo-cd
-argocd_version='2.14.8'                         # 2025-03-25
+argocd_version='3.2.10'                         # 2026-04-21
 
 # renovate: depName=hashicorp/terraform
 terraform_version='1.11.2'                      # 2025-03-12
