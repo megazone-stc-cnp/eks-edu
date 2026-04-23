@@ -38,7 +38,7 @@ Docker는 이 격리 기술을 사용하기 쉽게 만들어 대중에 공개하
 
 ### 1-2. Container Image
 
-컨테이너 이미지는 애플리케이션을 실행하는 데 필요한 모든것(Application 실행에 필요한 시스템 라이브러리, 환경변수, 스크립트 등)이 포함되어 있습니다.
+컨테이너 이미지는 **애플리케이션을 실행하는 데 필요한 모든것(Application 실행에 필요한 시스템 라이브러리, 환경변수, 스크립트 등)이 포함**되어 있습니다.
 실행 중인 컨테이너는 컨테이너 이미지를 통해 격리된 파일 시스템을 사용합니다.
 
 예전부터 Docker 가 하나의 표준으로 사용되었기 때문에 컨테이너 이미지라는 용어보다는 Docker 이미지라는 용어를 사용합니디만, Docker 이미지와 컨테이너 이미지는 동일한 용어입니다.
@@ -92,12 +92,6 @@ EXPOSE 3000
 
 ---
 
-<style scoped>
-   table {
-      font-size: 22px;
-   }
-</style>
-
 | Instruction | Description |
 | ----------- | ----------- |
 | [FROM](https://docs.docker.com/reference/dockerfile/#from) | Docker 이미지로 만들기 위한 `base image`를 지정합니다.<br/> 위 예제에서는 Node.js의 최신 Alpine LInux 기반 이미지를 사용합니다. |
@@ -108,12 +102,6 @@ EXPOSE 3000
 | [EXPOSE](https://docs.docker.com/reference/dockerfile/#expose) | 컨테이너에서 사용할 포트를 개방합니다.<br/> `EXPOSE`를 사용하지 않으면 컨테이너 외부에서 컨테이너 내부의 Application으로 통신이 되지 않습니다. |
 
 ---
-
-<style scoped>
-   table {
-      font-size: 21px;
-   }
-</style>
 
 Dockerfile 에서 사용할 수 있는 전체 지시문([Dockerfile reference](https://docs.docker.com/reference/dockerfile/))은 아래와 같으며 자세한 내용은 각 지시문의 링크를 확인해 주세요. 
 
@@ -137,12 +125,6 @@ Dockerfile 을 이용해 Docker 이미지를 생성할 준비를 마쳤다면, D
 이미지를 만들기 전에 Docker CLI 에서 주로 사용하는 명령어에 대해 살펴보겠습니다.
 
 ---
-
-<style scoped>
-   table {
-      font-size: 17px;
-   }
-</style>
 
 | **분류**        | **명령어**                                                      | **설명** |
 | ---------- | ---------------------------------------------------------- | ---------------------------- | 
@@ -345,7 +327,7 @@ Docker에서 Docker 이미지를 만들려면, 위에서 설명한 것과 같이
 
 2. `docker build` 명령어를 이용해 Docker 이미지를 다시 빌드합니다.
    ```bash
-   docker build -t getting-started ~/environment/eks-edu/00_Setup/.
+   docker build -t getting-started ~/environment/eks-edu/01_Container/getting-started-app/.
    ```
 
 3. 새로 업데이트된 이미지를 이용해 새로운 컨테이너를 실행합니다.
@@ -450,11 +432,6 @@ Kubernetes 에서는 다음과 같이 정의하고 있습니다.
 <sub>1\) 이동성(Portability) : 어떤 환경에서도 동일하게 실행될 수 있는 능력</sub>
 
 ---
-<style scoped>
-   table {
-      font-size: 23px;
-   }
-</style>
 
 ### 2-3. Container 기술이 각광 받는 이유
 
@@ -633,11 +610,6 @@ Kubernets 클러스터를 관리하기 위해서는 `kubectl` 이라는 CLI를 �
 Deployment를 생성하기 위해서는 YAML 문법을 이용한 Kubernetes 매니페스트(manifest) 파일을 이용합니다.<br/>
    
 ---
-<style scoped>
-   p {
-      font-size: 26px;
-   }
-</style>
 
 실습을 위해 미리 `~/environment/eks-edu/01_Container/manifests/deployment.yaml` 파일을 미리 만들어 준비해 두었습니다.
    ```yaml
@@ -826,7 +798,7 @@ Node는 Kubernetes 에서 워커 노드를 말하며, Cluster가 구성된 환�
 | `kubectl get <resource>` | resource 목록을 조회 |
 | `kubectl describe <resource>` | resource에 대한 상세 정보 조회 |
 | `kubectl logs <container>` | Pod 안의 Container 로그를 출력 |
-| `kubectl exec <container>` | Pod 안의 COntainer에 대한 명령 실행 |
+| `kubectl exec <container>` | Pod 안의 Container에 대한 명령 실행 |
 
 ---
 
