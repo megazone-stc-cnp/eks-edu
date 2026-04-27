@@ -525,13 +525,13 @@
 
 3. 결과 화면
    
-   Role 삭제 확인
+   Role 삭제 확인 ( 검색: iam > 역할 )
    ![alt text](image/result_delete_role.png)
 
-   Policy 삭제 확인
+   Policy 삭제 확인 ( 검색: iam > 정책 )
    ![alt text](image/result_delete_policy.png)
    
-   S3 버킷 삭제 확인
+   S3 버킷 삭제 확인 (검색: s3 > 검색: pod-secrets-bucket- )
    ![alt text](image/result_delete_bucket.png)
 
 4. EKS 삭제는 03_Default_Environment 에서 삭제 진행
