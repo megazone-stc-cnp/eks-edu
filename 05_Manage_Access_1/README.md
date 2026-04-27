@@ -49,7 +49,7 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 ### Access Entry Permision ([액세스 정책 권한 검토](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/access-policy-permissions.html))
 | Permission Type | Description |
 |----------------|-------------|
-| AmazonEKSAdminPolicy | 리소스에 대한 대부분의 권한을 IAM 보안 주체에 부여하는 권한이 포함 |
+| **AmazonEKSAdminPolicy** | 리소스에 대한 대부분의 권한을 IAM 보안 주체에 부여하는 권한이 포함 |
 | **AmazonEKSClusterAdminPolicy** | 클러스터에 대한 액세스 권한을 IAM 보안 주체 관리자에게 부여하는 권한이 포함 |
 | AmazonEKSAdminViewPolicy | 클러스터의 모든 리소스를 나열하고 볼 수 있는 권한을 IAM 보안 주체에 부여하는 권한이 포함 |
 | AmazonEKSEditPolicy | IAM 위탁자가 대부분의 Kubernetes 리소스를 편집할 수 있는 권한이 포함 |
@@ -76,6 +76,7 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
    
    User/ServiceAccount 에 모든 Cluster에 대해서 설정한 권한을 위임
    ```shell
+   # pod에 대한 정보 가져오기, 목록, 변경 확인
    kubectl create clusterrole pod-reader-crusterrole \
          --verb=get,list,watch \
          --resource=pods
@@ -94,16 +95,19 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 
    User/ServiceAccount 에 모든 Cluster에 대해서 설정한 권한을 위임
    ```shell
+   # pod에 대한 정보 가져오기, 목록, 변경 확인
    kubectl create role pod-reader-role \
          --verb=get --verb=list --verb=watch \
          --resource=pods \
          -n namespace
 
+   # User
    kubectl create rolebinding pod-reader-rolebinding \
-         --clusterrole=pod-reader-role --user=user1 --user=user2 \
+         --role=pod-reader-role --user=user1 --user=user2 \
          --group=group1 \
          -n namespace
 
+   # ServiceAccount
    kubectl create rolebinding pod-reader-rolebinding \
          --role=pod-reader-rolebinding \
          --serviceaccount=namespace:serviceaccountname \
@@ -203,7 +207,7 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 
    ![alt text](image/create_user.png)
 
-3. 생성 결과 화면
+3. 생성 결과 화면 ( 검색 : iam > 사용자 )
 
    ![result_create_user](image/result_create_user.png)
 
@@ -429,16 +433,17 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
     ![alt text](image/result_get_nodes.png)
 
 ### Access Entry를 사용하여 사용자 권한 설정
+0. 만약 기존에 Amazon EKS Pod Identity Agent가 생성되어 있다면 삭제하고 진행
 
-1. Clusters 를 선택
+1. Clusters 를 선택 ( 검색: eks > \[클러스터 이름\] )
 
    ![alt text](image/click_cluster.png)
    
-2. Addon 메뉴 선택
+2. Addon 메뉴 선택 ( 한글명: 추가 기능 )
 
    ![alt text](image/select_add-on.png)
 
-3. Get more add-ons 버튼 클릭
+3. Get more add-ons 버튼 클릭 ( 한글명: 추가 기능 가져오기 )
 
    ![alt text](image/click_get_more_add_ons.png)
 
@@ -461,7 +466,7 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 8. admin 권한의 access entry 생성
 
    ```shell
-   cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
+   cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_access_entry
    sh 02_create_admin_access_entry.sh
    ```
 
@@ -487,14 +492,14 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 
    ![alt text](image/create_access_entry.png)
 
-10. 생성 결과 화면
+10. 생성 결과 화면 ( 검색: eks > \[생성한 EKS\] > 액세스 )
 
     ![alt text](image/result_create_access_entry.png)
 
 11. node 조회 권한 체크
 
     ```shell
-    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
+    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_access_entry
     sh 03_get_nodes.sh
     ```
 
@@ -515,7 +520,7 @@ EKS 액세스 항목은 Kubernetes 권한 세트를 IAM 역할과 같은 IAM 자
 14. cluster role 권한으로 변경
 
     ```shell
-    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_pod_identity
+    cd ~/environment/eks-edu/05_Manage_Access_1/03_user_permission_access_entry
     sh 04_update_pod_reader_access_entry.sh
     ```
 

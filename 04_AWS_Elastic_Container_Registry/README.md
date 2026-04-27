@@ -134,7 +134,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 2. 실행 화면
 
    ![1743577747455](image/creating_lbc_repository.png)
-3. 생성 결과 화면
+3. 생성 결과 화면 ( 검색: ecr > 리포지토리 )
 
    ![1743577874296](image/result_lbc_repository.png)
 
@@ -156,7 +156,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 
    ![1743578043503.png](image/creating_cluster_autoscaler_repository.png)
 
-3. 생성 결과 화면
+3. 생성 결과 화면 ( 검색: ecr > 리포지토리 )
 
    ![1743578210172](image/result_cluster_autoscaler_repository.png)
 
@@ -179,7 +179,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 
    ![1743578426316](image/creating_nginx_repository.png)
 
-3. 생성 결과 화면
+3. 생성 결과 화면 ( 검색: ecr > 리포지토리 )
 
    ![1743578509292](image/result_nginx_repository.png)
 
@@ -311,7 +311,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 
    ![1743582805949](image/creating_pull_through_cache_rule.png)
 
-3. 생성 결과 화면
+3. 생성 결과 화면 ( 검색: ecr > 기능 및 설정 > 풀스루 캐시 )
 
    ![1743582919218](image/result_pull_through_cache_rule.png)
 
@@ -336,7 +336,7 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 
    ![1743584365543](image/pull_through_cache_nginx_pull.png)
 
-6. 생성 결과 화면
+6. 생성 결과 화면 ( 검색: ecr > 리포지토리 > 검색: public-ecr-9641173/nginx/nginx )
 
    ![1743585511177](image/result_pull_through_cache_nginx_pull.png)
 
@@ -371,10 +371,10 @@ Amazon ECR은 현재 다음 업스트림 레지스트리에 대한 풀스루 캐
 
 3. 결과 화면
 
-   private repository 목록
+   private repository 목록 ( 검색: ecr > 리포지토리 )
    ![1743642923754](image/result_private_repository.png)
 
-   Pull Through Cache 목록
+   Pull Through Cache 목록 ( 검색: ecr > 기능 및 설정 >  Pull through cache )
    ![1743643037705](image/result_delete_pull_through_cache.png)
 
 ## 관련 링크
