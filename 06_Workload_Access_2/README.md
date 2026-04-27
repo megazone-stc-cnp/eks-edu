@@ -20,7 +20,7 @@
 
 ## 이론
 
-### IRSA란 ?
+### IRSA란 ? ( IRSA: IAM Roles for Service Accounts )
 
 - Pod의 컨테이너에 있는 애플리케이션은 **AWS SDK 또는 AWS CLI를 사용하여 AWS ID 및 액세스 관리(IAM) 권한을 사용하여 AWS 서비스에 API 요청**을 할 수 있다.
 - 애플리케이션은 **AWS 자격 증명으로 AWS API 요청에 서명**해야 합니다.
@@ -89,7 +89,7 @@
 
    ![alt text](image/create_bucket.png)
 
-6. 생성 결과 화면
+6. 생성 결과 화면 ( 검색: S3 > 검색: pod-secrets-bucket- )
 
    ![alt text](image/result_create_bucket.png)
 
@@ -123,7 +123,7 @@
 
    ![alt text](image/irsa_create_policy.png)
 
-9. 생성 결과 화면
+9. 생성 결과 화면 ( 검색: iam > 정책 > 검색: eks-edu-irsa-workload-policy- )
 
    ![alt text](image/result_irsa_create_policy.png)
 
@@ -200,7 +200,7 @@
 
     ![alt text](image/create_role.png)
 
-15. 생성 결과 화면
+15. 생성 결과 화면 ( 검색: iam > 역할 > 검색: eks-edu-irsa-workload-role- )
 
     ![alt text](image/result_create_role.png)
 
@@ -326,7 +326,7 @@
 
    ![alt text](image/pod_identity_create_policy.png)
 
-3. 생성 결과 화면
+3. 생성 결과 화면 ( 검색: iam > 정책 > 검색: eks-edu-pod-identity-workload-policy- )
 
    ![alt text](image/result_pod_identity_create_policy.png)
 
@@ -354,7 +354,7 @@
 
    ![alt text](image/pod_identity_create_account.png)
 
-6. 생성 결과 화면
+6. 생성 결과 화면 ( 검색: iam > 역할 > 검색: eks-edu-pod-identity-workload-role- )
 
    ![alt text](image/result_pod_identity_create_account.png)
 
@@ -402,7 +402,7 @@
 
    ![alt text](image/pod_identity_create_role.png)
 
-9. 생성 결과 화면
+9. 생성 결과 화면 ( 검색: eks > \[클러스터 명칭\] > 액세스 > Pod Identity 연결 )
 
    ![alt text](image/result_pod_identity_create_role.png)
 
