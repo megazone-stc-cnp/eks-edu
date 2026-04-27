@@ -502,3 +502,11 @@ NOTE: vpc-cni, kube-proxy Pod들의 IP가 여전히 기존 IP로 적용된 이�
 - https://repost.aws/ko/knowledge-center/eks-configure-cni-plugin-use-ip-address[Amazon EKS에서 VPC 서브넷의 IP 주소를 사용하도록 Amazon VPC CNI 플러그인을 구성하려면 어떻게 해야 하나요?]
 - https://docs.aws.amazon.com/ko_kr/eks/latest/best-practices/vpc-cni.html[Amazon EKS Best Practice - Amazon VPC CNI]
 - https://nangman14.tistory.com/100[AWS EKS의 IP 주소 관리: 쿠버네티스 클러스터의 네트워킹 고려사항]
+
+== 정리
+. EKS 삭제는 03_Default_Environment 에서 삭제 진행
+[source,shell]
+----
+cd ~/environment/eks-edu/03_Default_Environment/99_delete
+sh 99_delete.sh
+----

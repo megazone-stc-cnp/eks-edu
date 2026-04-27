@@ -10,6 +10,7 @@
    sh 01_default_vpc.sh
 
    cd ../02_create_eks
+   [ -f template/eksctl.yaml ] && rm template/eksctl.yaml
    sh 01-1_make_eksctl_cluster_only_template.sh
    sh 02_eksctl_install.sh
    ```
@@ -433,3 +434,12 @@ eksctl delete addon --cluster $CLUSTER_NAME --name aws-ebs-csi-driver
     - [AmazonEFSCSIDriverPolicy](https://docs.aws.amazon.com/ko_kr/aws-managed-policy/latest/reference/AmazonEFSCSIDriverPolicy.html) - `arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy`
   - IRSA를 이용한 EFS CSI 드라이버 설치는 [Amazon EKS 사용자 가이드](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/index.html)의 [Amazon EFS를 사용한 탄력적 파일 시스템 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/efs-csi.html) 문서를 참고해 주세요.
 - [Amazon EFS를 사용한 탄력적 파일 시스템 저장](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/efs-csi.html) 의 3, 4단계를 참고하여 샘플 애플리케이션 배포 후 정상 동작하는지도 확인해 보세요.
+
+## 정리
+
+1. EKS 삭제는 03_Default_Environment 에서 삭제 진행
+
+   ```shell
+   cd ~/environment/eks-edu/03_Default_Environment/99_delete
+   sh 99_delete.sh
+   ```
