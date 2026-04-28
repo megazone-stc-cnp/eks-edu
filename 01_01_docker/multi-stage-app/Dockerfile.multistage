@@ -1,0 +1,12 @@
+# Stage 1: 빌드
+FROM golang:1.23 AS builder
+WORKDIR /app
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o myapp .
+
+# Stage 2: 실행
+FROM alpine:latest
+WORKDIR /app
+COPY --from=builder /app/myapp .
+CMD ["./myapp"]
+EXPOSE 8080
