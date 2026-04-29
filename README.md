@@ -21,6 +21,7 @@ AWS EKS에 대해 기초부터 고급주제까지 학습하실 수 있도록 교
 
 - [0. 교육 환경 구성하기](00_Setup/README.md)
 - [1. Container 기술 일반](01_Container/README.md)
+- [1-1 Docker 심화](01_01_docker/README.md)
 - [2. EKS 기초 실습](02_EKS_Basic/)
 - [3. 기본 환경 생성](03_Default_Environment/README.md)
 - [4. Amazon Elastic Container Registry](04_AWS_Elastic_Container_Registry/README.md)
