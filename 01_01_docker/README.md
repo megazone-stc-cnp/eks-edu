@@ -36,13 +36,14 @@ Docker의 주요 명령어와 리소스 간의 관계는 다음과 같습니다.
   │                       │  build  │                       │
   └──┬────────▲───────┬───┘         └───────────────────────┘
      │        │       │
-  docker run  │    docker rmi
-     │        │    (이미지 삭제)
-     │   docker commit
-     ▼        │
-  ┌───────────────────────┐
-  │  Running Container     │
-  │  (실행 중인 컨테이너)    │
+  docker run  │    docker rmi             ┌──────────────────┐
+     │        │    (이미지 삭제)             │   Tar / File     │
+     │   docker commit          save ────▶│   (이미지 파일)     │
+     ▼        │                 load ◀────│                  │
+  ┌───────────────────────┐               └──────────────────┘
+  │  Running Container    │
+  │  (실행 중인 컨테이너)      │──── docker exec (컨테이너 내 명령 실행)
+  │                       │──── docker logs (컨테이너 로그 확인)
   └───────┬───────▲───────┘
           │       │
   docker stop   docker start
@@ -63,10 +64,14 @@ Docker의 주요 명령어와 리소스 간의 관계는 다음과 같습니다.
 | | `docker push <이미지명>` | Registry에 이미지 업로드 |
 | | `docker images` | 로컬 이미지 목록 확인 |
 | | `docker rmi <이미지명>` | 이미지 삭제 |
+| | `docker save -o <파일명>.tar <이미지명>` | 이미지를 tar 파일로 저장 |
+| | `docker load -i <파일명>.tar` | tar 파일에서 이미지 로드 |
 | 컨테이너 | `docker run <이미지명>` | 이미지로 컨테이너 생성 및 실행 |
 | | `docker stop <컨테이너>` | 실행 중인 컨테이너 정지 |
 | | `docker start <컨테이너>` | 정지된 컨테이너 재시작 |
 | | `docker rm <컨테이너>` | 컨테이너 삭제 |
+| | `docker exec -it <컨테이너> sh` | 실행 중인 컨테이너에서 명령 실행 |
+| | `docker logs <컨테이너>` | 컨테이너 로그 확인 |
 | | `docker commit <컨테이너>` | 컨테이너를 이미지로 저장 |
 
 
