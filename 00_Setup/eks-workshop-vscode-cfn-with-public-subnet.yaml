@@ -187,6 +187,7 @@ Resources:
     Type: Custom::EksWorkshopIdeBootstrapInstanceLambda
     DependsOn:
       - EksWorkshopIdeLambdaExecutionRole
+      - EksWorkshopIdeEIPAssociation
     Properties:
       ServiceToken:
         Fn::GetAtt:
@@ -302,7 +303,7 @@ Resources:
                   systemctl enable --now caddy
 
                   tee /etc/caddy/Caddyfile <<EOF
-                  http://${EksWorkshopIdeCloudFrontDistribution.DomainName} {
+                  :80 {
                     reverse_proxy 127.0.0.1:8889
                   }
                   EOF
@@ -629,6 +630,8 @@ Resources:
   #     - EksWorkshopIdeInstance
   EksWorkshopIdeCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - EksWorkshopIdeEIPAssociation
     Properties:
       DistributionConfig:
         Comment: !Sub ${AWS::StackName}
