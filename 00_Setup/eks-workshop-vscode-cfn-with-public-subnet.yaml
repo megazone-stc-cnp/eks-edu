@@ -327,6 +327,9 @@ Resources:
                   export RAW_REPOSITORY_URL="https://raw.githubusercontent.com/$REPOSITORY_OWNER/$REPOSITORY_NAME/$REPOSITORY_REF"
                   curl -fsSL $RAW_REPOSITORY_URL/00_Setup/scripts/installer.sh | bash
 
+                  echo ">>> install java"
+                  sudo dnf install -y java-17-amazon-corretto
+                  
                   echo ">>> Install code-server"
                   cat <<"EOT" | sudo -E -H -u ec2-user bash
                   set -e

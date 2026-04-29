@@ -1,7 +1,16 @@
 # Docker 심화
 
 ## 사전 조건
-- [0. 교육 환경 구성하기](/00_Setup/README.md)를 이용해 생성된 `code-server`에 접속한 상태여야 합니다.
+- [0. 교육 환경 구성하기](/00_Setup/README.md) 내용 기반으로 아래의 코드로 생성된 `code-server`에 접속한 상태여야 합니다.
+```bash
+export IDE_NAME=9641173
+export CODE_SERVER_CFN="https://raw.githubusercontent.com/megazone-stc-cnp/eks-edu/refs/heads/main/00_Setup/eks-workshop-vscode-cfn-with-public-subnet.yaml"
+aws cloudformation create-stack \
+	--stack-name eks-workshop-${IDE_NAME} \
+	--template-body "$(curl -fsSL $CODE_SERVER_CFN)" \
+	--capabilities CAPABILITY_NAMED_IAM \
+	--region ${AWS_REGION}
+```
 
 ---
 
