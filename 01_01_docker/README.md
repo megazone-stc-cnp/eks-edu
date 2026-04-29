@@ -15,6 +15,7 @@ aws cloudformation create-stack \
 ---
 
 ## 학습 목표
+- AWS ECR에 이미지 업로드 하기
 - Docker 명령어 
 - Dockerfile 심화
     - Multi-stage Build를 이용한 이미지 최적화 방법 학습
@@ -23,9 +24,418 @@ aws cloudformation create-stack \
     - Docker Compose의 개념과 필요성 이해
     - docker-compose.yml 작성 방법 학습
     - 다중 컨테이너 애플리케이션 구성 및 실행 실습
-- AWS ECR에 이미지 업로드 하기
+
 ---
 
+## 개발 시나리오
+### 1. Java Application 개발
+
+#### 1.1 나의 이름을 출력하는 Java 코드 개발을 진행한다.
+
+```
+cd /home/ec2-user/environment
+git clone https://github.com/megazone-stc-cnp/spring-boot-hello-world-sample.git
+
+cd spring-boot-hello-world-sample
+```
+
+#### 1.2 나의 이름을 my_name.txt에 변경한다.
+
+![alt text](<images/CleanShot 2026-04-29 at 17.50.05@2x.png>)
+
+#### 1.3 Application을 구동한다.
+```
+mvn spring-boot:run
+```
+
+아래와 같이 Browser에서 http://[스택에 IdePublicIp]:8080 접속해 본다.
+
+![alt text](<images/CleanShot 2026-04-29 at 17.59.34@2x.png>)
+
+### 2. Docker로 마이그레이션
+
+#### 2.1 Docker 실행시 필요한 항목들 정리
+```
+pom.xml 파일 필요
+src/ 필요
+my_name.txt 파일 필요
+라이브러리 다운로드 : mvn dependency:go-offline -q
+패키징 명령어 : mvn package -DskipTests -q
+실행 명령어 : java -jar target/hello-0.0.1-SNAPSHOT.jar
+```
+
+#### 2.2 java를 구동할 수 있는 Docker base Image를 찾기
+
+[Docker Hub 사이트](https://hub.docker.com/) 에서 java Image 검색 ( maven 빌드, java 포함 )
+- 나의 Pick : maven:3.9-eclipse-temurin-17
+
+#### 2.3 Docker file 작성
+
+Dockerfile 에 아래의 내용을 추가
+```
+cd ~/environment/spring-boot-hello-world-sample
+touch Dockerfile
+
+- 아래 내용 입력
+FROM maven:3.9-eclipse-temurin-17
+
+WORKDIR /app
+
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+
+COPY src ./src
+COPY my_name.txt .
+RUN mvn package -DskipTests -q
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "target/*.jar"]
+```
+
+#### 2.4 Docker image 생성
+
+아래 명령으로 기존 docker image 여부 확인
+
+```
+docker images
+```
+
+아래 명령으로 docker image 생성
+```
+docker build -t my_spring_boot .
+```
+
+생성이 되었는지 아래의 명령으로 확인
+```
+docker images
+```
+
+용량 사이즈 확인
+
+![alt text](<images/CleanShot 2026-04-29 at 18.57.52@2x.png>)
+
+### 3. Docker 파일 사이즈 최적화
+
+#### 3.1 Multi-stage Build 적용
+```
+- Dockerfile을 아래와 같이 수정
+# ---- 빌드 스테이지 ----
+FROM maven:3.9-eclipse-temurin-17 AS builder
+WORKDIR /app
+
+# 의존성 캐시 레이어 (pom.xml만 먼저 복사)
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+
+# 소스 복사 후 빌드
+COPY src ./src
+COPY my_name.txt .
+RUN mvn package -DskipTests -q
+
+# ---- 실행 스테이지 ----
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+#### 3.2 Docker Image 생성
+1. 아래 명령으로 기존 docker image 여부 확인
+
+```
+docker images
+```
+
+2. 아래 명령으로 docker image 생성
+```
+docker build -t my_spring_boot:multi-stage .
+```
+
+3. 생성이 되었는지 아래의 명령으로 확인
+```
+docker images
+```
+
+4. 용량 사이즈 확인
+
+![alt text](<images/CleanShot 2026-04-29 at 19.04.27@2x.png>)
+
+### 4. Docker Image를 올리기 위한 ECR 생성
+
+1. AWS Management Console에서 ```ecr``` 입력하여 Elastic Container Registry 로 이동
+
+![alt text](<images/CleanShot 2026-04-29 at 19.06.52@2x.png>)
+
+2. 리포지토리 메뉴에서 리포지토리 생성 버튼 클릭
+
+![alt text](<images/CleanShot 2026-04-29 at 19.07.53@2x.png>)
+
+3. 아래 정보를 입력하고, 생성 버튼 클릭
+
+- 리포지토리 이름 : my_spring_boot
+
+4. 아래와 같이 프라이빗 리포지토리 생성 확인 하고 URI 복사 ( 예: 539666729110.dkr.ecr.ap-northeast-2.amazonaws.com/my_spring_boot )
+
+![alt text](<images/CleanShot 2026-04-29 at 19.10.38@2x.png>)
+
+### 5. 로컬 Docker Image 를 생성한 AWS ECR에 업로드
+
+1. Private ECR 로그인
+```
+source ~/environment/eks-edu/env.sh
+aws ecr get-login-password  | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+```
+
+그러면 아래와 같이 Login Succeeded 메시지가 나와야 한다.
+
+![alt text](<images/CleanShot 2026-04-29 at 19.19.11@2x.png>)
+
+2. Private ECR Repository 경로로 Tagging
+```
+docker tag my_spring_boot:multi-stage ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:multi-stage
+```
+
+3. Private ECR Repository 경로로 Tagging 되었는지 확인
+```
+docker images
+```
+
+4. docker image를 Private ECR Repository 로 업로드
+```
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:multi-stage
+```
+
+5. AWS Management Console에서 이미지 업로드 여부 확인 ( 검색: ecr > 리포지토리 > 검색: my_spring_boot > my_spring_boot 선택 )
+
+![alt text](<images/CleanShot 2026-04-29 at 19.23.52@2x.png>)
+
+6. Local에 있는 이미지 삭제
+
+```
+docker image prune -a
+```
+
+7. docker image 확인
+
+```
+docker images
+```
+
+### 6. Private ECR로 컨테이너 실행
+
+1. 아래의 명령으로 실행
+```
+docker run -p 8080:8080 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:multi-stage
+```
+
+2. WebBrowser에서 접근 시 Unknown으로 나옴
+
+![alt text](<images/CleanShot 2026-04-29 at 19.36.29@2x.png>)
+
+3. Container 를 백그라운드로 실행
+
+```
+docker run -d -p 8080:8080 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:multi-stage
+```
+
+4. docker exec 명령으로 터미널 접속
+```
+docker ps
+-> 컨테이너 ID 확인
+
+docker exec -it <컨테이너명> /bin/bash
+# docker exec -it 701e90a50cfe sh
+```
+
+### 7. Dockerfile 재작성
+
+1. Dockerfile에서 my_name.txt 파일을 추가하게 변경
+```
+FROM maven:3.9-eclipse-temurin-17 AS builder
+WORKDIR /app
+
+# 의존성 캐시 레이어 (pom.xml만 먼저 복사)
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+
+# 소스 복사 후 빌드
+COPY src ./src
+RUN mvn package -DskipTests -q
+
+# ---- 실행 스테이지 ----
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+COPY my_name.txt .
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+2. 다시 빌드해서 업로드 작업
+```
+docker build -t my_spring_boot:v2 .
+docker tag my_spring_boot:v2 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:v2
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:v2
+docker run -d -p 8080:8080 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:v2
+```
+
+3. 기존 실행되는 컨테이너 삭제후 재실행
+```
+docker ps
+-> 컨테이너 확인
+CONTAINER_ID=701e90a50cfe
+docker stop ${CONTAINER_ID}
+docker rm ${CONTAINER_ID}
+
+docker run -d --name my_spring_boot -p 8080:8080 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:v2
+```
+
+### 8. mysql 연동
+
+#### 8.1 docker run 명령을 docker-compose.yaml 로 변경
+
+1. docker run 명령어에서 필요한 항목들을 추출
+```
+--name my_spring_boot
+-p 8080:8080 -> 노출 포트
+image : ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot
+tag : v2
+```
+
+2. 이 정보 기반으로 docker-compose.yaml 생성
+```
+services:
+  my_spring_boot:
+    container_name: my_spring_boot   # --name 에 해당
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:v2
+    ports:
+      - "8080:8080"
+```
+
+3. .env 에 아래 내용 생성
+```
+AWS_ACCOUNT_ID=539666729110
+AWS_REGION=ap-northeast-2
+```
+
+4. 아래 명령으로 container 실행
+```
+docker compose up
+```
+
+5. 웹 브라우저에서 실행
+
+6. 백그라운드로 실행
+```
+docker compose up -d
+```
+
+7. 컨테이너 실행 여부 확인
+```
+docker compose ps
+```
+
+8. 로그 확인
+```
+docker compose logs
+```
+
+#### 8.2 mysql 부분 추가
+
+1. docker hub에서 mysql 검색
+
+2. docker-compose.yaml에 mysql 부분 추가
+```
+services:
+  ...
+  db:
+    image: mysql:8.0
+    container_name: my-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: composedb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppassword    
+    restart: always
+```
+
+3. docker-compose를 재실행
+```
+# 컨테이너 중지 + 삭제
+docker compose down
+# 컨테이너 시작
+docker compose up -d
+```
+
+4. mysql 동작 확인
+```
+docker compose ps
+docker compose logs db
+```
+
+#### 9. 연동
+
+1. my_spring_boot 앱과 db를 연결 작업
+```
+services:
+  my_spring_boot:
+    container_name: my_spring_boot
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/my_spring_boot:v2
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/composedb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: appuser
+      SPRING_DATASOURCE_PASSWORD: apppassword
+    depends_on:
+      db:
+        condition: service_healthy  # db 헬스체크 통과 후 스프링 시작
+    restart: unless-stopped
+    networks:
+      - spring-mysql-net
+
+  db:
+    image: mysql:8.0
+    container_name: my-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: composedb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppassword
+    volumes:
+      - mysql_data:/var/lib/mysql   # 데이터 영속성
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: always
+    networks:
+      - spring-mysql-net
+
+volumes:
+  mysql_data:
+
+networks:
+  spring-mysql-net:
+    driver: bridge
+```
+
+- LINE 8-10 : DB 접속을 위한 환경변수 설정
+- LINE 12 : Application이 실행 전에 DB가 먼저 실행되고 Health check가 통과 되어야 한다.
+- LINE 14 : restart 옵션중 하나이며, stop한 경우는 제외
+- LINE 16 : 네트워크 구성 ( 설정을 하지 않아도 네트워크 구성됨 )
+- LINE 27 : mysql은 데이터 베이스에 데이터가 쌓여야 하며, docker가 재시작 되어도 유지가 되어야 하므려, Volume으로 별도 구성
+- LINE 28 : Health Check
+
+2. 재기동
+```
+docker compose down
+
+docker compose up -d
+```
 ## 1. Docker 명령어
 
 Docker의 주요 명령어와 리소스 간의 관계는 다음과 같습니다.
@@ -129,44 +539,6 @@ Multi-stage Build는 하나의 Dockerfile 안에서 **여러 개의 `FROM` 지�
 Java, Go, TypeScript 등의 언어로 작성된 애플리케이션은 빌드 과정에서 컴파일러, 빌드 도구, 의존성 라이브러리 등이 필요합니다.
 하지만 실제 실행 시에는 이러한 빌드 도구가 필요하지 않습니다.
 
-```dockerfile
-# 이 이미지에는 빌드 도구(gcc, make 등)가 모두 포함됨
-FROM golang:1.23
-WORKDIR /app
-COPY . .
-RUN go build -o myapp .
-CMD ["./myapp"]
-```
-
-위 Dockerfile로 생성된 이미지에는 Go 컴파일러와 소스 코드가 모두 포함되어 **이미지 크기가 불필요하게 커집니다.**
-
----
-
-#### Multi-stage Build로 해결하기
-
-```dockerfile
-# ========== Stage 1: 빌드 단계 ==========
-FROM golang:1.23 AS builder
-WORKDIR /app
-COPY . .
-RUN go build -o myapp .
-
-# ========== Stage 2: 실행 단계 ==========
-FROM alpine:latest
-WORKDIR /app
-COPY --from=builder /app/myapp .
-CMD ["./myapp"]
-```
-
-| 단계 | 설명 |
-| --- | --- |
-| Stage 1 (`builder`) | Go 컴파일러가 포함된 이미지에서 애플리케이션을 빌드 |
-| Stage 2 | 경량 Alpine 이미지에 빌드된 바이너리만 복사하여 실행 |
-
-`COPY --from=builder`를 통해 이전 단계에서 생성된 파일만 가져올 수 있습니다.
-
----
-
 #### Multi-stage Build의 효과
 
 | 항목 | 일반 빌드 | Multi-stage Build |
@@ -174,31 +546,6 @@ CMD ["./myapp"]
 | 이미지 크기 | ~800MB (Go 컴파일러 포함) | ~15MB (Alpine + 바이너리) |
 | 보안 | 빌드 도구, 소스 코드 노출 | 실행에 필요한 파일만 포함 |
 | 빌드 속도 | 단일 단계 | 레이어 캐싱 활용 가능 |
-
----
-
-### 1-3. Multi-stage Build 활용 패턴
-
-#### Node.js 애플리케이션 예시
-
-```dockerfile
-# Stage 1: 의존성 설치 및 빌드
-FROM node:lts-alpine AS builder
-WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-COPY . .
-RUN yarn build
-
-# Stage 2: 실행
-FROM node:lts-alpine
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
-CMD ["node", "dist/index.js"]
-EXPOSE 3000
-```
 
 ---
 
@@ -316,345 +663,6 @@ networks:                      # 네트워크 정의
 | `docker compose stop` | 모든 서비스 중지 (컨테이너 유지) |
 | `docker compose restart` | 모든 서비스 재시작 |
 
----
-
-## 3. 실습 #1 - Multi-stage Build
-
-### 실습 목표
-1. Multi-stage Build를 이용해 최적화된 Docker 이미지를 생성합니다.
-2. 일반 빌드와 Multi-stage Build의 이미지 크기를 비교합니다.
-
----
-
-### 3-1. 실습용 Go 애플리케이션 작성
-
-1. `code-server`에 접속합니다.
-
-2. `terminal`을 실행하고, 실습 디렉토리를 생성합니다.
-   ```bash
-   mkdir -p ~/environment/eks-edu/01_01_docker/multi-stage-app
-   cd ~/environment/eks-edu/01_01_docker/multi-stage-app
-   ```
-
----
-
-3. 간단한 Go 웹 서버 파일(`main.go`)을 생성합니다.
-   ```go
-   package main
-
-   import (
-       "fmt"
-       "net/http"
-   )
-
-   func main() {
-       http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-           fmt.Fprintf(w, "Hello, Multi-stage Build!")
-       })
-       fmt.Println("Server is running on port 8080...")
-       http.ListenAndServe(":8080", nil)
-   }
-   ```
-
----
-
-4. Go 모듈 파일(`go.mod`)을 생성합니다.
-   ```
-   module multi-stage-app
-
-   go 1.23
-   ```
-
----
-
-### 3-2. 일반 Dockerfile로 빌드하기
-
-1. `Dockerfile.normal` 파일을 생성합니다.
-   ```dockerfile
-   FROM golang:1.23
-   WORKDIR /app
-   COPY . .
-   RUN go build -o myapp .
-   CMD ["./myapp"]
-   EXPOSE 8080
-   ```
-
-2. 이미지를 빌드합니다.
-   ```bash
-   docker build -t go-app-normal -f Dockerfile.normal .
-   ```
-
----
-
-### 3-3. Multi-stage Dockerfile로 빌드하기
-
-1. `Dockerfile.multistage` 파일을 생성합니다.
-   ```dockerfile
-   # Stage 1: 빌드
-   FROM golang:1.23 AS builder
-   WORKDIR /app
-   COPY . .
-   RUN CGO_ENABLED=0 GOOS=linux go build -o myapp .
-
-   # Stage 2: 실행
-   FROM alpine:latest
-   WORKDIR /app
-   COPY --from=builder /app/myapp .
-   CMD ["./myapp"]
-   EXPOSE 8080
-   ```
-
-2. 이미지를 빌드합니다.
-   ```bash
-   docker build -t go-app-multistage -f Dockerfile.multistage .
-   ```
-
----
-
-### 3-4. 이미지 크기 비교
-
-두 이미지의 크기를 비교해 보겠습니다.
-
-```bash
-docker images | grep go-app
-```
-
-아래와 유사한 결과가 출력됩니다.
-
-```
-REPOSITORY          TAG       IMAGE ID       CREATED          SIZE
-go-app-multistage   latest    abc123def456   10 seconds ago   15MB
-go-app-normal       latest    789ghi012jkl   30 seconds ago   800MB
-```
-
-Multi-stage Build를 사용한 이미지가 약 **50배 이상 작은 것**을 확인할 수 있습니다. 🎉
-
----
-
-### 3-5. Multi-stage Build 이미지 실행 및 확인
-
-1. 컨테이너를 실행합니다.
-   ```bash
-   docker run -d -p 127.0.0.1:8080:8080 --name go-multistage go-app-multistage
-   ```
-
-2. 정상 동작을 확인합니다.
-   ```bash
-   curl http://localhost:8080
-   ```
-
-   아래와 같은 응답이 출력되면 정상입니다.
-   ```
-   Hello, Multi-stage Build!
-   ```
-
----
-
-3. 실행 중인 컨테이너를 확인합니다.
-   ```bash
-   docker ps
-   ```
-
-4. 확인이 완료되면 컨테이너를 정리합니다.
-   ```bash
-   docker stop go-multistage
-   docker rm go-multistage
-   ```
-
----
-
-## 4. 실습 #2 - Docker Compose
-
-### 실습 목표
-1. Docker Compose를 이용해 다중 컨테이너 애플리케이션을 구성합니다.
-2. 웹 서버(Nginx) + 애플리케이션(Node.js) + 데이터베이스(MySQL) 구성을 실습합니다.
-
----
-
-### 4-1. 실습용 디렉토리 구성
-
-1. 실습 디렉토리를 생성합니다.
-   ```bash
-   mkdir -p ~/environment/eks-edu/01_01_docker/compose-app/{app,nginx}
-   cd ~/environment/eks-edu/01_01_docker/compose-app
-   ```
-
-2. 최종 디렉토리 구조는 다음과 같습니다.
-   ```
-   compose-app/
-   ├── app/
-   │   ├── index.js
-   │   ├── package.json
-   │   └── Dockerfile
-   ├── nginx/
-   │   └── default.conf
-   └── docker-compose.yml
-   ```
-
----
-
-### 4-2. Node.js 애플리케이션 작성
-
-1. `app/package.json` 파일을 생성합니다.
-   ```json
-   {
-     "name": "compose-demo-app",
-     "version": "1.0.0",
-     "main": "index.js",
-     "dependencies": {
-       "express": "^4.18.0",
-       "mysql2": "^3.6.0"
-     }
-   }
-   ```
-
----
-
-2. `app/index.js` 파일을 생성합니다.
-   ```javascript
-   const express = require('express');
-   const mysql = require('mysql2/promise');
-
-   const app = express();
-   const PORT = 3000;
-
-   // MySQL 연결 설정
-   const dbConfig = {
-     host: process.env.DB_HOST || 'mysql',
-     user: process.env.DB_USER || 'appuser',
-     password: process.env.DB_PASSWORD || 'apppassword',
-     database: process.env.DB_NAME || 'composedb'
-   };
-
-   // 헬스체크 엔드포인트
-   app.get('/health', (req, res) => {
-     res.json({ status: 'ok', timestamp: new Date().toISOString() });
-   });
-
-   // 메인 엔드포인트
-   app.get('/', async (req, res) => {
-     try {
-       const connection = await mysql.createConnection(dbConfig);
-       const [rows] = await connection.execute('SELECT NOW() as current_time');
-       await connection.end();
-       res.json({
-         message: 'Docker Compose 실습에 오신 것을 환영합니다!',
-         db_time: rows[0].current_time,
-         hostname: require('os').hostname()
-       });
-     } catch (error) {
-       res.status(500).json({
-         message: 'DB 연결 실패',
-         error: error.message
-       });
-     }
-   });
-
-   app.listen(PORT, () => {
-     console.log(`App server is running on port ${PORT}`);
-   });
-   ```
-
----
-
-3. `app/Dockerfile` 파일을 생성합니다.
-   ```dockerfile
-   FROM node:lts-alpine
-   WORKDIR /app
-   COPY package.json ./
-   RUN npm install --production
-   COPY . .
-   CMD ["node", "index.js"]
-   EXPOSE 3000
-   ```
-
----
-
-### 4-3. Nginx 설정 파일 작성
-
-`nginx/default.conf` 파일을 생성합니다.
-
-```nginx
-upstream app_server {
-    server app:3000;
-}
-
-server {
-    listen 80;
-
-    location / {
-        proxy_pass http://app_server;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-```
-
-이 설정은 Nginx가 80번 포트로 들어오는 요청을 Node.js 애플리케이션(app:3000)으로 전달하는 리버스 프록시 역할을 합니다.
-
----
-
-### 4-4. docker-compose.yml 작성
-
-`docker-compose.yml` 파일을 생성합니다.
-
-```yaml
-services:
-  # MySQL 데이터베이스
-  mysql:
-    image: mysql:8.0
-    container_name: compose-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: composedb
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppassword
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Node.js 애플리케이션
-  app:
-    build: ./app
-    container_name: compose-app
-    environment:
-      DB_HOST: mysql
-      DB_USER: appuser
-      DB_PASSWORD: apppassword
-      DB_NAME: composedb
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - app-network
-
-  # Nginx 웹 서버 (리버스 프록시)
-  nginx:
-    image: nginx:latest
-    container_name: compose-nginx
-    ports:
-      - "127.0.0.1:8080:80"
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - app
-    networks:
-      - app-network
-
-volumes:
-  mysql-data:
-
-networks:
-  app-network:
-    driver: bridge
-```
 
 ---
 
@@ -671,242 +679,17 @@ networks:
 
 ---
 
-### 4-5. Docker Compose로 실행하기
-
-1. `compose-app` 디렉토리에서 모든 서비스를 시작합니다.
-   ```bash
-   cd ~/environment/eks-edu/01_01_docker/compose-app
-   docker compose up -d
-   ```
-
-   아래와 유사한 출력이 표시됩니다.
-   ```
-   [+] Running 4/4
-    ✔ Network compose-app_app-network  Created
-    ✔ Volume "compose-app_mysql-data"  Created
-    ✔ Container compose-mysql          Healthy
-    ✔ Container compose-app            Started
-    ✔ Container compose-nginx          Started
-   ```
-
----
-
-2. 모든 서비스가 정상적으로 실행되었는지 확인합니다.
-   ```bash
-   docker compose ps
-   ```
-
-   3개의 서비스가 모두 `running` 상태여야 합니다.
-
----
-
-3. 애플리케이션이 정상 동작하는지 확인합니다.
-
-   헬스체크 엔드포인트를 호출합니다.
-   ```bash
-   curl http://localhost:8080/health
-   ```
-
-   아래와 같은 응답이 출력되면 정상입니다.
-   ```json
-   {"status":"ok","timestamp":"2025-04-28T09:00:00.000Z"}
-   ```
-
----
-
-   메인 엔드포인트를 호출합니다.
-   ```bash
-   curl http://localhost:8080/
-   ```
-
-   아래와 같이 DB 연결 시간과 함께 응답이 출력되면 모든 서비스가 정상적으로 연동된 것입니다. 🎉
-   ```json
-   {
-     "message": "Docker Compose 실습에 오신 것을 환영합니다!",
-     "db_time": "2025-04-28T09:00:00.000Z",
-     "hostname": "abc123def456"
-   }
-   ```
-
----
-
-### 4-6. 서비스 로그 확인하기
-
-각 서비스의 로그를 확인할 수 있습니다.
-
-1. 모든 서비스의 로그를 한 번에 확인합니다.
-   ```bash
-   docker compose logs
-   ```
-
-2. 특정 서비스의 로그만 실시간으로 확인합니다.
-   ```bash
-   docker compose logs -f app
-   ```
-
-3. 로그 확인을 종료하려면 `Ctrl + C`를 누릅니다.
-
----
-
-### 4-7. 서비스 컨테이너에 접속하기
-
-실행 중인 서비스 컨테이너에 직접 접속하여 내부를 확인할 수 있습니다.
-
-1. MySQL 컨테이너에 접속하여 데이터베이스를 확인합니다.
-   ```bash
-   docker compose exec mysql mysql -u appuser -papppassword composedb
-   ```
-
-   MySQL 프롬프트가 표시되면 아래 명령을 실행해 봅니다.
-   ```sql
-   SHOW DATABASES;
-   SELECT NOW();
-   EXIT;
-   ```
-
----
-
-2. App 컨테이너에 접속하여 환경 변수를 확인합니다.
-   ```bash
-   docker compose exec app sh
-   ```
-
-   컨테이너 내부에서 환경 변수를 확인합니다.
-   ```bash
-   echo $DB_HOST
-   echo $DB_NAME
-   exit
-   ```
-
----
-
-## 5. Docker Compose 심화
-
-### 5-1. 환경 변수 파일 (.env) 활용
-
-`docker-compose.yml`에 직접 환경 변수를 작성하는 대신, `.env` 파일을 사용하여 관리할 수 있습니다.
-
-1. `compose-app` 디렉토리에 `.env` 파일을 생성합니다.
-   ```bash
-   cd ~/environment/eks-edu/01_01_docker/compose-app
-   ```
-
-   ```env
-   MYSQL_ROOT_PASSWORD=rootpassword
-   MYSQL_DATABASE=composedb
-   MYSQL_USER=appuser
-   MYSQL_PASSWORD=apppassword
-   APP_PORT=3000
-   NGINX_PORT=8080
-   ```
-
----
-
-2. `docker-compose.yml`에서 `.env` 파일의 변수를 참조할 수 있습니다.
-   ```yaml
-   services:
-     mysql:
-       image: mysql:8.0
-       environment:
-         MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-         MYSQL_DATABASE: ${MYSQL_DATABASE}
-         MYSQL_USER: ${MYSQL_USER}
-         MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-   ```
-
-   `.env` 파일은 `docker-compose.yml`과 같은 디렉토리에 위치하면 자동으로 로드됩니다.
-
----
-
-### 5-2. Docker Compose 프로필(Profile)
-
-프로필을 사용하면 개발/운영 환경에 따라 특정 서비스만 선택적으로 실행할 수 있습니다.
-
-```yaml
-services:
-  app:
-    build: ./app
-    # ... (기존 설정)
-
-  mysql:
-    image: mysql:8.0
-    # ... (기존 설정)
-
-  # 개발 환경에서만 사용하는 DB 관리 도구
-  adminer:
-    image: adminer:latest
-    ports:
-      - "127.0.0.1:9090:8080"
-    profiles:
-      - debug
-    depends_on:
-      - mysql
-    networks:
-      - app-network
-```
-
----
-
-```bash
-# 기본 서비스만 실행 (adminer 제외)
-docker compose up -d
-
-# debug 프로필 포함하여 실행 (adminer 포함)
-docker compose --profile debug up -d
-```
-
----
-
 ## 6. 실습 환경 삭제하기
 
-실습이 모두 완료되었다면, 실습 중 생성한 리소스들을 삭제하여 환경을 정리합니다.
-
----
-
-### 6-1. Docker Compose 서비스 삭제
-
-Docker Compose로 실행한 모든 서비스를 중지하고 삭제합니다.
+생성된 자원을 삭제하려면 CloudShell 에서 아래 명령어어를 입력해 주세요.
 
 ```bash
-cd ~/environment/eks-edu/01_01_docker/compose-app
-docker compose down -v
+export IDE_NAME=mzc-kjh
+
+aws cloudformation delete-stack --stack-name eks-workshop-${IDE_NAME}
 ```
 
-| 옵션 | 설명 |
-| --- | --- |
-| `down` | 모든 서비스를 중지하고 컨테이너, 네트워크를 삭제 |
-| `-v` | 생성된 볼륨(mysql-data)도 함께 삭제 |
-
----
-
-### 6-2. Multi-stage Build 실습 이미지 삭제
-
-```bash
-docker rmi go-app-normal go-app-multistage
-```
-
----
-
-### 6-3. Docker Compose 실습 이미지 삭제
-
-```bash
-docker rmi compose-app-app
-```
-
-사용하지 않는 이미지를 일괄 삭제하려면 아래 명령을 사용합니다. (선택사항)
-```bash
-docker image prune -a
-```
-
----
-
-### 6-4. 실습 디렉토리 삭제 (선택사항)
-
-실습에서 생성한 소스 파일을 삭제합니다.
-```bash
-rm -rf ~/environment/eks-edu/01_01_docker/multi-stage-app
-rm -rf ~/environment/eks-edu/01_01_docker/compose-app
-```
+CloudShell이 아닌 CloudFormation에서 직접 Stack 을 선택하여 삭제하셔도 됩니다.
 
 ---
 

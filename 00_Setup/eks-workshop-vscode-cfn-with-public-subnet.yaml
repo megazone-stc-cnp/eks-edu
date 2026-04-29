@@ -144,6 +144,11 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        - Description: Allow HTTP from anywhere (Public IP direct access)
+          IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - Description: Allow all outbound traffic
           IpProtocol: -1
@@ -329,6 +334,9 @@ Resources:
 
                   echo ">>> install java"
                   sudo dnf install -y java-17-amazon-corretto
+
+                  echo ">>> install maven"
+                  sudo dnf install -y maven
                   
                   echo ">>> Install code-server"
                   cat <<"EOT" | sudo -E -H -u ec2-user bash
