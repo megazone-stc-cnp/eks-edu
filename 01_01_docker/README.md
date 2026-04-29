@@ -116,7 +116,26 @@ docker images
 
 ### 3. Docker 파일 사이즈 최적화
 
-#### 3.1 Multi-stage Build 적용
+### 3.1 Multi-stage Build란?
+
+Multi-stage Build는 하나의 Dockerfile 안에서 **여러 개의 `FROM` 지시문**을 사용하여 빌드 단계를 분리하는 기법입니다.
+
+#### 3.2 일반적인 빌드의 문제점
+
+Java, Go, TypeScript 등의 언어로 작성된 애플리케이션은 빌드 과정에서 컴파일러, 빌드 도구, 의존성 라이브러리 등이 필요합니다.
+하지만 실제 실행 시에는 이러한 빌드 도구가 필요하지 않습니다.
+
+#### 3.3 Multi-stage Build의 효과
+
+| 항목 | 일반 빌드 | Multi-stage Build |
+| --- | --- | --- |
+| 이미지 크기 | ~800MB (Go 컴파일러 포함) | ~15MB (Alpine + 바이너리) |
+| 보안 | 빌드 도구, 소스 코드 노출 | 실행에 필요한 파일만 포함 |
+| 빌드 속도 | 단일 단계 | 레이어 캐싱 활용 가능 |
+
+---
+
+#### 3.4 Multi-stage Build 적용
 ```
 - Dockerfile을 아래와 같이 수정
 # ---- 빌드 스테이지 ----
@@ -140,7 +159,7 @@ EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
-#### 3.2 Docker Image 생성
+#### 3.5 Docker Image 생성
 1. 아래 명령으로 기존 docker image 여부 확인
 
 ```
@@ -293,7 +312,80 @@ docker run -d --name my_spring_boot -p 8080:8080 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS
 
 ### 8. mysql 연동
 
-#### 8.1 docker run 명령을 docker-compose.yaml 로 변경
+##### 8.1 Docker Compose란?
+
+Docker Compose는 **여러 개의 컨테이너로 구성된 애플리케이션**을 정의하고 실행하기 위한 도구입니다.
+
+하나의 `docker-compose.yml` (또는 `compose.yml`) 파일에 애플리케이션을 구성하는 모든 서비스를 정의하고, `docker compose up` 명령 하나로 모든 서비스를 한 번에 시작할 수 있습니다.
+
+##### 8.2 Docker Compose가 필요한 이유
+
+실제 애플리케이션은 대부분 여러 컴포넌트로 구성됩니다.
+
+예를 들어, 일반적인 웹 애플리케이션은 다음과 같은 구성을 가집니다.
+
+```
+┌──────────┐     ┌──────────┐     ┌──────────┐
+│  Nginx   │────▶│  App     │────▶│  MySQL   │
+│ (Web)    │     │ (API)    │     │  (DB)    │
+└──────────┘     └──────────┘     └──────────┘
+```
+
+이 구성을 Docker CLI만으로 실행하려면 다음과 같이 여러 명령을 순서대로 실행해야 합니다.
+
+---
+
+```bash
+# 네트워크 생성
+docker network create app-network
+
+# MySQL 실행
+docker run -d --name mysql --network app-network \
+  -e MYSQL_ROOT_PASSWORD=secret \
+  -e MYSQL_DATABASE=myapp \
+  mysql:8.0
+
+# App 실행
+docker run -d --name app --network app-network \
+  -e DB_HOST=mysql \
+  app-image:latest
+
+# Nginx 실행
+docker run -d --name nginx --network app-network \
+  -p 80:80 \
+  nginx:latest
+```
+
+컨테이너가 늘어날수록 관리가 복잡해지고, 실행 순서나 환경 변수 관리가 어려워집니다.
+
+##### 8.3 docker-compose.yml 구조
+
+Docker Compose는 YAML 파일을 사용하여 서비스를 정의합니다.
+
+```yaml
+services:
+  <서비스명>:
+    image: <이미지명>          # 사용할 Docker 이미지
+    build: <빌드경로>          # 또는 Dockerfile로 빌드
+    ports:                     # 포트 매핑
+      - "호스트:컨테이너"
+    environment:               # 환경 변수
+      - KEY=VALUE
+    volumes:                   # 볼륨 마운트
+      - 호스트경로:컨테이너경로
+    depends_on:                # 의존 서비스 (시작 순서)
+      - <다른서비스명>
+    networks:                  # 네트워크 연결
+      - <네트워크명>
+
+volumes:                       # 볼륨 정의
+  <볼륨명>:
+
+networks:                      # 네트워크 정의
+  <네트워크명>:
+```
+
+#### 8.4 docker run 명령을 docker-compose.yaml 로 변경
 
 1. docker run 명령어에서 필요한 항목들을 추출
 ```
@@ -305,6 +397,10 @@ tag : v2
 
 2. 이 정보 기반으로 docker-compose.yaml 생성
 ```
+cd ~/environment/spring-boot-hello-world-sample
+touch docker-compose.yaml
+
+# 아래 내용 복사
 services:
   my_spring_boot:
     container_name: my_spring_boot   # --name 에 해당
@@ -315,6 +411,9 @@ services:
 
 3. .env 에 아래 내용 생성
 ```
+touch .env
+
+# 아래 내용 복사
 AWS_ACCOUNT_ID=539666729110
 AWS_REGION=ap-northeast-2
 ```
@@ -374,7 +473,7 @@ docker compose ps
 docker compose logs db
 ```
 
-#### 9. 연동
+### 9. 연동
 
 1. my_spring_boot 앱과 db를 연결 작업
 ```
@@ -436,7 +535,7 @@ docker compose down
 
 docker compose up -d
 ```
-## 1. Docker 명령어
+### 10. Docker 명령어 정리
 
 Docker의 주요 명령어와 리소스 간의 관계는 다음과 같습니다.
 
@@ -494,9 +593,7 @@ Docker의 주요 명령어와 리소스 간의 관계는 다음과 같습니다.
 | | `docker commit <컨테이너>` | 컨테이너를 이미지로 저장 |
 
 
-## 2. Dockerfile 심화
-
-### 2-1. Docker 이미지 레이어 구조
+### 11. Docker 이미지 레이어 구조
 
 Docker 이미지는 여러 개의 읽기 전용 레이어(Layer)로 구성됩니다.
 Dockerfile의 각 지시문(`FROM`, `RUN`, `COPY` 등)은 하나의 레이어를 생성하며, 이 레이어들이 순서대로 쌓여 최종 이미지를 구성합니다.
@@ -526,30 +623,7 @@ Dockerfile의 각 지시문(`FROM`, `RUN`, `COPY` 등)은 하나의 레이어를
 
 ---
 
-### 2-2. Multi-stage Build란?
-
-Multi-stage Build는 하나의 Dockerfile 안에서 **여러 개의 `FROM` 지시문**을 사용하여 빌드 단계를 분리하는 기법입니다.
-
-이 기법이 필요한 이유를 예시로 살펴보겠습니다.
-
----
-
-#### 일반적인 빌드의 문제점
-
-Java, Go, TypeScript 등의 언어로 작성된 애플리케이션은 빌드 과정에서 컴파일러, 빌드 도구, 의존성 라이브러리 등이 필요합니다.
-하지만 실제 실행 시에는 이러한 빌드 도구가 필요하지 않습니다.
-
-#### Multi-stage Build의 효과
-
-| 항목 | 일반 빌드 | Multi-stage Build |
-| --- | --- | --- |
-| 이미지 크기 | ~800MB (Go 컴파일러 포함) | ~15MB (Alpine + 바이너리) |
-| 보안 | 빌드 도구, 소스 코드 노출 | 실행에 필요한 파일만 포함 |
-| 빌드 속도 | 단일 단계 | 레이어 캐싱 활용 가능 |
-
----
-
-#### 빌드 효율을 높이는 팁
+### 12. 기타
 
 1. **변경이 적은 파일을 먼저 COPY**: `package.json`을 먼저 복사하고 `yarn install`을 실행하면, 소스 코드만 변경되었을 때 의존성 설치 레이어가 캐싱됩니다.
 
@@ -566,89 +640,7 @@ Java, Go, TypeScript 등의 언어로 작성된 애플리케이션은 빌드 과
 
 ---
 
-## 2. Docker Compose
-
-### 2-1. Docker Compose란?
-
-Docker Compose는 **여러 개의 컨테이너로 구성된 애플리케이션**을 정의하고 실행하기 위한 도구입니다.
-
-하나의 `docker-compose.yml` (또는 `compose.yml`) 파일에 애플리케이션을 구성하는 모든 서비스를 정의하고,
-`docker compose up` 명령 하나로 모든 서비스를 한 번에 시작할 수 있습니다.
-
----
-
-### 2-2. Docker Compose가 필요한 이유
-
-실제 애플리케이션은 대부분 여러 컴포넌트로 구성됩니다.
-
-예를 들어, 일반적인 웹 애플리케이션은 다음과 같은 구성을 가집니다.
-
-```
-┌──────────┐     ┌──────────┐     ┌──────────┐
-│  Nginx   │────▶│  App     │────▶│  MySQL   │
-│ (Web)    │     │ (API)    │     │  (DB)    │
-└──────────┘     └──────────┘     └──────────┘
-```
-
-이 구성을 Docker CLI만으로 실행하려면 다음과 같이 여러 명령을 순서대로 실행해야 합니다.
-
----
-
-```bash
-# 네트워크 생성
-docker network create app-network
-
-# MySQL 실행
-docker run -d --name mysql --network app-network \
-  -e MYSQL_ROOT_PASSWORD=secret \
-  -e MYSQL_DATABASE=myapp \
-  mysql:8.0
-
-# App 실행
-docker run -d --name app --network app-network \
-  -e DB_HOST=mysql \
-  app-image:latest
-
-# Nginx 실행
-docker run -d --name nginx --network app-network \
-  -p 80:80 \
-  nginx:latest
-```
-
-컨테이너가 늘어날수록 관리가 복잡해지고, 실행 순서나 환경 변수 관리가 어려워집니다.
-
----
-
-### 2-3. docker-compose.yml 구조
-
-Docker Compose는 YAML 파일을 사용하여 서비스를 정의합니다.
-
-```yaml
-services:
-  <서비스명>:
-    image: <이미지명>          # 사용할 Docker 이미지
-    build: <빌드경로>          # 또는 Dockerfile로 빌드
-    ports:                     # 포트 매핑
-      - "호스트:컨테이너"
-    environment:               # 환경 변수
-      - KEY=VALUE
-    volumes:                   # 볼륨 마운트
-      - 호스트경로:컨테이너경로
-    depends_on:                # 의존 서비스 (시작 순서)
-      - <다른서비스명>
-    networks:                  # 네트워크 연결
-      - <네트워크명>
-
-volumes:                       # 볼륨 정의
-  <볼륨명>:
-
-networks:                      # 네트워크 정의
-  <네트워크명>:
-```
-
----
-
-### 2-4. Docker Compose 주요 명령어
+### 13. Docker Compose 주요 명령어
 
 | 명령어 | 설명 |
 | --- | --- |
@@ -663,10 +655,7 @@ networks:                      # 네트워크 정의
 | `docker compose stop` | 모든 서비스 중지 (컨테이너 유지) |
 | `docker compose restart` | 모든 서비스 재시작 |
 
-
----
-
-위 `docker-compose.yml`의 주요 내용을 살펴보겠습니다.
+### 14. `docker-compose.yml`의 주요 내용
 
 | 항목 | 설명 |
 | --- | --- |
@@ -679,17 +668,19 @@ networks:                      # 네트워크 정의
 
 ---
 
-## 6. 실습 환경 삭제하기
+## 실습 환경 삭제하기
 
 생성된 자원을 삭제하려면 CloudShell 에서 아래 명령어어를 입력해 주세요.
 
 ```bash
-export IDE_NAME=mzc-kjh
+export IDE_NAME=9641173
 
 aws cloudformation delete-stack --stack-name eks-workshop-${IDE_NAME}
 ```
 
 CloudShell이 아닌 CloudFormation에서 직접 Stack 을 선택하여 삭제하셔도 됩니다.
+
+ECR에 등록된 이미지도 삭제해 주세요.
 
 ---
 
