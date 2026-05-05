@@ -6,7 +6,7 @@ set -e
 docker_compose_version='2.34.0'                 # unknown
 
 # kind
-kind_version='0.27.0'                           # 2025-02-15
+kind_version='0.31.0'                           # 2025-02-15
 
 # renovate: depName=kubernetes/kubernetes
 kubectl_version='1.35.3'                        # 2026-03-19
