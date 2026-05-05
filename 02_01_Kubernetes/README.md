@@ -1,4 +1,4 @@
-# Docker 심화
+# Kubernetes 심화
 
 ## 사전 조건
 - [0. 교육 환경 구성하기](/00_Setup/README.md) 내용 기반으로 아래의 코드로 생성된 `code-server`에 접속한 상태여야 합니다.
@@ -169,11 +169,15 @@ kubectl create secret generic ${SECRET_NAME} \
   --from-literal=postgres-password="${ADMIN_PASSWORD}" \
   --from-literal=password="springpwd" \
   -n $NAMESPACE_NAME
+
+# 확인하기
+kubectl -n samchun get secret postgresql-secret -oyaml
 ```
 
 4. 설정값을 세팅하게 value.yaml 파일을 아래 내용으로 작성한다.
 
 ```
+cd ~/environment/eks-edu/02_01_Kubernetes
 touch value.yaml
 
 # 아래 내용을 작성
@@ -190,6 +194,11 @@ auth:
   secretKeys:
     adminPasswordKey: "postgres-password"   # postgres 슈퍼유저
     userPasswordKey: "password"             # springuser
+
+primary:
+  persistence:
+    enabled: true
+    size: 1Gi
 ```
 
 4. postgresql을 helm 명령을 이용해서 생성한다.
@@ -204,6 +213,7 @@ echo $CHART_VERSION
 helm install ${RELEASE_NAME} \
   bitnami/postgresql \
   -n $NAMESPACE_NAME \
+  -f value.yaml \
   --version ${CHART_VERSION}
 ```
 
@@ -226,7 +236,247 @@ kubectl get pods -n samchun
 -> my-postgresql-0
 
 kubectl exec -it my-postgresql-0 -n samchun -- \
-  psql -U springuser -d springdb
+  env PGPASSWORD=springpwd psql -U springuser -d springdb
+```
+
+7. temp 테이블 생성하기
+```
+CREATE TABLE temp (
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+8. 테이블 생성 확인
+```
+\dt
+```
+
+#### 4.2 pod를 재기동하기
+
+1. pod를 삭제하기
+```
+kubectl -n samchun get pods
+
+kubectl -n samchun delete pod my-postgresql-0
+```
+
+2. 테이블이 존재하는지 확인
+```
+kubectl get pods -n samchun
+
+-> my-postgresql-0
+
+kubectl exec -it my-postgresql-0 -n samchun -- \
+  env PGPASSWORD=springpwd psql -U springuser -d springdb
+
+springdb=> \dt
+```
+
+3. 데이터 저장하는 Persistent Volume이 존재하는지 확인
+```
+kubectl -n samchun get pods -oyaml
+
+# 아래 내용이 존재하는지 확인
+volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: data-my-postgresql-0
+```
+
+### 5. Application 배포
+#### 5.1 deployment 생성
+1. deployment 생성
+```
+DEPLOYMENT_NAME=my-springboot
+IMAGE_NAME=public.ecr.aws/a8c1n9n2/hcseo/my_spring_boot:v2
+PORT_NAME=8080
+
+echo $DEPLOYMENT_NAME
+echo $IMAGE_NAME
+echo $NAMESPACE_NAME
+echo $PORT_NAME
+
+kubectl -n $NAMESPACE_NAME create deployment ${DEPLOYMENT_NAME} --image=${IMAGE_NAME} --port=$PORT_NAME
+```
+
+2. deployment 생성이 잘되었는지 확인
+```
+kubectl -n $NAMESPACE_NAME get deploy
+```
+
+3. 제대로 안떠 있는 부분을 확인
+
+![alt text](<CleanShot 2026-05-06 at 01.03.14.png>)
+
+4. 로그 확인
+
+```
+kubectl -n $NAMESPACE_NAME get pods
+
+-> NAME: my-springboot-677c6dbd6c-shqcj
+kubectl -n $NAMESPACE_NAME logs my-springboot-677c6dbd6c-shqcj
+```
+
+#### 5.2 deploy를 띄울 때 Database 연동하게 config 작업
+
+1. 배포된 deployment 정보를 yaml로 저장하기
+```
+DEPLOYMENT_NAME=my-springboot
+
+echo $DEPLOYMENT_NAME
+echo $NAMESPACE_NAME
+
+kubectl -n $NAMESPACE_NAME get deployment ${DEPLOYMENT_NAME} -oyaml | tee temp_deployment.yaml
+```
+
+2. Database에 접속할 도메인 정보를 찾는다.
+```
+kubectl -n samchun get service
+
+-> NAME: my-postgresql
+```
+
+3. Application에 접속할 데이터 베이스 정보를 뽑는다.
+```
+SPRING_DATASOURCE_URL=jdbc:postgresql://my-postgresql:5432/springdb
+SPRING_DATASOURCE_USERNAME=springuser
+SPRING_DATASOURCE_PASSWORD=springpwd
+```
+
+4. deployment에 환경 변수를 주입하기 위해 secret를 생성한다.
+```
+touch springboot-secret.yaml
+
+# 아래 내용을 등록한다.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: spring-boot-secret
+type: Opaque
+stringData:
+  datasource-url: jdbc:postgresql://my-postgresql:5432/springdb
+  datasource-username: springuser
+  datasource-password: springpwd
+```
+
+5. 아래와 같이 secret를 생성한다.
+```
+kubectl -n samchun apply -f springboot-secret.yaml
+```
+
+6. 생성이 잘 되었는지 확인한다.
+```
+kubectl -n samchun get secret
+```
+
+7. temp_deployment.yaml 에 아래와 같이 변경한다.
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-springboot
+  namespace: samchun
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-springboot
+  template:
+    metadata:
+      labels:
+        app: my-springboot
+    spec:
+      containers:
+      - image: public.ecr.aws/a8c1n9n2/hcseo/my_spring_boot:v2
+        imagePullPolicy: IfNotPresent
+        name: my-spring-boot-4psh4
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+          - name: SPRING_DATASOURCE_URL
+            valueFrom:
+              secretKeyRef:
+                name: spring-boot-secret
+                key: datasource-url
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: spring-boot-secret
+                key: datasource-username
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: spring-boot-secret
+                key: datasource-password
+```
+
+8. deployment 재기동
+```
+kubectl -n samchun get deploy
+
+kubectl -n samchun delete deploy/my-springboot
+
+kubectl -n samchun apply -f temp_deployment.yaml
+``` 
+
+9. pod가 잘 떴는지 확인
+```
+kubectl -n samchun get pods
+```
+
+10. 아래와 같이 정상적으로 떴는지 확인
+
+![alt text](<CleanShot 2026-05-06 at 01.36.04.png>)
+
+#### 5.3 외부에서 서비스를 유입 받게 서비스 생성
+1. 서비스 생성
+```
+DEPLOYMENT_NAME=my-springboot
+NAMESPACE_NAME=samchun
+PORT_NAME=8080
+
+echo $DEPLOYMENT_NAME
+echo $NAMESPACE_NAME
+echo $PORT_NAME
+
+kubectl -n ${NAMESPACE_NAME} expose deployment $DEPLOYMENT_NAME --port=$PORT_NAME --target-port=$PORT_NAME
+```
+
+2. 서비스가 제대로 생성되었는지 확인
+```
+kubectl -n ${NAMESPACE_NAME} get service
+
+kubectl -n ${NAMESPACE_NAME} get endpoints
+```
+
+#### 5.4 Ingress 생성
+1. springboot-ingress.yaml 로 배포
+```
+cat > springboot-ingress.yaml<<EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-springboot-ingress
+  namespace: samchun  
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-springboot
+                port:
+                  number: 8080
+EOF
+
+kubectl apply -f springboot-ingress.yaml
 ```
 
 ## 참고 URL
