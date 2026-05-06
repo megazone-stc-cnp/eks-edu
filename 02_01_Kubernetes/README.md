@@ -544,6 +544,126 @@ http://<Public IP>:8000/
 
 ![alt text](<images/CleanShot 2026-05-06 at 18.20.43.png>)
 
+#### 5.6 /app/logs 디렉토리를 유지하기 위해서, Persistent Volume을 연동
+1. 기존 Storageclass 이름 확인하기
+```
+kubectl get storageclass
+
+-> NAME: standard
+```
+
+2. PVC를 생성
+```
+PVC_NAME=my-springboot-pvc
+
+echo ${PVC_NAME}
+
+cat >my_springboot_pvc.yaml<<EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-springboot-pvc
+  namespace: samchun
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard # Maps to local-path in KinD
+  resources:
+    requests:
+      storage: 1Gi
+EOF
+
+kubectl apply -f my_springboot_pvc.yaml
+```
+
+3. PVC 생성이 잘되었는지 확인
+```
+kubectl -n samchun get pvc
+```
+
+4. 아직 Pod에서 사용하지 않기 때문에 Volume이 생성되지 않았다.
+
+![alt text](<images/CleanShot 2026-05-06 at 21.07.38.png>)
+
+5. temp_deployment.yaml에 내용 추가
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: my-springboot
+  name: my-springboot
+  namespace: samchun
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: my-springboot
+  template:
+    metadata:
+      labels:
+        app: my-springboot
+    spec:
+      containers:
+      - image: public.ecr.aws/a8c1n9n2/hcseo/my_spring_boot:v2
+        imagePullPolicy: Always
+        name: my-spring-boot-2wvkg
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+          - name: SPRING_DATASOURCE_URL
+            valueFrom:
+              secretKeyRef:
+                name: spring-boot-secret
+                key: datasource-url
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: spring-boot-secret
+                key: datasource-username
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: spring-boot-secret
+                key: datasource-password
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /app/logs
+      volumes:
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: my-springboot-pvc
+```
+
+6. deploy를 다시 시작한다.
+```
+kubectl apply -f temp_deployment.yaml
+```
+
+9. deploy를 삭제하고 다시 띄어본다.
+```
+# deployment를 삭제한다.
+kubectl -n samchun delete deploy my-springboot
+
+# 삭제된것 확인
+kubectl -n samchun get deploy
+
+# 다시 배포
+kubectl apply -f temp_deployment.yaml
+```
+
+10. container안에 들어가서 /app/logs 디렉토리 내용이 유지되는지 확인
+```
+k exec -it my-springboot-ddcfddc97-rlf8r -- sh
+
+ls /app/logs
+```
+
 ---
 
 ## 실습 환경 삭제하기
