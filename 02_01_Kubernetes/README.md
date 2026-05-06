@@ -1,4 +1,4 @@
-# Kubernetes 심화
+# Kubernetes 실습
 
 ## 사전 조건
 - [0. 교육 환경 구성하기](/00_Setup/README.md) 내용 기반으로 아래의 코드로 생성된 `code-server`에 접속한 상태여야 합니다.
@@ -32,7 +32,7 @@ kind get clusters
 
 아래와 같이 kind가 존재하지 않아야 한다.
 
-![alt text](<CleanShot 2026-05-04 at 22.57.11.png>)
+![alt text](<images/CleanShot 2026-05-04 at 22.57.11.png>)
 
 ### 2. kind cluster 생성
 
@@ -75,7 +75,7 @@ kubectl cluster-info --context kind-kind
 
 아래와 같이 정보가 나오면 정상적으로 생성된 것인다.
 
-![alt text](<CleanShot 2026-05-04 at 23.13.00.png>)
+![alt text](<images/CleanShot 2026-05-04 at 23.13.00.png>)
 
 ### 3. 외부 서비스를 위해서 ingress-nginx를 배포한다.
 ```
@@ -97,7 +97,7 @@ kubectl -n ingress-nginx get pods
 
 아래와 같이 정상적으로 Pod가 올라와 있다.
 
-![alt text](<CleanShot 2026-05-04 at 23.17.55.png>)
+![alt text](<images/CleanShot 2026-05-04 at 23.17.55.png>)
 
 ## 개발 시나리오
 
@@ -226,7 +226,7 @@ helm -n samchun list
 
 아래와 같이 상태가 deployed 가 나와야 한다.
 
-![alt text](<CleanShot 2026-05-05 at 23.08.22.png>)
+![alt text](<images/CleanShot 2026-05-05 at 23.08.22.png>)
 
 6. 데이터베이스가 잘 생성되었는지 확인
 
@@ -309,7 +309,7 @@ kubectl -n $NAMESPACE_NAME get deploy
 
 3. 제대로 안떠 있는 부분을 확인
 
-![alt text](<CleanShot 2026-05-06 at 01.03.14.png>)
+![alt text](<images/CleanShot 2026-05-06 at 01.03.14.png>)
 
 4. 로그 확인
 
@@ -430,7 +430,7 @@ kubectl -n samchun get pods
 
 10. 아래와 같이 정상적으로 떴는지 확인
 
-![alt text](<CleanShot 2026-05-06 at 01.36.04.png>)
+![alt text](<images/CleanShot 2026-05-06 at 01.36.04.png>)
 
 #### 5.3 외부에서 서비스를 유입 받게 서비스 생성
 1. 서비스 생성
@@ -481,3 +481,7 @@ kubectl apply -f springboot-ingress.yaml
 
 ## 참고 URL
 - [Kubectl 명령어 Cheat](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands)
+- [파드](https://kubernetes.io/ko/docs/concepts/workloads/pods/)
+- [서비스](https://kubernetes.io/ko/docs/concepts/services-networking/service/)
+- [인그레스](https://kubernetes.io/ko/docs/concepts/services-networking/ingress/)
+- [deployment](https://kubernetes.io/ko/docs/concepts/workloads/controllers/deployment/)
