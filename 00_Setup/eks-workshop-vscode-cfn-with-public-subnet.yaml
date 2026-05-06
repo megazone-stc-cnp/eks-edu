@@ -149,6 +149,11 @@ Resources:
           FromPort: 8080
           ToPort: 8080
           CidrIp: 0.0.0.0/0
+        - Description: Allow HTTP from anywhere (Public IP direct access)
+          IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - Description: Allow all outbound traffic
           IpProtocol: -1
