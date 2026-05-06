@@ -39,11 +39,11 @@ kind get clusters
 #### 2.0 작업 디렉토리로 이동
 ```
 cd ~/environment/eks-edu/02_01_Kubernetes
-touch kind-config.yaml
 ```
 
 #### 2.1 아래의 내용으로 kind-config.yaml를 생성해 준다.
 ```
+cat >kind-config.yaml<<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -61,6 +61,7 @@ nodes:
   - containerPort: 443
     hostPort: 443
     protocol: TCP
+EOF
 ```
 
 #### 2.2 kind cluster 생성 
@@ -124,6 +125,9 @@ cd spring-boot-hello-world-sample
 
 ```
 NAMESPACE_NAME=samchun
+
+echo $NAMESPACE_NAME
+
 kubectl create namespace ${NAMESPACE_NAME}
 ```
 
@@ -151,9 +155,15 @@ helm repo update
 helm search repo bitnami
 
 -> bitnami/postgresql
+-> CHART VERSION : 18.6.2
 ```
 
-4. postgresql은 보안상 패스워드를 보안상 평문으로 저장하지 않기 위해 secret 컴포넌트로 저장한다.
+4. 수정해야 할 values.yaml 을 다운로드 받는다.
+```
+helm show values bitnami/postgresql --version 18.6.2 > origin_values.yaml
+```
+
+5. postgresql은 보안상 패스워드를 보안상 평문으로 저장하지 않기 위해 secret 컴포넌트로 저장한다.
 
 ```
 SECRET_NAME=postgresql-secret
@@ -167,22 +177,24 @@ echo $NAMESPACE_NAME
 
 kubectl create secret generic ${SECRET_NAME} \
   --from-literal=postgres-password="${ADMIN_PASSWORD}" \
-  --from-literal=password="springpwd" \
+  --from-literal=password="${USER_PASSWORD}" \
   -n $NAMESPACE_NAME
 
 # 확인하기
 kubectl -n samchun get secret postgresql-secret -oyaml
 ```
 
-4. 설정값을 세팅하게 value.yaml 파일을 아래 내용으로 작성한다.
+6. 저장된 data 부분을 Base64로 인코딩되어 있으므로, [Base64 사이트](https://www.base64decode.org/ko/) 에서 암호를 풀어본다.
+
+7. 설정값을 세팅하게 value.yaml 파일을 아래 내용으로 작성한다.
 
 ```
 cd ~/environment/eks-edu/02_01_Kubernetes
-touch value.yaml
 
 # 아래 내용을 작성
 # values.yaml - Bitnami PostgreSQL Helm Chart
 
+cat >value.yaml<<EOF
 auth:
   # 생성할 커스텀 유저명
   username: "springuser"
@@ -199,6 +211,7 @@ primary:
   persistence:
     enabled: true
     size: 1Gi
+EOF
 ```
 
 4. postgresql을 helm 명령을 이용해서 생성한다.
@@ -228,7 +241,13 @@ helm -n samchun list
 
 ![alt text](<images/CleanShot 2026-05-05 at 23.08.22.png>)
 
-6. 데이터베이스가 잘 생성되었는지 확인
+6. 설치된 전체 목록을 확인한다.
+```
+echo ${NAMESPACE_NAME} 
+kubectl -n ${NAMESPACE_NAME} get all
+```
+
+7. 데이터베이스가 잘 생성되었는지 확인
 
 ```
 kubectl get pods -n samchun
@@ -254,13 +273,47 @@ CREATE TABLE temp (
 \dt
 ```
 
-#### 4.2 pod를 재기동하기
+#### 4.2 kubectl 명령을 좀더 세련되게
+1. [krew 설치](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
+```
+(
+  set -x; cd "$(mktemp -d)" &&
+  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+  KREW="krew-${OS}_${ARCH}" &&
+  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+  tar zxvf "${KREW}.tar.gz" &&
+  ./"${KREW}" install krew
+)
+```
+2. export 해주기
+```
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+```
+3. [Kubectl plugins available](https://krew.sigs.k8s.io/plugins/) 에서 아래 항목 추가
+```
+kubectl krew install ctx ns df-pv neat get-all
+
+# 상세 설명
+ctx : 여러 Kubernetes를 전환할 때 사용
+ns : default Namespace를 전환할 때 사용
+df-pv : Persistent Volume 조회 때 사용
+neat : yaml 내용을 출력시 불필요한 부분 제거
+get-all : 모든 항목 보이게
+```
+
+4. 아래 명령으로 default Namespace를 samchun 으로 변경
+```
+kubectl ns samchun
+```
+
+#### 4.3 pod를 재기동하기
 
 1. pod를 삭제하기
 ```
-kubectl -n samchun get pods
+kubectl get pods
 
-kubectl -n samchun delete pod my-postgresql-0
+kubectl delete pod my-postgresql-0
 ```
 
 2. 테이블이 존재하는지 확인
@@ -277,7 +330,7 @@ springdb=> \dt
 
 3. 데이터 저장하는 Persistent Volume이 존재하는지 확인
 ```
-kubectl -n samchun get pods -oyaml
+kubectl get pods -oyaml
 
 # 아래 내용이 존재하는지 확인
 volumes:
@@ -317,7 +370,8 @@ kubectl -n $NAMESPACE_NAME get deploy
 kubectl -n $NAMESPACE_NAME get pods
 
 -> NAME: my-springboot-677c6dbd6c-shqcj
-kubectl -n $NAMESPACE_NAME logs my-springboot-677c6dbd6c-shqcj
+POD_NAME=
+kubectl -n $NAMESPACE_NAME logs ${POD_NAME}
 ```
 
 #### 5.2 deploy를 띄울 때 Database 연동하게 config 작업
@@ -348,9 +402,8 @@ SPRING_DATASOURCE_PASSWORD=springpwd
 
 4. deployment에 환경 변수를 주입하기 위해 secret를 생성한다.
 ```
-touch springboot-secret.yaml
-
 # 아래 내용을 등록한다.
+cat >springboot-secret.yaml<<EOF
 apiVersion: v1
 kind: Secret
 metadata:
@@ -360,6 +413,7 @@ stringData:
   datasource-url: jdbc:postgresql://my-postgresql:5432/springdb
   datasource-username: springuser
   datasource-password: springpwd
+EOF
 ```
 
 5. 아래와 같이 secret를 생성한다.
@@ -438,12 +492,14 @@ kubectl -n samchun get pods
 DEPLOYMENT_NAME=my-springboot
 NAMESPACE_NAME=samchun
 PORT_NAME=8080
+SERVICE_NAME=my-springboot-service
 
 echo $DEPLOYMENT_NAME
 echo $NAMESPACE_NAME
 echo $PORT_NAME
+echo $SERVICE_NAME
 
-kubectl -n ${NAMESPACE_NAME} expose deployment $DEPLOYMENT_NAME --port=$PORT_NAME --target-port=$PORT_NAME
+kubectl -n ${NAMESPACE_NAME} expose deployment $DEPLOYMENT_NAME --name=$SERVICE_NAME --port=$PORT_NAME --target-port=$PORT_NAME
 ```
 
 2. 서비스가 제대로 생성되었는지 확인
@@ -471,7 +527,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: my-springboot
+                name: my-springboot-service
                 port:
                   number: 8080
 EOF
@@ -479,9 +535,36 @@ EOF
 kubectl apply -f springboot-ingress.yaml
 ```
 
+#### 5.5 서비스 확인
+```
+http://<Public IP>:8000/
+```
+
+아래와 같이 컨텐츠가 정상적으로 나와야 한다.
+
+![alt text](<images/CleanShot 2026-05-06 at 18.20.43.png>)
+
+---
+
+## 실습 환경 삭제하기
+
+생성된 자원을 삭제하려면 CloudShell 에서 아래 명령어어를 입력해 주세요.
+
+```bash
+export IDE_NAME=9641173
+
+aws cloudformation delete-stack --stack-name eks-workshop-${IDE_NAME}
+```
+
+CloudShell이 아닌 CloudFormation에서 직접 Stack 을 선택하여 삭제하셔도 됩니다.
+
+---
+
 ## 참고 URL
 - [Kubectl 명령어 Cheat](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands)
 - [파드](https://kubernetes.io/ko/docs/concepts/workloads/pods/)
 - [서비스](https://kubernetes.io/ko/docs/concepts/services-networking/service/)
 - [인그레스](https://kubernetes.io/ko/docs/concepts/services-networking/ingress/)
 - [deployment](https://kubernetes.io/ko/docs/concepts/workloads/controllers/deployment/)
+- [Krew install](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
+- [Krew plugins available](https://krew.sigs.k8s.io/plugins/)
