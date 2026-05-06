@@ -27,7 +27,7 @@ Parameters:
   CodeServerInstanceType:
     Type: String
     Description: The instance type to use for code-server
-    Default: "t3.large"
+    Default: "t3a.large"
   CodeServerVersion:
     Type: String
     Description: Default code-server version to use
