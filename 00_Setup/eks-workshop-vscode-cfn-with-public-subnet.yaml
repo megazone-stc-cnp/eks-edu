@@ -187,6 +187,7 @@ Resources:
                   - iam:PassRole
                   - ssm:SendCommand
                   - ssm:GetCommandInvocation
+                  - ssm:DescribeInstanceInformation
                 Resource: "*"
   EksWorkshopIdeBootstrapInstanceLambda:
     Type: Custom::EksWorkshopIdeBootstrapInstanceLambda
