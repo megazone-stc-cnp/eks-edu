@@ -472,6 +472,8 @@ Kubernetes는 컨트롤 플레인(Control Plane) 컴포넌트와 워커 노드(W
 | 클라우드 컨트롤러 매니저(cloud-controller-manager) | 클라우드 환경(AWS, GCP, Azure 등)과의 연동을 담당 |
 | etcd | Kubernetes의 모든 클러스터 데이터를 저장하는 **Key-Value 저장소** |
 
+![alt text](<images/CleanShot 2026-05-07 at 07.22.47@2x.png>)
+
 ---
 
 #### 2-4-2. 워커 노드 컴포넌트
