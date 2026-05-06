@@ -106,7 +106,7 @@ kubectl -n ingress-nginx get pods
 
 - postgresql에 DB에 접속해서 counters 테이블에 호출 횟수를 기록한다. ( 첫 로딩시 counters 테이블이 없으면 생성한다.)
 - "/" 를 호출할 때 마다, Hello World! <이름> ( count : <호출 횟수> ) 를 출력한다.
-- 로그 정보를 /app/logs/YYYYMMDD.log 에 기록한다.
+- 로그 정보를 /app/logs/application.log 에 기록한다. 그 다음날에 app/logs/YYYYMMDD.log 로 복사해서 저장한다.
 
 ```
 cd /home/ec2-user/environment
@@ -146,6 +146,7 @@ kubectl get namespace
 
 2. postgresql repo를 등록한다.
 ```
+cd ~/environment/eks-edu/02_01_Kubernetes
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 ```
@@ -668,7 +669,7 @@ ls /app/logs
 
 ## 실습 환경 삭제하기
 
-생성된 자원을 삭제하려면 CloudShell 에서 아래 명령어어를 입력해 주세요.
+생성된 자원을 삭제하려면 CloudShell 에서 아래 명령어를 입력해 주세요.
 
 ```bash
 export IDE_NAME=9641173
