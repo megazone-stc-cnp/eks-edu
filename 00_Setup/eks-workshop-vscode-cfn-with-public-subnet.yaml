@@ -253,6 +253,29 @@ Resources:
 
                       ssm_document = event['ResourceProperties']['SsmDocument']
 
+                      # Wait for instance to be registered with SSM
+                      print('Waiting for instance to be registered with SSM...')
+                      max_retries = 40
+                      retry_interval = 15
+                      for i in range(max_retries):
+                          response = ssm.describe_instance_information(
+                              Filters=[
+                                  {
+                                      'Key': 'InstanceIds',
+                                      'Values': [instance_id]
+                                  }
+                              ]
+                          )
+                          if response['InstanceInformationList']:
+                              instance_info = response['InstanceInformationList'][0]
+                              if instance_info.get('PingStatus') == 'Online':
+                                  print(f'Instance {instance_id} is registered with SSM and Online (attempt {i+1})')
+                                  break
+                          print(f'Instance not yet registered with SSM, waiting... (attempt {i+1}/{max_retries})')
+                          time.sleep(retry_interval)
+                      else:
+                          raise Exception(f'Instance {instance_id} did not register with SSM within {max_retries * retry_interval} seconds')
+
                       print('Sending SSM command...')
 
                       response = ssm.send_command(
